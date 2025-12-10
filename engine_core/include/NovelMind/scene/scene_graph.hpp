@@ -17,6 +17,7 @@
 #include "NovelMind/renderer/renderer.hpp"
 #include "NovelMind/renderer/color.hpp"
 #include "NovelMind/scene/animation.hpp"
+#include "NovelMind/scene/scene_manager.hpp"  // For LayerType enum
 #include <string>
 #include <memory>
 #include <vector>
@@ -415,16 +416,9 @@ private:
     f32 m_effectDuration = 0.0f;
 };
 
-/**
- * @brief Layer types for scene organization
- */
-enum class LayerType : u8
-{
-    Background,
-    Characters,
-    UI,
-    Effects
-};
+// LayerType is defined in scene_manager.hpp
+// Using forward declaration to avoid duplication
+// Note: This file assumes LayerType is already defined when included
 
 /**
  * @brief Layer - container for scene objects of the same category

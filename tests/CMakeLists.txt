@@ -29,7 +29,10 @@ target_link_libraries(unit_tests
         novelmind_compiler_options
 )
 
-# Register tests
+# Register unit tests
 include(CTest)
 include(Catch)
 catch_discover_tests(unit_tests)
+
+# Note: Integration tests for editor components are defined here but may require
+# additional work as the editor APIs stabilize. For now, focus on unit tests.
