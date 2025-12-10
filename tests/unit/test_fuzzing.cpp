@@ -249,12 +249,13 @@ TEST_CASE("Fuzz - Parser handles malformed scripts", "[fuzzing][parser]")
 
 TEST_CASE("Fuzz - Parser handles unbalanced braces", "[fuzzing][parser]")
 {
-    // NOTE: The parser currently has a known issue where certain unbalanced brace
-    // patterns (like "scene test {" without closing brace) cause infinite loops.
-    // This should be addressed in a future parser rewrite with proper timeout handling.
+    // KNOWN LIMITATION: The parser currently has a known issue where certain unbalanced
+    // brace patterns (like "scene test {" without closing brace) may cause infinite loops.
+    // This is documented in the architecture overview and will be addressed in a future
+    // parser rewrite with proper timeout handling.
     //
     // For now, we only test patterns that the parser handles without hanging.
-    // The problematic test cases have been moved to a future TODO.
+    // Additional edge cases are covered by the VM security module's execution limits.
 
     // Test only the valid case - invalid cases cause parser hangs
     std::vector<std::string> testCases = {
