@@ -5,6 +5,7 @@ add_library(engine_core STATIC
     src/core/timer.cpp
     src/core/profiler.cpp
     src/core/debug_overlay.cpp
+    src/core/property_system.cpp
 
     # Platform
     src/core/platform_sdl.cpp
