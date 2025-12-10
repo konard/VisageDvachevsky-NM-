@@ -29,6 +29,15 @@
 #include <cstring>
 #include <filesystem>
 
+// Platform-specific includes for isatty/fileno
+#ifdef _WIN32
+#include <io.h>
+#define isatty _isatty
+#define fileno _fileno
+#else
+#include <unistd.h>
+#endif
+
 namespace fs = std::filesystem;
 
 // ANSI color codes for terminal output
@@ -399,7 +408,6 @@ int main(int argc, char* argv[]) {
 
         if (opts.showAst) {
             // Print AST info - characters can be printed, but scene body requires special handling
-            const char* bold = useColor ? Color::Bold : "";
             const char* cyan = useColor ? Color::Cyan : "";
             const char* yellow = useColor ? Color::Yellow : "";
             std::cout << "\n=== AST ===\n";

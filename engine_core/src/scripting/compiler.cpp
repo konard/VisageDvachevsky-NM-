@@ -153,7 +153,7 @@ void Compiler::compileScene(const SceneDecl& decl)
 
 void Compiler::compileStatement(const Statement& stmt)
 {
-    std::visit([this, &stmt](const auto& s)
+    std::visit([this](const auto& s)
     {
         using T = std::decay_t<decltype(s)>;
 
