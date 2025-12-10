@@ -6,7 +6,7 @@
 #include <unordered_set>
 #include <functional>
 
-namespace NovelMind::Scripting
+namespace NovelMind::scripting
 {
 
 struct VMSecurityLimits
@@ -121,4 +121,4 @@ private:
     usize m_currentMemory = 0;
 };
 
-} // namespace NovelMind::Scripting
+} // namespace NovelMind::scripting

@@ -1,7 +1,7 @@
 #include "NovelMind/scripting/vm_security.hpp"
 #include <algorithm>
 
-namespace NovelMind::Scripting
+namespace NovelMind::scripting
 {
 
 VMSecurityGuard::VMSecurityGuard(const VMSecurityLimits& limits)
@@ -213,4 +213,4 @@ void VMSandbox::freeMemory(usize bytes)
     }
 }
 
-} // namespace NovelMind::Scripting
+} // namespace NovelMind::scripting

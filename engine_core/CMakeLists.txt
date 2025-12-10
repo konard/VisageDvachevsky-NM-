@@ -32,10 +32,17 @@ add_library(engine_core STATIC
     src/scripting/interpreter.cpp
     src/scripting/vm.cpp
     src/scripting/vm_security.cpp
+    src/scripting/lexer.cpp
+    src/scripting/parser.cpp
+    src/scripting/compiler.cpp
 
     # Scene
     src/scene/scene_manager.cpp
     src/scene/scene_object.cpp
+    src/scene/character_sprite.cpp
+    src/scene/dialogue_box.cpp
+    src/scene/choice_menu.cpp
+    src/scene/transition.cpp
 
     # Input
     src/input/input_manager.cpp
