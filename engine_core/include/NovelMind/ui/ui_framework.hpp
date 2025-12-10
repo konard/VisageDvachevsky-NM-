@@ -489,8 +489,9 @@ private:
     bool m_password = false;
     size_t m_maxLength = 256;
     size_t m_cursorPos = 0;
-    size_t m_selectionStart = 0;
-    size_t m_selectionEnd = 0;
+    // TODO: Implement text selection functionality
+    // size_t m_selectionStart = 0;
+    // size_t m_selectionEnd = 0;
     f32 m_scrollOffset = 0.0f;
     f32 m_cursorBlink = 0.0f;
 

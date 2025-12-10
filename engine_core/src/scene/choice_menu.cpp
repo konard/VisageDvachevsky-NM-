@@ -335,7 +335,6 @@ renderer::Rect ChoiceMenu::getOptionRect(size_t index) const
     }
 
     f32 currentY = menuY + m_style.paddingTop;
-    size_t visibleIndex = 0;
 
     for (size_t i = 0; i < m_options.size(); ++i)
     {
@@ -355,7 +354,6 @@ renderer::Rect ChoiceMenu::getOptionRect(size_t index) const
         }
 
         currentY += m_style.optionHeight + m_style.optionSpacing;
-        ++visibleIndex;
     }
 
     return renderer::Rect{0, 0, 0, 0};
