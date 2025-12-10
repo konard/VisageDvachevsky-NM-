@@ -3,6 +3,7 @@
 #include "NovelMind/vfs/file_handle.hpp"
 #include "NovelMind/vfs/resource_id.hpp"
 #include <memory>
+#include <mutex>
 #include <vector>
 #include <string>
 
