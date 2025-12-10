@@ -1,10 +1,23 @@
-# Resource Compiler and Pack Builder
-# This is a placeholder - actual implementation will come later
+# NovelMind Script Compiler (nmc)
+# Command-line tool for compiling NM Script files to bytecode
 
-message(STATUS "Compiler build is not yet fully implemented")
+# Create the compiler executable
+add_executable(nmc
+    src/main.cpp
+)
 
-# The compiler will be responsible for:
-# - NM Script parsing and compilation
-# - Resource packing and encryption
-# - Asset processing (image optimization, audio conversion)
-# - Final executable building
+target_link_libraries(nmc
+    PRIVATE
+        engine_core
+        novelmind_compiler_options
+)
+
+# Set output name
+set_target_properties(nmc PROPERTIES
+    OUTPUT_NAME "nmc"
+)
+
+# Installation
+install(TARGETS nmc
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)

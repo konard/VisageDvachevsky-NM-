@@ -88,8 +88,11 @@ if(NOVELMIND_BUILD_EDITOR)
     add_subdirectory(editor)
 endif()
 
-# Compiler (always build for testing)
+# Compiler (nmc - NovelMind Script Compiler)
 add_subdirectory(compiler)
+
+# Runtime (console-based visual novel player)
+add_subdirectory(runtime)
 
 # Installation
 include(GNUInstallDirs)
