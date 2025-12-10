@@ -33,6 +33,7 @@ public:
     [[nodiscard]] bool isPaused() const;
     [[nodiscard]] bool isWaiting() const;
     [[nodiscard]] bool isHalted() const;
+    [[nodiscard]] u32 getIP() const { return m_ip; }
 
     void setVariable(const std::string& name, Value value);
     [[nodiscard]] Value getVariable(const std::string& name) const;

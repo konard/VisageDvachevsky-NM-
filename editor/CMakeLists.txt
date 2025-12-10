@@ -6,6 +6,7 @@ add_library(novelmind_editor STATIC
     src/diagnostics_panel.cpp
     src/asset_pipeline.cpp
     src/editor_settings.cpp
+    src/voice_manager.cpp
 )
 
 # Alias for backward compatibility

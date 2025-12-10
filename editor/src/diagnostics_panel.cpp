@@ -563,15 +563,31 @@ scripting::ValidationResult DiagnosticsManager::validateScript(
     const std::string& source,
     const std::string& filePath)
 {
-    // Parse the script first
-    scripting::Lexer lexer(source);
-    auto tokens = lexer.tokenize();
+    (void)filePath;  // Reserved for future use
 
-    scripting::Parser parser(tokens);
-    auto parseResult = parser.parse();
+    // Parse the script first
+    scripting::Lexer lexer;
+    auto tokensResult = lexer.tokenize(source);
 
     scripting::ValidationResult result;
     result.isValid = false;
+
+    if (!tokensResult.isOk())
+    {
+        // Add lexer error
+        scripting::ScriptError error(
+            scripting::ErrorCode::InvalidSyntax,
+            scripting::Severity::Error,
+            tokensResult.error(),
+            scripting::SourceLocation{1, 1}
+        );
+
+        result.errors.add(error);
+        return result;
+    }
+
+    scripting::Parser parser;
+    auto parseResult = parser.parse(tokensResult.value());
 
     if (!parseResult.isOk())
     {
@@ -579,7 +595,7 @@ scripting::ValidationResult DiagnosticsManager::validateScript(
         scripting::ScriptError error(
             scripting::ErrorCode::InvalidSyntax,
             scripting::Severity::Error,
-            parseResult.error().message,
+            parseResult.error(),
             scripting::SourceLocation{1, 1}
         );
 

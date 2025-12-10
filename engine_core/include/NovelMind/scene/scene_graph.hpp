@@ -58,6 +58,8 @@ struct SceneObjectState
     SceneObjectType type;
     f32 x = 0.0f;
     f32 y = 0.0f;
+    f32 width = 100.0f;
+    f32 height = 100.0f;
     f32 scaleX = 1.0f;
     f32 scaleY = 1.0f;
     f32 rotation = 0.0f;

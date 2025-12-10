@@ -155,7 +155,7 @@ Result<void> EditorRuntimeHost::playFromScene(const std::string& sceneId)
             fireStateChanged(m_state);
             if (m_onRuntimeError)
             {
-                m_onRuntimeError("Failed to load script: " + loadResult.error().message);
+                m_onRuntimeError("Failed to load script: " + loadResult.error());
             }
             return loadResult;
         }
@@ -168,7 +168,7 @@ Result<void> EditorRuntimeHost::playFromScene(const std::string& sceneId)
             fireStateChanged(m_state);
             if (m_onRuntimeError)
             {
-                m_onRuntimeError("Failed to go to scene: " + gotoResult.error().message);
+                m_onRuntimeError("Failed to go to scene: " + gotoResult.error());
             }
             return gotoResult;
         }
@@ -824,16 +824,21 @@ Result<void> EditorRuntimeHost::compileProject()
         }
 
         // Lexer
-        scripting::Lexer lexer(allScripts);
-        auto tokens = lexer.tokenize();
+        scripting::Lexer lexer;
+        auto tokensResult = lexer.tokenize(allScripts);
+
+        if (!tokensResult.isOk())
+        {
+            return Result<void>::error("Lexer error: " + tokensResult.error());
+        }
 
         // Parser
-        scripting::Parser parser(tokens);
-        auto parseResult = parser.parse();
+        scripting::Parser parser;
+        auto parseResult = parser.parse(tokensResult.value());
 
         if (!parseResult.isOk())
         {
-            return Result<void>::error("Parse error: " + parseResult.error().message);
+            return Result<void>::error("Parse error: " + parseResult.error());
         }
 
         m_program = std::make_unique<scripting::Program>(std::move(parseResult.value()));
@@ -841,7 +846,7 @@ Result<void> EditorRuntimeHost::compileProject()
         // Extract scene names
         for (const auto& scene : m_program->scenes)
         {
-            m_sceneNames.push_back(scene.id);
+            m_sceneNames.push_back(scene.name);
         }
 
         // Validator
@@ -864,7 +869,7 @@ Result<void> EditorRuntimeHost::compileProject()
 
         if (!compileResult.isOk())
         {
-            return Result<void>::error("Compilation error: " + compileResult.error().message);
+            return Result<void>::error("Compilation error: " + compileResult.error());
         }
 
         m_compiledScript = std::make_unique<scripting::CompiledScript>(
@@ -918,7 +923,7 @@ void EditorRuntimeHost::resetRuntime()
 
     if (m_animationManager)
     {
-        m_animationManager->clear();
+        m_animationManager->stopAll();
     }
 
     m_singleStepping = false;

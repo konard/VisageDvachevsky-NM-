@@ -232,8 +232,8 @@ public:
     void duplicateSelectedNodes();
 
     // Connection operations
-    void startConnection(const std::string& nodeId, const std::string& portId);
-    void completeConnection(const std::string& nodeId, const std::string& portId);
+    void startConnection(scripting::NodeId nodeId, const std::string& portId);
+    void completeConnection(scripting::NodeId nodeId, const std::string& portId);
     void cancelConnection();
 
     // View control
@@ -243,13 +243,13 @@ public:
     void fitToContent();
 
     // Selection
-    void selectNode(const std::string& nodeId);
-    void selectNodes(const std::vector<std::string>& nodeIds);
+    void selectNode(scripting::NodeId nodeId);
+    void selectNodes(const std::vector<scripting::NodeId>& nodeIds);
     void clearSelection();
-    [[nodiscard]] const std::vector<std::string>& getSelectedNodes() const;
+    [[nodiscard]] const std::vector<scripting::NodeId>& getSelectedNodes() const;
 
     // Callbacks
-    void setOnNodeSelected(std::function<void(const std::string&)> callback);
+    void setOnNodeSelected(std::function<void(scripting::NodeId)> callback);
     void setOnGraphModified(std::function<void()> callback);
 
 private:
@@ -264,15 +264,15 @@ private:
     f32 m_viewY = 0.0f;
     f32 m_viewZoom = 1.0f;
 
-    std::vector<std::string> m_selectedNodes;
+    std::vector<scripting::NodeId> m_selectedNodes;
 
     bool m_isConnecting = false;
-    std::string m_connectionStartNode;
+    scripting::NodeId m_connectionStartNode = 0;
     std::string m_connectionStartPort;
     f32 m_connectionEndX = 0.0f;
     f32 m_connectionEndY = 0.0f;
 
-    std::function<void(const std::string&)> m_onNodeSelected;
+    std::function<void(scripting::NodeId)> m_onNodeSelected;
     std::function<void()> m_onGraphModified;
 };
 
@@ -291,7 +291,7 @@ public:
 
     void setInspectorAPI(scene::SceneInspectorAPI* inspector);
     void inspectObject(const std::string& objectId);
-    void inspectNode(const scripting::VisualNode* node);
+    void inspectNode(const scripting::VisualGraphNode* node);
     void clearInspection();
 
     // IInspectorListener implementation
@@ -306,7 +306,7 @@ private:
 
     scene::SceneInspectorAPI* m_inspector = nullptr;
     std::string m_currentObjectId;
-    const scripting::VisualNode* m_currentNode = nullptr;
+    const scripting::VisualGraphNode* m_currentNode = nullptr;
 
     std::unique_ptr<ui::Widget> m_propertyWidgets;
 };

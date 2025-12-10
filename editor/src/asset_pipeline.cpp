@@ -110,7 +110,7 @@ Result<AssetMetadata> ImageImporter::import(
     auto processResult = processImage(sourcePath, destPath);
     if (!processResult.isOk())
     {
-        return Result<AssetMetadata>::error(processResult.error().message);
+        return Result<AssetMetadata>::error(processResult.error());
     }
 
     // Create metadata
@@ -243,7 +243,7 @@ Result<AssetMetadata> AudioImporter::import(
     auto processResult = processAudio(sourcePath, destPath);
     if (!processResult.isOk())
     {
-        return Result<AssetMetadata>::error(processResult.error().message);
+        return Result<AssetMetadata>::error(processResult.error());
     }
 
     // Create metadata
@@ -350,7 +350,7 @@ Result<AssetMetadata> FontImporter::import(
     auto processResult = processFont(sourcePath, destPath);
     if (!processResult.isOk())
     {
-        return Result<AssetMetadata>::error(processResult.error().message);
+        return Result<AssetMetadata>::error(processResult.error());
     }
 
     // Create metadata

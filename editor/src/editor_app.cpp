@@ -398,17 +398,27 @@ void StoryGraphView::addNode(scripting::IRNodeType type, f32 x, f32 y)
 {
     if (!m_graph) return;
 
-    // Create node at position
-    auto& nodes = m_graph->nodes;
-    scripting::VisualNode node;
-    node.id = "node_" + std::to_string(nodes.size());
-    node.type = type;
-    node.x = x;
-    node.y = y;
-    node.width = 150.0f;
-    node.height = 100.0f;
+    // Map IRNodeType to string type name for VisualGraph
+    std::string typeStr;
+    switch (type)
+    {
+        case scripting::IRNodeType::Dialogue: typeStr = "dialogue"; break;
+        case scripting::IRNodeType::Choice: typeStr = "choice"; break;
+        case scripting::IRNodeType::Branch: typeStr = "branch"; break;
+        case scripting::IRNodeType::Goto: typeStr = "goto"; break;
+        case scripting::IRNodeType::ShowCharacter: typeStr = "show_character"; break;
+        case scripting::IRNodeType::HideCharacter: typeStr = "hide_character"; break;
+        case scripting::IRNodeType::ShowBackground: typeStr = "show_background"; break;
+        case scripting::IRNodeType::PlayMusic: typeStr = "play_music"; break;
+        case scripting::IRNodeType::StopMusic: typeStr = "stop_music"; break;
+        case scripting::IRNodeType::PlaySound: typeStr = "play_sound"; break;
+        case scripting::IRNodeType::SceneStart: typeStr = "scene_start"; break;
+        case scripting::IRNodeType::SceneEnd: typeStr = "scene_end"; break;
+        default: typeStr = "unknown"; break;
+    }
 
-    nodes.push_back(std::move(node));
+    // Use VisualGraph's addNode API
+    m_graph->addNode(typeStr, x, y);
 
     if (m_onGraphModified)
     {
@@ -422,25 +432,8 @@ void StoryGraphView::deleteSelectedNodes()
 
     for (const auto& nodeId : m_selectedNodes)
     {
-        // Remove connections to/from this node
-        auto& connections = m_graph->connections;
-        connections.erase(
-            std::remove_if(connections.begin(), connections.end(),
-                [&nodeId](const scripting::VisualConnection& conn)
-                {
-                    return conn.sourceNode == nodeId || conn.targetNode == nodeId;
-                }),
-            connections.end());
-
-        // Remove node
-        auto& nodes = m_graph->nodes;
-        nodes.erase(
-            std::remove_if(nodes.begin(), nodes.end(),
-                [&nodeId](const scripting::VisualNode& node)
-                {
-                    return node.id == nodeId;
-                }),
-            nodes.end());
+        // Use VisualGraph's removeNode API which handles edge cleanup
+        m_graph->removeNode(nodeId);
     }
 
     m_selectedNodes.clear();
@@ -455,24 +448,26 @@ void StoryGraphView::duplicateSelectedNodes()
 {
     if (!m_graph) return;
 
-    std::vector<std::string> newNodeIds;
+    std::vector<scripting::NodeId> newNodeIds;
 
     for (const auto& nodeId : m_selectedNodes)
     {
-        // Find original node
-        for (const auto& node : m_graph->nodes)
+        // Find original node using the proper API
+        const auto* node = m_graph->findNode(nodeId);
+        if (node)
         {
-            if (node.id == nodeId)
-            {
-                scripting::VisualNode newNode = node;
-                newNode.id = "node_" + std::to_string(m_graph->nodes.size());
-                newNode.x += 50.0f;
-                newNode.y += 50.0f;
+            // Add a new node with the same type but offset position
+            auto newNodeId = m_graph->addNode(node->type, node->x + 50.0f, node->y + 50.0f);
 
-                m_graph->nodes.push_back(std::move(newNode));
-                newNodeIds.push_back(m_graph->nodes.back().id);
-                break;
+            // Copy properties
+            auto* newNode = m_graph->findNode(newNodeId);
+            if (newNode)
+            {
+                newNode->displayName = node->displayName;
+                newNode->properties = node->properties;
             }
+
+            newNodeIds.push_back(newNodeId);
         }
     }
 
@@ -484,14 +479,14 @@ void StoryGraphView::duplicateSelectedNodes()
     }
 }
 
-void StoryGraphView::startConnection(const std::string& nodeId, const std::string& portId)
+void StoryGraphView::startConnection(scripting::NodeId nodeId, const std::string& portId)
 {
     m_isConnecting = true;
     m_connectionStartNode = nodeId;
     m_connectionStartPort = portId;
 }
 
-void StoryGraphView::completeConnection(const std::string& nodeId, const std::string& portId)
+void StoryGraphView::completeConnection(scripting::NodeId nodeId, const std::string& portId)
 {
     if (!m_isConnecting || !m_graph) return;
 
@@ -501,15 +496,8 @@ void StoryGraphView::completeConnection(const std::string& nodeId, const std::st
         return;
     }
 
-    // Create connection
-    scripting::VisualConnection conn;
-    conn.id = "conn_" + std::to_string(m_graph->connections.size());
-    conn.sourceNode = m_connectionStartNode;
-    conn.sourcePort = m_connectionStartPort;
-    conn.targetNode = nodeId;
-    conn.targetPort = portId;
-
-    m_graph->connections.push_back(std::move(conn));
+    // Use VisualGraph's addEdge API
+    m_graph->addEdge(m_connectionStartNode, m_connectionStartPort, nodeId, portId);
 
     cancelConnection();
 
@@ -522,7 +510,7 @@ void StoryGraphView::completeConnection(const std::string& nodeId, const std::st
 void StoryGraphView::cancelConnection()
 {
     m_isConnecting = false;
-    m_connectionStartNode.clear();
+    m_connectionStartNode = 0;
     m_connectionStartPort.clear();
 }
 
@@ -545,15 +533,18 @@ void StoryGraphView::centerView()
 
 void StoryGraphView::fitToContent()
 {
-    if (!m_graph || m_graph->nodes.empty()) return;
+    if (!m_graph) return;
+
+    const auto& nodes = m_graph->getNodes();
+    if (nodes.empty()) return;
 
     // Calculate bounding box of all nodes
-    f32 minX = m_graph->nodes[0].x;
-    f32 maxX = m_graph->nodes[0].x + m_graph->nodes[0].width;
-    f32 minY = m_graph->nodes[0].y;
-    f32 maxY = m_graph->nodes[0].y + m_graph->nodes[0].height;
+    f32 minX = nodes[0].x;
+    f32 maxX = nodes[0].x + nodes[0].width;
+    f32 minY = nodes[0].y;
+    f32 maxY = nodes[0].y + nodes[0].height;
 
-    for (const auto& node : m_graph->nodes)
+    for (const auto& node : nodes)
     {
         minX = std::min(minX, node.x);
         maxX = std::max(maxX, node.x + node.width);
@@ -575,7 +566,7 @@ void StoryGraphView::fitToContent()
     m_viewY = static_cast<f32>(m_height) * 0.5f - (minY + contentHeight * 0.5f) * m_viewZoom;
 }
 
-void StoryGraphView::selectNode(const std::string& nodeId)
+void StoryGraphView::selectNode(scripting::NodeId nodeId)
 {
     m_selectedNodes.clear();
     m_selectedNodes.push_back(nodeId);
@@ -586,7 +577,7 @@ void StoryGraphView::selectNode(const std::string& nodeId)
     }
 }
 
-void StoryGraphView::selectNodes(const std::vector<std::string>& nodeIds)
+void StoryGraphView::selectNodes(const std::vector<scripting::NodeId>& nodeIds)
 {
     m_selectedNodes = nodeIds;
 }
@@ -596,12 +587,12 @@ void StoryGraphView::clearSelection()
     m_selectedNodes.clear();
 }
 
-const std::vector<std::string>& StoryGraphView::getSelectedNodes() const
+const std::vector<scripting::NodeId>& StoryGraphView::getSelectedNodes() const
 {
     return m_selectedNodes;
 }
 
-void StoryGraphView::setOnNodeSelected(std::function<void(const std::string&)> callback)
+void StoryGraphView::setOnNodeSelected(std::function<void(scripting::NodeId)> callback)
 {
     m_onNodeSelected = std::move(callback);
 }
@@ -615,7 +606,7 @@ void StoryGraphView::renderNodes()
 {
     if (!m_graph) return;
 
-    for (const auto& node : m_graph->nodes)
+    for (const auto& node : m_graph->getNodes())
     {
         // Transform node position
         f32 screenX = node.x * m_viewZoom + m_viewX;
@@ -637,17 +628,11 @@ void StoryGraphView::renderConnections()
 {
     if (!m_graph) return;
 
-    for (const auto& conn : m_graph->connections)
+    for (const auto& edge : m_graph->getEdges())
     {
         // Find source and target nodes
-        const scripting::VisualNode* sourceNode = nullptr;
-        const scripting::VisualNode* targetNode = nullptr;
-
-        for (const auto& node : m_graph->nodes)
-        {
-            if (node.id == conn.sourceNode) sourceNode = &node;
-            if (node.id == conn.targetNode) targetNode = &node;
-        }
+        const auto* sourceNode = m_graph->findNode(edge.sourceNode);
+        const auto* targetNode = m_graph->findNode(edge.targetNode);
 
         if (sourceNode && targetNode)
         {
@@ -758,7 +743,7 @@ void InspectorPanel::inspectObject(const std::string& objectId)
     m_currentNode = nullptr;
 }
 
-void InspectorPanel::inspectNode(const scripting::VisualNode* node)
+void InspectorPanel::inspectNode(const scripting::VisualGraphNode* node)
 {
     m_currentNode = node;
     m_currentObjectId.clear();
@@ -1040,9 +1025,13 @@ void PreviewWindow::render()
     if (!m_visible) return;
 
     // Render preview
+    // Note: Actual rendering requires a renderer backend.
+    // This is a stub for the preview window - rendering will be
+    // implemented when a concrete renderer is attached.
     if (m_sceneGraph && m_running)
     {
-        m_sceneGraph->render();
+        // TODO: Pass actual renderer once preview backend is set up
+        // m_sceneGraph->render(renderer);
     }
 }
 
@@ -1071,7 +1060,7 @@ void PreviewWindow::stopPreview()
 
     if (m_sceneGraph)
     {
-        m_sceneGraph->restoreState(m_savedState);
+        m_sceneGraph->loadState(m_savedState);
     }
 }
 
@@ -1137,7 +1126,7 @@ Result<void> BuildManager::startBuild(const BuildConfig& config)
     auto result = validateProject();
     if (!result.isOk())
     {
-        m_progress.errors.push_back(result.error().message);
+        m_progress.errors.push_back(result.error());
         m_progress.completed = true;
         m_progress.success = false;
         m_building = false;
@@ -1158,7 +1147,7 @@ Result<void> BuildManager::startBuild(const BuildConfig& config)
     result = compileScripts();
     if (!result.isOk())
     {
-        m_progress.errors.push_back(result.error().message);
+        m_progress.errors.push_back(result.error());
         m_progress.completed = true;
         m_progress.success = false;
         m_building = false;
@@ -1179,7 +1168,7 @@ Result<void> BuildManager::startBuild(const BuildConfig& config)
     result = packAssets();
     if (!result.isOk())
     {
-        m_progress.errors.push_back(result.error().message);
+        m_progress.errors.push_back(result.error());
         m_progress.completed = true;
         m_progress.success = false;
         m_building = false;
@@ -1200,7 +1189,7 @@ Result<void> BuildManager::startBuild(const BuildConfig& config)
     result = generateExecutable();
     if (!result.isOk())
     {
-        m_progress.errors.push_back(result.error().message);
+        m_progress.errors.push_back(result.error());
         m_progress.completed = true;
         m_progress.success = false;
         m_building = false;
@@ -1366,7 +1355,7 @@ Result<void> EditorApp::initialize(const EditorConfig& config)
 
     // Create core systems
     m_sceneGraph = std::make_unique<scene::SceneGraph>();
-    m_sceneGraph->initialize();
+    // SceneGraph is ready to use after construction
 
     m_inspectorAPI = std::make_unique<scene::SceneInspectorAPI>(m_sceneGraph.get());
 
@@ -1376,7 +1365,7 @@ Result<void> EditorApp::initialize(const EditorConfig& config)
     m_buildManager = std::make_unique<BuildManager>();
 
     m_uiManager = std::make_unique<ui::UIManager>();
-    m_uiManager->initialize();
+    // UIManager is ready to use after construction
 
     // Create panels
     setupPanels();
@@ -1564,8 +1553,8 @@ Result<void> EditorApp::closeProject()
     m_projectBrowser->setRootPath("");
     m_assetBrowser->setAssetsPath("");
     m_sceneGraph->clear();
-    m_visualGraph->nodes.clear();
-    m_visualGraph->connections.clear();
+    // Reset visual graph by creating a new one
+    m_visualGraph = std::make_unique<scripting::VisualGraph>();
 
     return Result<void>::ok();
 }
@@ -1612,8 +1601,8 @@ Result<void> EditorApp::saveSceneAs(const std::string& path)
 
 Result<void> EditorApp::newScript()
 {
-    m_visualGraph->nodes.clear();
-    m_visualGraph->connections.clear();
+    // Reset visual graph by creating a new one
+    m_visualGraph = std::make_unique<scripting::VisualGraph>();
     m_currentScriptPath.clear();
     m_projectModified = true;
 
@@ -1868,7 +1857,8 @@ void EditorApp::render()
     if (m_previewWindow) m_previewWindow->render();
 
     // Render UI overlays
-    if (m_uiManager) m_uiManager->render();
+    // Note: UIManager::render() requires a renderer - this is a stub for now
+    // if (m_uiManager) m_uiManager->render(renderer);
 }
 
 void EditorApp::handleFileDropped(const std::string& path)

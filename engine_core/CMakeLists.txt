@@ -64,8 +64,11 @@ add_library(engine_core STATIC
     # UI Framework
     src/ui/ui_framework.cpp
 
-    # Build Pipeline
-    src/build/build_pipeline.cpp
+    # Localization
+    src/localization/localization_manager.cpp
+
+    # VFS Multi-Pack
+    src/vfs/multi_pack_manager.cpp
 )
 
 target_include_directories(engine_core
