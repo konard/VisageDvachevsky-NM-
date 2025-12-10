@@ -1,12 +1,32 @@
-# Visual Editor
-# This is a placeholder - actual editor implementation will come later
+# NovelMind Visual Editor
 
-message(STATUS "Editor build is not yet implemented")
+add_library(editor STATIC
+    src/editor_app.cpp
+)
 
-# Future implementation will include:
-# - Qt or ImGui-based UI
-# - Scene editor
-# - Story flow editor
-# - Script editor
-# - Localization editor
-# - Build system integration
+target_include_directories(editor
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+)
+
+target_link_libraries(editor
+    PUBLIC
+        engine_core
+    PRIVATE
+        novelmind_compiler_options
+)
+
+# Editor executable (optional, only build if main.cpp exists)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
+    add_executable(novelmind_editor
+        src/main.cpp
+    )
+
+    target_link_libraries(novelmind_editor
+        PRIVATE
+            editor
+            engine_core
+            novelmind_compiler_options
+    )
+endif()

@@ -37,6 +37,7 @@ add_library(engine_core STATIC
     src/scripting/compiler.cpp
     src/scripting/validator.cpp
     src/scripting/script_runtime.cpp
+    src/scripting/ir.cpp
 
     # Renderer (Text)
     src/renderer/text_layout.cpp
@@ -48,6 +49,8 @@ add_library(engine_core STATIC
     src/scene/dialogue_box.cpp
     src/scene/choice_menu.cpp
     src/scene/transition.cpp
+    src/scene/scene_graph.cpp
+    src/scene/scene_inspector.cpp
 
     # Input
     src/input/input_manager.cpp
@@ -57,6 +60,12 @@ add_library(engine_core STATIC
 
     # Save
     src/save/save_manager.cpp
+
+    # UI Framework
+    src/ui/ui_framework.cpp
+
+    # Build Pipeline
+    src/build/build_pipeline.cpp
 )
 
 target_include_directories(engine_core
