@@ -152,6 +152,39 @@ bool DialogueBox::isAutoAdvanceEnabled() const
     return m_autoAdvance;
 }
 
+void DialogueBox::setTypewriterSpeed(f32 charsPerSecond)
+{
+    m_style.typewriterSpeed = charsPerSecond;
+}
+
+void DialogueBox::startTypewriter()
+{
+    m_visibleCharacters = 0;
+    m_typewriterTimer = 0.0f;
+    m_typewriterComplete = false;
+    m_showWaitIndicator = false;
+}
+
+bool DialogueBox::isTypewriterComplete() const
+{
+    return m_typewriterComplete;
+}
+
+bool DialogueBox::isWaitingForInput() const
+{
+    return m_typewriterComplete && m_showWaitIndicator;
+}
+
+void DialogueBox::show()
+{
+    m_visible = true;
+}
+
+void DialogueBox::hide()
+{
+    m_visible = false;
+}
+
 void DialogueBox::update(f64 deltaTime)
 {
     SceneObject::update(deltaTime);

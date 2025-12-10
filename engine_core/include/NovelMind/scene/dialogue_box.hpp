@@ -164,6 +164,36 @@ public:
     [[nodiscard]] bool isAutoAdvanceEnabled() const;
 
     /**
+     * @brief Set the typewriter speed (characters per second)
+     */
+    void setTypewriterSpeed(f32 charsPerSecond);
+
+    /**
+     * @brief Start the typewriter animation
+     */
+    void startTypewriter();
+
+    /**
+     * @brief Check if typewriter animation is complete
+     */
+    [[nodiscard]] bool isTypewriterComplete() const;
+
+    /**
+     * @brief Check if waiting for user input
+     */
+    [[nodiscard]] bool isWaitingForInput() const;
+
+    /**
+     * @brief Show the dialogue box
+     */
+    void show();
+
+    /**
+     * @brief Hide the dialogue box
+     */
+    void hide();
+
+    /**
      * @brief Update dialogue box state
      */
     void update(f64 deltaTime) override;

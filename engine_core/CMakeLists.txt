@@ -35,6 +35,11 @@ add_library(engine_core STATIC
     src/scripting/lexer.cpp
     src/scripting/parser.cpp
     src/scripting/compiler.cpp
+    src/scripting/validator.cpp
+    src/scripting/script_runtime.cpp
+
+    # Renderer (Text)
+    src/renderer/text_layout.cpp
 
     # Scene
     src/scene/scene_manager.cpp

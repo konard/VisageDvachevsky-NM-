@@ -18,6 +18,8 @@ add_executable(unit_tests
     unit/test_value.cpp
     unit/test_lexer.cpp
     unit/test_parser.cpp
+    unit/test_validator.cpp
+    unit/test_animation.cpp
 )
 
 target_link_libraries(unit_tests
