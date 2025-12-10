@@ -175,14 +175,14 @@ struct CurveEditorConfig
     i32 gridDivisionsX = 10;
     i32 gridDivisionsY = 10;
 
-    // Colors
-    renderer::Color backgroundColor = {0.15f, 0.15f, 0.15f, 1.0f};
-    renderer::Color gridColor = {0.25f, 0.25f, 0.25f, 1.0f};
-    renderer::Color curveColor = {0.2f, 0.8f, 0.4f, 1.0f};
-    renderer::Color pointColor = {1.0f, 1.0f, 1.0f, 1.0f};
-    renderer::Color selectedPointColor = {1.0f, 0.6f, 0.0f, 1.0f};
-    renderer::Color handleColor = {0.6f, 0.6f, 0.6f, 1.0f};
-    renderer::Color handleLineColor = {0.5f, 0.5f, 0.5f, 0.5f};
+    // Colors (u8 values: 0-255)
+    renderer::Color backgroundColor = {38, 38, 38, 255};
+    renderer::Color gridColor = {64, 64, 64, 255};
+    renderer::Color curveColor = {51, 204, 102, 255};
+    renderer::Color pointColor = {255, 255, 255, 255};
+    renderer::Color selectedPointColor = {255, 153, 0, 255};
+    renderer::Color handleColor = {153, 153, 153, 255};
+    renderer::Color handleLineColor = {128, 128, 128, 128};
 
     // Point size
     f32 pointRadius = 5.0f;

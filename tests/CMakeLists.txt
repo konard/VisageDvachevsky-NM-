@@ -34,7 +34,13 @@ target_link_libraries(unit_tests
 # Register unit tests
 include(CTest)
 include(Catch)
-catch_discover_tests(unit_tests)
+
+# Discover tests with reasonable timeout for fuzz tests
+# Windows Debug builds can be significantly slower, so we use a generous default
+catch_discover_tests(unit_tests
+    PROPERTIES
+        TIMEOUT 60  # 60 seconds max per test
+)
 
 # Note: Integration tests for editor components are defined here but may require
 # additional work as the editor APIs stabilize. For now, focus on unit tests.
