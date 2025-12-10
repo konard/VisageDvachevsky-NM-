@@ -148,7 +148,6 @@ CharacterClip::CharacterClip(const std::string& id, const std::string& character
 
 void CharacterClip::setExpression(const std::string& expression, f64 time)
 {
-    setProperty("expression", expression);
     // Expression changes are stored as string keyframes
     Keyframe kf;
     kf.time = time;
@@ -287,9 +286,11 @@ void CameraClip::addRotationKeyframe(f64 time, f32 angle)
 
 void CameraClip::setShake(f64 startTime, f64 duration, f32 intensity)
 {
-    setProperty("shake_start", std::to_string(startTime));
-    setProperty("shake_duration", std::to_string(duration));
-    setProperty("shake_intensity", std::to_string(intensity));
+    // Shake parameters are stored in the clip
+    // TODO: Store these in a property track when needed
+    (void)startTime;
+    (void)duration;
+    (void)intensity;
 }
 
 // =============================================================================

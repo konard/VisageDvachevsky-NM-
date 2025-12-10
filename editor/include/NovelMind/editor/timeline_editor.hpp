@@ -15,6 +15,7 @@
 
 #include "NovelMind/core/types.hpp"
 #include "NovelMind/core/result.hpp"
+#include "NovelMind/editor/editor_app.hpp"
 #include "NovelMind/scene/animation.hpp"
 #include "NovelMind/renderer/renderer.hpp"
 #include <string>
@@ -176,7 +177,7 @@ protected:
     bool m_locked = false;
     bool m_selected = false;
 
-    renderer::Color m_color = {0.4f, 0.6f, 0.8f, 1.0f};
+    renderer::Color m_color = {102, 153, 204, 255};  // Light blue
 };
 
 /**
@@ -346,7 +347,7 @@ protected:
     bool m_expanded = true;
 
     f32 m_height = 30.0f;
-    renderer::Color m_color = {0.3f, 0.3f, 0.3f, 1.0f};
+    renderer::Color m_color = {77, 77, 77, 255};  // Dark gray
 };
 
 /**

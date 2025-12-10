@@ -1,12 +1,25 @@
 # NovelMind Visual Editor
 
 add_library(novelmind_editor STATIC
+    # Core editor
     src/editor_app.cpp
     src/editor_runtime_host.cpp
     src/diagnostics_panel.cpp
     src/asset_pipeline.cpp
     src/editor_settings.cpp
     src/voice_manager.cpp
+    src/timeline_editor.cpp
+    src/curve_editor.cpp
+
+    # v0.2.0 backend systems
+    src/selection_system.cpp
+    src/event_bus.cpp
+    src/project_manager.cpp
+    src/inspector_binding.cpp
+    src/asset_preview.cpp
+    src/timeline_playback.cpp
+    src/editor_state.cpp
+    src/error_reporter.cpp
 )
 
 # Alias for backward compatibility
