@@ -161,14 +161,14 @@ void LocalizationPanel::renderLocaleSelector()
     if (!localeNames.empty()) {
         if (widgets::Dropdown("Source", &m_primaryLocaleIndex, localeNames)) {
             if (m_primaryLocaleIndex >= 0 && m_primaryLocaleIndex < static_cast<i32>(m_availableLocales.size())) {
-                m_primaryLocale = m_availableLocales[m_primaryLocaleIndex];
+                m_primaryLocale = m_availableLocales[static_cast<size_t>(m_primaryLocaleIndex)];
                 m_entriesDirty = true;
             }
         }
 
         if (widgets::Dropdown("Target", &m_secondaryLocaleIndex, localeNames)) {
             if (m_secondaryLocaleIndex >= 0 && m_secondaryLocaleIndex < static_cast<i32>(m_availableLocales.size())) {
-                m_secondaryLocale = m_availableLocales[m_secondaryLocaleIndex];
+                m_secondaryLocale = m_availableLocales[static_cast<size_t>(m_secondaryLocaleIndex)];
                 m_entriesDirty = true;
             }
         }
@@ -204,10 +204,12 @@ void LocalizationPanel::renderTableHeader()
 {
     // Key column header (sortable)
     bool isSortedByKey = (m_sortColumn == SortColumn::Key);
+    (void)isSortedByKey; // Reserved for sort indicator rendering
     // Render header with sort arrow if sorted
 
     // Status column header (sortable)
     bool isSortedByStatus = (m_sortColumn == SortColumn::Status);
+    (void)isSortedByStatus; // Reserved for sort indicator rendering
     // Render header
 
     // Primary locale column header
@@ -221,8 +223,10 @@ void LocalizationPanel::renderTableHeader()
 
 void LocalizationPanel::renderTableRow(const LocalizationEntry& entry, size_t rowIndex)
 {
+    (void)rowIndex; // Reserved for row UI rendering
     bool isSelected = std::find(m_selectedKeys.begin(), m_selectedKeys.end(), entry.key)
                       != m_selectedKeys.end();
+    (void)isSelected; // Reserved for row selection highlighting
 
     bool isEditing = m_isEditing && m_editingKey == entry.key;
 
@@ -266,7 +270,7 @@ void LocalizationPanel::renderTableRow(const LocalizationEntry& entry, size_t ro
 void LocalizationPanel::renderStatusBadge(LocalizationStatus status)
 {
     renderer::Color color;
-    const char* text;
+    const char* text = "";
 
     switch (status) {
         case LocalizationStatus::Complete:
@@ -297,7 +301,9 @@ void LocalizationPanel::renderCoverageStats()
     // Stats for secondary locale (target language)
     f32 coverage = getLocaleCoverage(m_secondaryLocale);
     size_t missing = getMissingCount(m_secondaryLocale);
+    (void)missing; // Reserved for stats display
     size_t total = getTotalStringCount();
+    (void)total; // Reserved for stats display
 
     // Stats bar
     // Total: X | Translated: Y | Missing: Z | Coverage: XX%
@@ -353,7 +359,7 @@ void LocalizationPanel::setLocalizationManager(localization::LocalizationManager
         if (!m_availableLocales.empty()) {
             m_primaryLocale = m_locManager->getDefaultLocale();
             for (i32 i = 0; i < static_cast<i32>(m_availableLocales.size()); ++i) {
-                if (m_availableLocales[i] == m_primaryLocale) {
+                if (m_availableLocales[static_cast<size_t>(i)] == m_primaryLocale) {
                     m_primaryLocaleIndex = i;
                     break;
                 }
@@ -362,7 +368,7 @@ void LocalizationPanel::setLocalizationManager(localization::LocalizationManager
             // Find a different locale for secondary
             if (m_availableLocales.size() > 1) {
                 m_secondaryLocaleIndex = (m_primaryLocaleIndex == 0) ? 1 : 0;
-                m_secondaryLocale = m_availableLocales[m_secondaryLocaleIndex];
+                m_secondaryLocale = m_availableLocales[static_cast<size_t>(m_secondaryLocaleIndex)];
             }
         }
     }
@@ -530,7 +536,7 @@ void LocalizationPanel::setPrimaryLocale(const localization::LocaleId& locale)
 {
     m_primaryLocale = locale;
     for (i32 i = 0; i < static_cast<i32>(m_availableLocales.size()); ++i) {
-        if (m_availableLocales[i] == locale) {
+        if (m_availableLocales[static_cast<size_t>(i)] == locale) {
             m_primaryLocaleIndex = i;
             break;
         }
@@ -542,7 +548,7 @@ void LocalizationPanel::setSecondaryLocale(const localization::LocaleId& locale)
 {
     m_secondaryLocale = locale;
     for (i32 i = 0; i < static_cast<i32>(m_availableLocales.size()); ++i) {
-        if (m_availableLocales[i] == locale) {
+        if (m_availableLocales[static_cast<size_t>(i)] == locale) {
             m_secondaryLocaleIndex = i;
             break;
         }
@@ -749,17 +755,17 @@ std::vector<MenuItem> LocalizationPanel::getContextMenuItems() const
     if (!m_selectedKeys.empty()) {
         items.push_back({"Copy Key", "Ctrl+C", [this]() {
             // Copy key to clipboard
-        }});
+        }, nullptr, {}});
         items.push_back({"Copy Value", "", [this]() {
             // Copy primary locale value to clipboard
-        }});
+        }, nullptr, {}});
         items.push_back(MenuItem::separator());
         items.push_back({"Remove Key", "Delete", [this]() {
             auto* panel = const_cast<LocalizationPanel*>(this);
             for (const auto& key : panel->m_selectedKeys) {
                 panel->removeKey(key);
             }
-        }});
+        }, nullptr, {}});
     }
 
     return items;
