@@ -33,7 +33,7 @@ void HierarchyPanel::refresh()
     }
 
     // Helper lambda to convert SceneObject to HierarchyNode
-    auto convertToNode = [](const scene::SceneObjectBase* obj, i32 layer) -> HierarchyNode {
+    std::function<HierarchyNode(const scene::SceneObjectBase*, i32)> convertToNode = [&](const scene::SceneObjectBase* obj, i32 layer) -> HierarchyNode {
         HierarchyNode node;
         node.id = obj->getId();
         node.name = obj->getId(); // Can be enhanced with custom names

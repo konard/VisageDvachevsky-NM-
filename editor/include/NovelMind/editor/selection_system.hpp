@@ -185,8 +185,8 @@ public:
   /**
    * @brief Called when selection changes
    */
-  virtual void onSelectionChanged(SelectionType type,
-                                  const std::vector<SelectionItem> &selection) {
+  virtual void onSelectionChanged(SelectionType /*type*/,
+                                  const std::vector<SelectionItem> &/*selection*/) {
   }
 
   /**
@@ -197,7 +197,7 @@ public:
   /**
    * @brief Called when primary selection changes (first item in multi-select)
    */
-  virtual void onPrimarySelectionChanged(const SelectionItem &item) {}
+  virtual void onPrimarySelectionChanged(const SelectionItem &/*item*/) {}
 };
 
 /**

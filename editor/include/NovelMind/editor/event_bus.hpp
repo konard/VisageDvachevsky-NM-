@@ -256,14 +256,14 @@ struct TimelineKeyframeEvent : EditorEvent {
   u64 keyframeIndex = 0;
   f64 time = 0.0;
 
-  explicit TimelineKeyframeEvent(EditorEventType type) : EditorEvent(type) {}
+  explicit TimelineKeyframeEvent(EditorEventType eventType) : EditorEvent(eventType) {}
 };
 
 struct TimelineTrackEvent : EditorEvent {
   std::string trackId;
   std::string trackType;
 
-  explicit TimelineTrackEvent(EditorEventType type) : EditorEvent(type) {}
+  explicit TimelineTrackEvent(EditorEventType eventType) : EditorEvent(eventType) {}
 };
 
 struct TimelinePlaybackChangedEvent : EditorEvent {
@@ -284,7 +284,7 @@ struct SceneObjectEvent : EditorEvent {
   std::string objectId;
   std::string objectType;
 
-  explicit SceneObjectEvent(EditorEventType type) : EditorEvent(type) {}
+  explicit SceneObjectEvent(EditorEventType eventType) : EditorEvent(eventType) {}
 };
 
 struct SceneObjectTransformedEvent : EditorEvent {
@@ -307,7 +307,7 @@ struct ProjectEvent : EditorEvent {
   std::string projectPath;
   std::string projectName;
 
-  explicit ProjectEvent(EditorEventType type) : EditorEvent(type) {}
+  explicit ProjectEvent(EditorEventType eventType) : EditorEvent(eventType) {}
 };
 
 struct ProjectModifiedEvent : EditorEvent {
@@ -326,7 +326,7 @@ struct UndoRedoEvent : EditorEvent {
   bool canUndo = false;
   bool canRedo = false;
 
-  explicit UndoRedoEvent(EditorEventType type) : EditorEvent(type) {}
+  explicit UndoRedoEvent(EditorEventType eventType) : EditorEvent(eventType) {}
 };
 
 struct UndoStackChangedEvent : EditorEvent {
@@ -347,7 +347,7 @@ struct PlayModeEvent : EditorEvent {
   scripting::NodeId currentNodeId = 0;
   f64 playTime = 0.0;
 
-  explicit PlayModeEvent(EditorEventType type) : EditorEvent(type) {}
+  explicit PlayModeEvent(EditorEventType eventType) : EditorEvent(eventType) {}
 };
 
 // ============================================================================
@@ -359,7 +359,7 @@ struct AssetEvent : EditorEvent {
   std::string assetType;
   std::string assetId;
 
-  explicit AssetEvent(EditorEventType type) : EditorEvent(type) {}
+  explicit AssetEvent(EditorEventType eventType) : EditorEvent(eventType) {}
 };
 
 struct AssetRenamedEvent : EditorEvent {
@@ -381,7 +381,7 @@ struct ErrorEvent : EditorEvent {
   Severity severity = Severity::Error;
   std::string location; // File:line or component name
 
-  explicit ErrorEvent(EditorEventType type) : EditorEvent(type) {}
+  explicit ErrorEvent(EditorEventType eventType) : EditorEvent(eventType) {}
 };
 
 struct DiagnosticEvent : EditorEvent {
@@ -395,7 +395,7 @@ struct DiagnosticEvent : EditorEvent {
 
   std::vector<Diagnostic> diagnostics;
 
-  explicit DiagnosticEvent(EditorEventType type) : EditorEvent(type) {}
+  explicit DiagnosticEvent(EditorEventType eventType) : EditorEvent(eventType) {}
 };
 
 // ============================================================================

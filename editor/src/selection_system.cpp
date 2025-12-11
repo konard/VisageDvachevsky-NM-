@@ -14,24 +14,24 @@ std::unique_ptr<EditorSelectionManager> EditorSelectionManager::s_instance =
 std::string SelectionItem::getDisplayName() const {
   switch (type) {
   case SelectionType::SceneObject:
-    if (auto *id = std::get_if<ObjectId>(&this->id)) {
-      return "Object: " + *id;
+    if (auto *objId = std::get_if<ObjectId>(&this->id)) {
+      return "Object: " + *objId;
     }
     break;
   case SelectionType::StoryGraphNode:
-    if (auto *id = std::get_if<scripting::NodeId>(&this->id)) {
-      return "Node: " + std::to_string(*id);
+    if (auto *nodeId = std::get_if<scripting::NodeId>(&this->id)) {
+      return "Node: " + std::to_string(*nodeId);
     }
     break;
   case SelectionType::TimelineItem:
-    if (auto *id = std::get_if<TimelineItemId>(&this->id)) {
-      return "Timeline: " + id->trackId + "[" +
-             std::to_string(id->keyframeIndex) + "]";
+    if (auto *timelineId = std::get_if<TimelineItemId>(&this->id)) {
+      return "Timeline: " + timelineId->trackId + "[" +
+             std::to_string(timelineId->keyframeIndex) + "]";
     }
     break;
   case SelectionType::Asset:
-    if (auto *id = std::get_if<AssetId>(&this->id)) {
-      return "Asset: " + id->path;
+    if (auto *assetId = std::get_if<AssetId>(&this->id)) {
+      return "Asset: " + assetId->path;
     }
     break;
   default:
@@ -56,13 +56,13 @@ std::vector<std::string> SceneObjectSelection::getPropertyNames() const {
 }
 
 std::string
-SceneObjectSelection::getPropertyValue(const std::string &name) const {
+SceneObjectSelection::getPropertyValue(const std::string &/*name*/) const {
   // This would fetch from the actual scene object
   return "";
 }
 
-void SceneObjectSelection::setPropertyValue(const std::string &name,
-                                            const std::string &value) {
+void SceneObjectSelection::setPropertyValue(const std::string &/*name*/,
+                                            const std::string &/*value*/) {
   // This would set on the actual scene object
 }
 
@@ -168,13 +168,13 @@ std::vector<std::string> TimelineItemSelection::getPropertyNames() const {
 }
 
 std::string
-TimelineItemSelection::getPropertyValue(const std::string &name) const {
+TimelineItemSelection::getPropertyValue(const std::string &/*name*/) const {
   // This would fetch from the actual timeline system
   return "";
 }
 
-void TimelineItemSelection::setPropertyValue(const std::string &name,
-                                             const std::string &value) {
+void TimelineItemSelection::setPropertyValue(const std::string &/*name*/,
+                                             const std::string &/*value*/) {
   // This would set on the actual timeline system
 }
 
