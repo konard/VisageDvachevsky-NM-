@@ -116,8 +116,8 @@ class IProjectListener {
 public:
   virtual ~IProjectListener() = default;
 
-  virtual void onProjectCreated(const std::string &path) {}
-  virtual void onProjectOpened(const std::string &path) {}
+  virtual void onProjectCreated(const std::string &/*path*/) {}
+  virtual void onProjectOpened(const std::string &/*path*/) {}
   virtual void onProjectClosed() {}
   virtual void onProjectSaved() {}
   virtual void onProjectModified() {}

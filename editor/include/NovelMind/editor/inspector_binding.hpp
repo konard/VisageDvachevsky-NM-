@@ -111,9 +111,9 @@ class IInspectorBindingListener {
 public:
   virtual ~IInspectorBindingListener() = default;
 
-  virtual void onTargetChanged(const InspectorTarget &target) {}
-  virtual void onPropertyWillChange(const PropertyChangeContext &context) {}
-  virtual void onPropertyDidChange(const PropertyChangeContext &context) {}
+  virtual void onTargetChanged(const InspectorTarget &/*target*/) {}
+  virtual void onPropertyWillChange(const PropertyChangeContext &/*context*/) {}
+  virtual void onPropertyDidChange(const PropertyChangeContext &/*context*/) {}
   virtual void onPropertiesRefreshed() {}
 };
 

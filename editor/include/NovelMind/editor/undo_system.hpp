@@ -59,12 +59,12 @@ public:
     /**
      * @brief Check if command can be merged with another
      */
-    [[nodiscard]] virtual bool canMergeWith(const IEditorCommand* other) const { return false; }
+    [[nodiscard]] virtual bool canMergeWith(const IEditorCommand* /*other*/) const { return false; }
 
     /**
      * @brief Merge with another command (for continuous operations)
      */
-    virtual void mergeWith(const IEditorCommand* other) {}
+    virtual void mergeWith(const IEditorCommand* /*other*/) {}
 };
 
 // ============================================================================
