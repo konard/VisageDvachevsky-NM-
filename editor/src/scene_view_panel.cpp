@@ -287,12 +287,14 @@ void SceneViewPanel::renderToolbar()
     widgets::BeginToolbar("SceneViewToolbar");
     renderToolbarItems(getToolbarItems());
 
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     // Add zoom slider on the right
-    // ImGui::SameLine(ImGui::GetContentRegionAvail().x - 150);
-    // ImGui::SetNextItemWidth(100);
-    // ImGui::SliderFloat("##Zoom", &m_zoom, m_minZoom, m_maxZoom, "%.1fx");
-    // ImGui::SameLine();
-    // if (ImGui::Button("1:1")) setZoom(1.0f);
+    ImGui::SameLine(ImGui::GetContentRegionAvail().x - 150);
+    ImGui::SetNextItemWidth(100);
+    ImGui::SliderFloat("##Zoom", &m_zoom, m_minZoom, m_maxZoom, "%.1fx");
+    ImGui::SameLine();
+    if (ImGui::Button("1:1")) setZoom(1.0f);
+#endif
 
     widgets::EndToolbar();
 }
@@ -794,26 +796,28 @@ void SceneViewPanel::renderOverlays()
 
 void SceneViewPanel::renderLayerControls()
 {
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     // Draw layer visibility popup
-    // if (ImGui::BeginPopup("LayerControls"))
-    // {
-    //     for (int i = 0; i < 8; i++)
-    //     {
-    //         bool visible = isLayerVisible(i);
-    //         char label[32];
-    //         snprintf(label, sizeof(label), "Layer %d", i);
-    //         if (ImGui::Checkbox(label, &visible))
-    //         {
-    //             setLayerVisible(i, visible);
-    //         }
-    //     }
-    //     ImGui::Separator();
-    //     if (ImGui::Button("Show All"))
-    //     {
-    //         showAllLayers();
-    //     }
-    //     ImGui::EndPopup();
-    // }
+    if (ImGui::BeginPopup("LayerControls"))
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            bool visible = isLayerVisible(static_cast<u32>(i));
+            char label[32];
+            snprintf(label, sizeof(label), "Layer %d", i);
+            if (ImGui::Checkbox(label, &visible))
+            {
+                setLayerVisible(static_cast<u32>(i), visible);
+            }
+        }
+        ImGui::Separator();
+        if (ImGui::Button("Show All"))
+        {
+            showAllLayers();
+        }
+        ImGui::EndPopup();
+    }
+#endif
 }
 
 void SceneViewPanel::handleMouseInput()
