@@ -141,18 +141,18 @@ void BuildSettingsPanel::estimateBuildSize()
         switch (m_settings.textureCompression)
         {
             case TextureCompression::BC1_DXT1:
-                imagesSize = static_cast<u64>(imagesSize * 0.25);
+                imagesSize = static_cast<u64>(static_cast<double>(imagesSize) * 0.25);
                 break;
             case TextureCompression::BC3_DXT5:
             case TextureCompression::ETC2:
-                imagesSize = static_cast<u64>(imagesSize * 0.5);
+                imagesSize = static_cast<u64>(static_cast<double>(imagesSize) * 0.5);
                 break;
             case TextureCompression::BC7:
             case TextureCompression::ASTC:
-                imagesSize = static_cast<u64>(imagesSize * 0.4);
+                imagesSize = static_cast<u64>(static_cast<double>(imagesSize) * 0.4);
                 break;
             case TextureCompression::WebP:
-                imagesSize = static_cast<u64>(imagesSize * 0.3);
+                imagesSize = static_cast<u64>(static_cast<double>(imagesSize) * 0.3);
                 break;
             default:
                 break;
@@ -162,11 +162,11 @@ void BuildSettingsPanel::estimateBuildSize()
         {
             case AudioCompression::MP3:
             case AudioCompression::OGG:
-                audioSize = static_cast<u64>(audioSize * 0.1);
+                audioSize = static_cast<u64>(static_cast<double>(audioSize) * 0.1);
                 break;
             case AudioCompression::AAC:
             case AudioCompression::Opus:
-                audioSize = static_cast<u64>(audioSize * 0.08);
+                audioSize = static_cast<u64>(static_cast<double>(audioSize) * 0.08);
                 break;
             default:
                 break;
@@ -176,7 +176,7 @@ void BuildSettingsPanel::estimateBuildSize()
     // Scripts compression
     if (m_settings.compressScripts)
     {
-        scriptsSize = static_cast<u64>(scriptsSize * 0.5);
+        scriptsSize = static_cast<u64>(static_cast<double>(scriptsSize) * 0.5);
     }
 
     // Calculate localization size
