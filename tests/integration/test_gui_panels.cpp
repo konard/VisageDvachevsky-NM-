@@ -919,26 +919,34 @@ TEST_CASE("SceneViewPanel - Render mode", "[gui][scene_view]")
     CHECK(panel.getRenderMode() == SceneRenderMode::Bounds);
 }
 
+// NOTE: TimelinePanel does not have setZoom/getZoom or setScrollX/getScrollX methods
+// It uses view range instead via setViewRange(start, end)
 TEST_CASE("TimelinePanel - Zoom management", "[gui][timeline]")
 {
     TimelinePanel panel;
 
-    panel.setZoom(2.0f);
-    CHECK(panel.getZoom() == 2.0f);
+    // panel.setZoom(2.0f);
+    // CHECK(panel.getZoom() == 2.0f);
 
-    panel.setScrollX(100.0f);
-    CHECK(panel.getScrollX() == 100.0f);
+    // panel.setScrollX(100.0f);
+    // CHECK(panel.getScrollX() == 100.0f);
+
+    // Use view range instead
+    panel.setViewRange(0.0, 5.0);
+    CHECK(panel.getViewStart() == 0.0);
+    CHECK(panel.getViewEnd() == 5.0);
 }
 
+// NOTE: TimelinePanel uses setFPS/getFPS instead of setFrameRate/getFrameRate
 TEST_CASE("TimelinePanel - Frame rate", "[gui][timeline]")
 {
     TimelinePanel panel;
 
-    panel.setFrameRate(30.0);
-    CHECK(panel.getFrameRate() == 30.0);
+    panel.setFPS(30.0f);
+    CHECK(panel.getFPS() == 30.0f);
 
-    panel.setFrameRate(60.0);
-    CHECK(panel.getFrameRate() == 60.0);
+    panel.setFPS(60.0f);
+    CHECK(panel.getFPS() == 60.0f);
 }
 
 // =============================================================================
@@ -1014,9 +1022,9 @@ TEST_CASE("TimelinePanel - Scrubbing simulation", "[gui][timeline][extended]")
 {
     TimelinePanel panel;
 
-    // Set up timeline
+    // Set up timeline (use setFPS instead of setFrameRate)
     panel.setDuration(60.0);
-    panel.setFrameRate(30.0);
+    panel.setFPS(30.0f);
 
     // Scrub to different positions
     panel.setCurrentTime(0.0);
@@ -1029,54 +1037,54 @@ TEST_CASE("TimelinePanel - Scrubbing simulation", "[gui][timeline][extended]")
     CHECK(panel.getCurrentTime() == 60.0);
 }
 
+// NOTE: TimelinePanel does not have zoom/scroll methods - it uses view range
 TEST_CASE("TimelinePanel - Zoom and scroll operations", "[gui][timeline][extended]")
 {
     TimelinePanel panel;
 
-    // Test zoom levels
-    panel.setZoom(0.5f);
-    CHECK(panel.getZoom() == 0.5f);
+    // Test view range instead of zoom
+    panel.setViewRange(0.0, 5.0);
+    CHECK(panel.getViewStart() == 0.0);
+    CHECK(panel.getViewEnd() == 5.0);
 
-    panel.setZoom(4.0f);
-    CHECK(panel.getZoom() == 4.0f);
-
-    // Test scroll positions
-    panel.setScrollX(0.0f);
-    CHECK(panel.getScrollX() == 0.0f);
-
-    panel.setScrollX(500.0f);
-    CHECK(panel.getScrollX() == 500.0f);
+    panel.setViewRange(2.5, 7.5);
+    CHECK(panel.getViewStart() == 2.5);
+    CHECK(panel.getViewEnd() == 7.5);
 }
 
 // =============================================================================
 // Extended GUI Tests - SceneView Operations
 // =============================================================================
 
+// NOTE: SceneViewPanel uses TransformTool (not GizmoMode) for tool selection
+// GizmoSpace is for local/world space toggle, not tool mode
 TEST_CASE("SceneViewPanel - Gizmo mode switching", "[gui][scene_view][extended]")
 {
     SceneViewPanel panel;
 
-    // Test all gizmo modes
-    panel.setGizmoMode(GizmoMode::Translate);
-    CHECK(panel.getGizmoMode() == GizmoMode::Translate);
+    // Test transform tools (not gizmo modes)
+    panel.setCurrentTool(TransformTool::Move);
+    CHECK(panel.getCurrentTool() == TransformTool::Move);
 
-    panel.setGizmoMode(GizmoMode::Rotate);
-    CHECK(panel.getGizmoMode() == GizmoMode::Rotate);
+    panel.setCurrentTool(TransformTool::Rotate);
+    CHECK(panel.getCurrentTool() == TransformTool::Rotate);
 
-    panel.setGizmoMode(GizmoMode::Scale);
-    CHECK(panel.getGizmoMode() == GizmoMode::Scale);
+    panel.setCurrentTool(TransformTool::Scale);
+    CHECK(panel.getCurrentTool() == TransformTool::Scale);
 }
 
+// NOTE: SceneViewPanel does not have setGridSize/getGridSize methods
+// Grid size is internal and not exposed for configuration via public API
 TEST_CASE("SceneViewPanel - Grid size configuration", "[gui][scene_view][extended]")
 {
     SceneViewPanel panel;
 
-    // Default grid size
-    panel.setGridSize(10.0f);
-    CHECK(panel.getGridSize() == 10.0f);
+    // Grid visibility can be controlled, but not grid size
+    panel.setGridVisible(true);
+    CHECK(panel.isGridVisible());
 
-    panel.setGridSize(50.0f);
-    CHECK(panel.getGridSize() == 50.0f);
+    panel.setGridVisible(false);
+    CHECK(!panel.isGridVisible());
 }
 
 TEST_CASE("SceneViewPanel - Snapping precision", "[gui][scene_view][extended]")
@@ -1126,17 +1134,19 @@ TEST_CASE("SceneViewPanel - View manipulation", "[gui][scene_view][extended]")
 // Extended GUI Tests - Hierarchy Panel Operations
 // =============================================================================
 
+// NOTE: HierarchyPanel does not have getSelectedObjects() or clearSelection()
+// It syncs with EditorSelectionManager instead of maintaining its own selection
 TEST_CASE("HierarchyPanel - Selection management", "[gui][hierarchy][extended]")
 {
     HierarchyPanel panel;
+    auto& selection = EditorSelectionManager::instance();
 
-    // Initial state - no selection
-    auto selected = panel.getSelectedObjects();
-    CHECK(selected.empty());
+    // Clear selection via selection manager
+    selection.clearSelection();
+    CHECK(!selection.hasSelection());
 
-    // Clear selection shouldn't crash
-    panel.clearSelection();
-    CHECK(panel.getSelectedObjects().empty());
+    // Panel reflects selection state via selection manager
+    CHECK(selection.getSelectionCount() == 0);
 }
 
 TEST_CASE("HierarchyPanel - Search and filter", "[gui][hierarchy][extended]")
