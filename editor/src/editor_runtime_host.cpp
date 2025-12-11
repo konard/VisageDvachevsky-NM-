@@ -734,8 +734,8 @@ void EditorRuntimeHost::checkForFileChanges()
                 if (ext == ".nms" || ext == ".nm")
                 {
                     std::string path = entry.path().string();
-                    u64 modTime = std::chrono::duration_cast<std::chrono::seconds>(
-                        entry.last_write_time().time_since_epoch()).count();
+                    u64 modTime = static_cast<u64>(std::chrono::duration_cast<std::chrono::seconds>(
+                        entry.last_write_time().time_since_epoch()).count());
 
                     auto it = m_fileTimestamps.find(path);
                     if (it != m_fileTimestamps.end())
@@ -810,8 +810,8 @@ Result<void> EditorRuntimeHost::compileProject()
                         allScripts += content;
 
                         // Track file timestamps for hot reload
-                        u64 modTime = std::chrono::duration_cast<std::chrono::seconds>(
-                            entry.last_write_time().time_since_epoch()).count();
+                        u64 modTime = static_cast<u64>(std::chrono::duration_cast<std::chrono::seconds>(
+                            entry.last_write_time().time_since_epoch()).count());
                         m_fileTimestamps[entry.path().string()] = modTime;
                     }
                 }

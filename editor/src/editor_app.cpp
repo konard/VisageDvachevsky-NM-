@@ -106,8 +106,8 @@ void ProjectBrowser::scanDirectory(const std::string& path)
             }
 
             auto modTime = entry.last_write_time();
-            asset.modifiedTimestamp = std::chrono::duration_cast<std::chrono::seconds>(
-                modTime.time_since_epoch()).count();
+            asset.modifiedTimestamp = static_cast<u64>(std::chrono::duration_cast<std::chrono::seconds>(
+                modTime.time_since_epoch()).count());
 
             m_entries.push_back(std::move(asset));
         }
@@ -1506,8 +1506,8 @@ Result<void> EditorApp::newProject(const std::string& path, const std::string& n
         m_projectInfo.name = name;
         m_projectInfo.path = path;
         m_projectInfo.version = "1.0.0";
-        m_projectInfo.createdTimestamp = std::chrono::duration_cast<std::chrono::seconds>(
-            std::chrono::system_clock::now().time_since_epoch()).count();
+        m_projectInfo.createdTimestamp = static_cast<u64>(std::chrono::duration_cast<std::chrono::seconds>(
+            std::chrono::system_clock::now().time_since_epoch()).count());
         m_projectInfo.modifiedTimestamp = m_projectInfo.createdTimestamp;
 
         // Save project file
@@ -1572,8 +1572,8 @@ Result<void> EditorApp::saveProject()
     }
 
     // Update timestamp
-    m_projectInfo.modifiedTimestamp = std::chrono::duration_cast<std::chrono::seconds>(
-        std::chrono::system_clock::now().time_since_epoch()).count();
+    m_projectInfo.modifiedTimestamp = static_cast<u64>(std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count());
 
     // Save project.json
     // Would serialize m_projectInfo to JSON

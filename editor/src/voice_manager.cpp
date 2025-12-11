@@ -142,7 +142,7 @@ void VoiceManager::scanVoiceDirectory(const std::string& path)
             voiceEntry.relativePath = fs::relative(entry.path(), m_projectPath).string();
             voiceEntry.filename = entry.path().filename().string();
             voiceEntry.fileSize = fs::file_size(entry.path());
-            voiceEntry.modifiedTimestamp = fs::last_write_time(entry.path()).time_since_epoch().count();
+            voiceEntry.modifiedTimestamp = static_cast<u64>(fs::last_write_time(entry.path()).time_since_epoch().count());
             voiceEntry.duration = getAudioDuration(voiceEntry.path);
             voiceEntry.bound = false;
 
@@ -622,11 +622,11 @@ bool VoiceManager::matchPattern(const std::string& filename, const VoiceMappingP
 
             if (charGroup < static_cast<int>(match.size()))
             {
-                outCharacter = match[charGroup].str();
+                outCharacter = match[static_cast<size_t>(charGroup)].str();
             }
             if (lineGroup < static_cast<int>(match.size()))
             {
-                outLineId = match[lineGroup].str();
+                outLineId = match[static_cast<size_t>(lineGroup)].str();
             }
             return true;
         }
