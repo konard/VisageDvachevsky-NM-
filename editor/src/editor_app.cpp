@@ -46,7 +46,7 @@ void ProjectBrowser::render()
     if (!m_visible) return;
 
     // Render file tree
-    for (const auto& entry : m_entries)
+    for ([[maybe_unused]] const auto& entry : m_entries)
     {
         // Render entry based on type
         // This would use the UI framework to render tree items

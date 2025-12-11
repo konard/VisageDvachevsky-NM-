@@ -177,7 +177,7 @@ TEST_CASE("HotkeyManager - Construction", "[hotkey_manager]")
 TEST_CASE("HotkeyManager - GetAllActions initially empty or has defaults", "[hotkey_manager]")
 {
     HotkeyManager manager;
-    auto& actions = manager.getAllActions();
+    [[maybe_unused]] auto& actions = manager.getAllActions();
     // May be empty or have default actions
     CHECK(true);  // Just test it doesn't crash
 }

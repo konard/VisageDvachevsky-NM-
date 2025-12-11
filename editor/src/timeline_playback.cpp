@@ -116,7 +116,7 @@ void TimelinePlaybackEngine::togglePlayPause() {
 void TimelinePlaybackEngine::seekTo(f64 time) {
   std::lock_guard<std::mutex> lock(m_mutex);
 
-  f64 oldTime = m_currentTime;
+  [[maybe_unused]] f64 oldTime = m_currentTime;
   m_currentTime = clampTime(time);
 
   notifyTimeChanged();
