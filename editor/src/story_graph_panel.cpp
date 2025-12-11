@@ -926,20 +926,20 @@ void StoryGraphPanel::renderNode(const scripting::VisualGraphNode& node)
     drawList->AddRectFilled(
         ImVec2(screenX + 3, screenY + 3),
         ImVec2(screenX + nodeWidth + 3, screenY + nodeHeight + 3),
-        IM_COL32(0, 0, 0, 80), m_nodeStyle.cornerRadius * m_zoom);
+        IM_COL32(0, 0, 0, 80), m_nodeStyle.borderRadius * m_zoom);
 
     // Draw node body
     drawList->AddRectFilled(
         ImVec2(screenX, screenY),
         ImVec2(screenX + nodeWidth, screenY + nodeHeight),
-        IM_COL32(40, 40, 40, 240), m_nodeStyle.cornerRadius * m_zoom);
+        IM_COL32(40, 40, 40, 240), m_nodeStyle.borderRadius * m_zoom);
 
     // Draw header
     drawList->AddRectFilled(
         ImVec2(screenX, screenY),
         ImVec2(screenX + nodeWidth, screenY + headerHeight),
         IM_COL32(catColor.r, catColor.g, catColor.b, 255),
-        m_nodeStyle.cornerRadius * m_zoom, ImDrawFlags_RoundCornersTop);
+        m_nodeStyle.borderRadius * m_zoom, ImDrawFlags_RoundCornersTop);
 
     // Draw node title
     std::string title = getNodeTitle(node);
@@ -982,7 +982,7 @@ void StoryGraphPanel::renderNode(const scripting::VisualGraphNode& node)
     drawList->AddRect(
         ImVec2(screenX, screenY),
         ImVec2(screenX + nodeWidth, screenY + nodeHeight),
-        borderColor, m_nodeStyle.cornerRadius * m_zoom, 0, isSelected ? 3.0f : 1.0f);
+        borderColor, m_nodeStyle.borderRadius * m_zoom, 0, isSelected ? 3.0f : 1.0f);
 
 #else
     f32 screenX = (node.x + m_viewOffsetX) * m_zoom;
@@ -1132,9 +1132,9 @@ void StoryGraphPanel::handleMouseInput()
     // Middle mouse panning
     if (ImGui::IsMouseDown(ImGuiMouseButton_Middle) && ImGui::IsWindowHovered())
     {
-        if (!m_isPanning)
+        if (m_interactionMode != GraphInteractionMode::Panning)
         {
-            m_isPanning = true;
+            m_interactionMode = GraphInteractionMode::Panning;
         }
         else
         {
@@ -1146,7 +1146,10 @@ void StoryGraphPanel::handleMouseInput()
     }
     else
     {
-        m_isPanning = false;
+        if (m_interactionMode == GraphInteractionMode::Panning)
+        {
+            m_interactionMode = GraphInteractionMode::Normal;
+        }
     }
 
     // Left click - node selection or connection creation
@@ -1175,7 +1178,8 @@ void StoryGraphPanel::handleMouseInput()
     }
 
     // Dragging nodes
-    if (ImGui::IsMouseDragging(ImGuiMouseButton_Left, 2.0f) && !m_isPanning &&
+    if (ImGui::IsMouseDragging(ImGuiMouseButton_Left, 2.0f) &&
+        m_interactionMode != GraphInteractionMode::Panning &&
         getSelection().hasSelectionOfType(SelectionType::StoryGraphNode))
     {
         ImVec2 delta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left, 0.0f);
@@ -1196,7 +1200,7 @@ void StoryGraphPanel::handleMouseInput()
             }
         }
 
-        GraphModifiedEvent event;
+        GraphNodeMovedEvent event;
         publishEvent(event);
     }
 #else

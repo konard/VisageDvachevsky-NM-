@@ -371,7 +371,7 @@ void InspectorPanel::renderProperty(const std::string& name, const std::string& 
             std::strncpy(buffer, value.c_str(), sizeof(buffer) - 1);
             buffer[sizeof(buffer) - 1] = '\0';
 
-            if (def.isReadOnly)
+            if (def.readOnly)
             {
                 ImGui::TextDisabled("%s", buffer);
             }

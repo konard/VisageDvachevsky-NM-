@@ -225,7 +225,7 @@ void AssetBrowserPanel::showInExplorer()
     // Linux: use xdg-open on parent directory
     std::filesystem::path path(m_selectedAssets[0]);
     std::string cmd = "xdg-open \"" + path.parent_path().string() + "\"";
-    std::system(cmd.c_str());
+    [[maybe_unused]] int result = std::system(cmd.c_str());
 #endif
 }
 

@@ -6,6 +6,8 @@
 #include "NovelMind/editor/imgui_integration.hpp"
 #include <cmath>
 #include <algorithm>
+#include <cstdio>
+#include <cstring>
 
 // ImGui is optional at compile time - stub implementation when not available
 // This allows the editor to compile without ImGui for testing purposes.
@@ -13,6 +15,7 @@
 
 #if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
 #include <imgui.h>
+#include <imgui_internal.h>
 #include <backends/imgui_impl_sdl2.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <SDL.h>
@@ -495,7 +498,7 @@ void ImGuiLayer::applyTheme(const EditorTheme& theme)
     style.FrameRounding = theme.frameRounding;
     style.ScrollbarRounding = theme.scrollbarRounding;
     style.GrabRounding = theme.grabRounding;
-    style.TabRounding = theme.tabRounding;
+    style.TabRounding = theme.frameRounding; // Use frameRounding for tabs
 
     // Colors
     auto toImVec4 = [](const renderer::Color& c) {

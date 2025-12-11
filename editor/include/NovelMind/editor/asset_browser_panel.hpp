@@ -21,6 +21,9 @@
 #include <vector>
 #include <filesystem>
 
+// Forward declarations
+struct ImVec4;
+
 namespace NovelMind::editor {
 
 /**
@@ -371,7 +374,7 @@ private:
     std::string getAssetTypeName(AssetType type) const;
     const char* getAssetTypeIcon(AssetType type) const;
 #if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
-    struct ImVec4 getAssetTypeColor(AssetType type) const;
+    ImVec4 getAssetTypeColor(AssetType type) const;
 #endif
 
     std::string m_currentPath;

@@ -1022,7 +1022,7 @@ void SceneViewPanel::handleKeyboardInput()
         if (!selectedIds.empty())
         {
             getSelection().clearSelection();
-            SceneModifiedEvent event;
+            ProjectModifiedEvent event;
             publishEvent(event);
         }
     }
@@ -1074,7 +1074,7 @@ void SceneViewPanel::handleDragDrop()
             (void)sceneX;
             (void)sceneY;
 
-            SceneModifiedEvent event;
+            ProjectModifiedEvent event;
             publishEvent(event);
         }
 
