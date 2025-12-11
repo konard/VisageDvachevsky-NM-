@@ -621,38 +621,175 @@ void SceneViewPanel::renderPlaceholderObjects()
 
 void SceneViewPanel::renderSelectionHighlight()
 {
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     auto selectedIds = getSelection().getSelectedObjectIds();
     if (selectedIds.empty())
     {
         return;
     }
 
-    // Draw selection rectangles around selected objects
-    // This would iterate through selected objects and draw their bounds
-    // ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImVec2 contentMin = ImGui::GetCursorScreenPos();
 
-    // For each selected object:
-    // - Get object bounds
-    // - Convert to screen coordinates
-    // - Draw selection rectangle
+    ImU32 selectionColor = IM_COL32(m_selectionColor.r, m_selectionColor.g, m_selectionColor.b, 255);
+    ImU32 selectionFillColor = IM_COL32(m_selectionColor.r, m_selectionColor.g, m_selectionColor.b, 30);
+
+    // For each selected object, draw selection rectangle
+    // TODO: This needs to be connected to actual scene graph
+    // For now, draw a placeholder selection box at the center
+    for (size_t i = 0; i < selectedIds.size(); ++i)
+    {
+        // Placeholder: draw selection at center with offset per object
+        f32 objX = m_sceneWidth / 2.0f + (static_cast<f32>(i) * 50.0f);
+        f32 objY = m_sceneHeight / 2.0f;
+        f32 objWidth = 200.0f;
+        f32 objHeight = 300.0f;
+
+        // Convert object bounds to screen coordinates
+        auto [screenX1, screenY1] = sceneToScreen(objX - objWidth/2, objY - objHeight/2);
+        auto [screenX2, screenY2] = sceneToScreen(objX + objWidth/2, objY + objHeight/2);
+
+        screenX1 += contentMin.x;
+        screenY1 += contentMin.y;
+        screenX2 += contentMin.x;
+        screenY2 += contentMin.y;
+
+        // Draw selection fill
+        drawList->AddRectFilled(
+            ImVec2(screenX1, screenY1),
+            ImVec2(screenX2, screenY2),
+            selectionFillColor);
+
+        // Draw selection border
+        drawList->AddRect(
+            ImVec2(screenX1, screenY1),
+            ImVec2(screenX2, screenY2),
+            selectionColor, 0.0f, 0, 2.5f);
+
+        // Draw corner handles for selected objects
+        f32 handleSize = 8.0f;
+        ImU32 handleColor = IM_COL32(255, 255, 255, 255);
+
+        // Top-left
+        drawList->AddRectFilled(
+            ImVec2(screenX1 - handleSize/2, screenY1 - handleSize/2),
+            ImVec2(screenX1 + handleSize/2, screenY1 + handleSize/2),
+            handleColor);
+        // Top-right
+        drawList->AddRectFilled(
+            ImVec2(screenX2 - handleSize/2, screenY1 - handleSize/2),
+            ImVec2(screenX2 + handleSize/2, screenY1 + handleSize/2),
+            handleColor);
+        // Bottom-left
+        drawList->AddRectFilled(
+            ImVec2(screenX1 - handleSize/2, screenY2 - handleSize/2),
+            ImVec2(screenX1 + handleSize/2, screenY2 + handleSize/2),
+            handleColor);
+        // Bottom-right
+        drawList->AddRectFilled(
+            ImVec2(screenX2 - handleSize/2, screenY2 - handleSize/2),
+            ImVec2(screenX2 + handleSize/2, screenY2 + handleSize/2),
+            handleColor);
+    }
+#else
+    auto selectedIds = getSelection().getSelectedObjectIds();
+    (void)selectedIds;
+#endif
 }
 
 void SceneViewPanel::renderOverlays()
 {
-    // Draw zoom indicator
-    // char zoomText[32];
-    // snprintf(zoomText, sizeof(zoomText), "%.0f%%", m_zoom * 100.0f);
-    // ImVec2 textSize = ImGui::CalcTextSize(zoomText);
-    // ImGui::SetCursorPos(ImVec2(m_contentWidth - textSize.x - 10, 10));
-    // ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "%s", zoomText);
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImVec2 windowPos = ImGui::GetWindowPos();
+    ImVec2 windowSize = ImGui::GetWindowSize();
 
-    // Draw coordinate indicator
-    // if (m_isHovered)
-    // {
-    //     auto [sceneX, sceneY] = screenToScene(m_lastMouseX, m_lastMouseY);
-    //     ImGui::SetCursorPos(ImVec2(10, m_contentHeight - 30));
-    //     ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "X: %.1f Y: %.1f", sceneX, sceneY);
-    // }
+    // Draw zoom indicator (top-right corner)
+    char zoomText[32];
+    snprintf(zoomText, sizeof(zoomText), "%.0f%%", m_zoom * 100.0f);
+    ImVec2 textSize = ImGui::CalcTextSize(zoomText);
+    ImVec2 zoomPos(windowPos.x + windowSize.x - textSize.x - 15, windowPos.y + ImGui::GetFrameHeight() + 10);
+
+    // Draw background for zoom text
+    drawList->AddRectFilled(
+        ImVec2(zoomPos.x - 5, zoomPos.y - 2),
+        ImVec2(zoomPos.x + textSize.x + 5, zoomPos.y + textSize.y + 2),
+        IM_COL32(0, 0, 0, 180));
+    drawList->AddText(zoomPos, IM_COL32(200, 200, 200, 255), zoomText);
+
+    // Draw coordinate indicator (bottom-left corner)
+    if (m_isHovered && m_lastMouseX >= 0 && m_lastMouseY >= 0)
+    {
+        auto [sceneX, sceneY] = screenToScene(m_lastMouseX, m_lastMouseY);
+        char coordText[64];
+        snprintf(coordText, sizeof(coordText), "X: %.1f Y: %.1f", sceneX, sceneY);
+
+        ImVec2 coordTextSize = ImGui::CalcTextSize(coordText);
+        ImVec2 coordPos(windowPos.x + 10, windowPos.y + windowSize.y - coordTextSize.y - 10);
+
+        // Draw background for coordinate text
+        drawList->AddRectFilled(
+            ImVec2(coordPos.x - 5, coordPos.y - 2),
+            ImVec2(coordPos.x + coordTextSize.x + 5, coordPos.y + coordTextSize.y + 2),
+            IM_COL32(0, 0, 0, 180));
+        drawList->AddText(coordPos, IM_COL32(200, 200, 200, 255), coordText);
+    }
+
+    // Draw current tool indicator (bottom-right corner)
+    const char* toolName = "";
+    switch (m_currentTool)
+    {
+        case TransformTool::Select: toolName = "Select (Q)"; break;
+        case TransformTool::Move: toolName = "Move (W)"; break;
+        case TransformTool::Rotate: toolName = "Rotate (E)"; break;
+        case TransformTool::Scale: toolName = "Scale (R)"; break;
+        case TransformTool::Rect: toolName = "Rect (T)"; break;
+    }
+
+    if (toolName[0] != '\0')
+    {
+        ImVec2 toolTextSize = ImGui::CalcTextSize(toolName);
+        ImVec2 toolPos(windowPos.x + windowSize.x - toolTextSize.x - 15,
+                       windowPos.y + windowSize.y - toolTextSize.y - 10);
+
+        // Draw background
+        drawList->AddRectFilled(
+            ImVec2(toolPos.x - 5, toolPos.y - 2),
+            ImVec2(toolPos.x + toolTextSize.x + 5, toolPos.y + toolTextSize.y + 2),
+            IM_COL32(0, 0, 0, 180));
+        drawList->AddText(toolPos, IM_COL32(200, 200, 200, 255), toolName);
+    }
+
+    // Draw grid/snap indicators if enabled
+    if (m_showGrid || m_snapEnabled)
+    {
+        char statusText[64] = "";
+        if (m_showGrid && m_snapEnabled)
+        {
+            snprintf(statusText, sizeof(statusText), "Grid: ON | Snap: ON (%.0f)", m_snapIncrement);
+        }
+        else if (m_showGrid)
+        {
+            snprintf(statusText, sizeof(statusText), "Grid: ON");
+        }
+        else if (m_snapEnabled)
+        {
+            snprintf(statusText, sizeof(statusText), "Snap: ON (%.0f)", m_snapIncrement);
+        }
+
+        if (statusText[0] != '\0')
+        {
+            ImVec2 statusSize = ImGui::CalcTextSize(statusText);
+            ImVec2 statusPos(windowPos.x + 10, windowPos.y + ImGui::GetFrameHeight() + 10);
+
+            drawList->AddRectFilled(
+                ImVec2(statusPos.x - 5, statusPos.y - 2),
+                ImVec2(statusPos.x + statusSize.x + 5, statusPos.y + statusSize.y + 2),
+                IM_COL32(0, 0, 0, 180));
+            drawList->AddText(statusPos, IM_COL32(180, 220, 180, 255), statusText);
+        }
+    }
+#endif
 }
 
 void SceneViewPanel::renderLayerControls()
@@ -681,103 +818,192 @@ void SceneViewPanel::renderLayerControls()
 
 void SceneViewPanel::handleMouseInput()
 {
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     if (!m_isHovered)
     {
         return;
     }
 
-    // Get mouse position relative to content area
-    // ImVec2 mousePos = ImGui::GetMousePos();
-    // ImVec2 contentMin = ImGui::GetCursorScreenPos();
-    // f32 localX = mousePos.x - contentMin.x;
-    // f32 localY = mousePos.y - contentMin.y;
+    ImGuiIO& io = ImGui::GetIO();
+    ImVec2 mousePos = ImGui::GetMousePos();
+    ImVec2 contentMin = ImGui::GetWindowPos();
+    contentMin.y += ImGui::GetFrameHeight(); // Account for title bar
+    f32 localX = mousePos.x - contentMin.x;
+    f32 localY = mousePos.y - contentMin.y;
 
     // Handle mouse wheel zoom
-    // f32 wheel = ImGui::GetIO().MouseWheel;
-    // if (wheel != 0.0f)
-    // {
-    //     f32 zoomFactor = 1.0f + wheel * 0.1f;
-    //     setZoom(m_zoom * zoomFactor);
-    // }
+    f32 wheel = io.MouseWheel;
+    if (wheel != 0.0f && ImGui::IsWindowHovered())
+    {
+        f32 zoomFactor = 1.0f + wheel * 0.1f;
+        f32 newZoom = m_zoom * zoomFactor;
+
+        // Zoom towards mouse position
+        f32 mouseSceneX, mouseSceneY;
+        std::tie(mouseSceneX, mouseSceneY) = screenToScene(localX, localY);
+
+        setZoom(newZoom);
+
+        // Adjust pan to keep mouse position steady
+        f32 newMouseX, newMouseY;
+        std::tie(newMouseX, newMouseY) = sceneToScreen(mouseSceneX, mouseSceneY);
+        m_panX += (localX - newMouseX) / m_zoom;
+        m_panY += (localY - newMouseY) / m_zoom;
+    }
 
     // Handle middle mouse panning
-    // if (ImGui::IsMouseDown(ImGuiMouseButton_Middle))
-    // {
-    //     if (!m_isPanning)
-    //     {
-    //         m_isPanning = true;
-    //         m_dragStartX = localX;
-    //         m_dragStartY = localY;
-    //     }
-    //     else
-    //     {
-    //         f32 deltaX = localX - m_lastMouseX;
-    //         f32 deltaY = localY - m_lastMouseY;
-    //         m_panX += deltaX / m_zoom;
-    //         m_panY += deltaY / m_zoom;
-    //     }
-    // }
-    // else
-    // {
-    //     m_isPanning = false;
-    // }
+    if (ImGui::IsMouseDown(ImGuiMouseButton_Middle) && ImGui::IsWindowHovered())
+    {
+        if (!m_isPanning)
+        {
+            m_isPanning = true;
+            m_dragStartX = localX;
+            m_dragStartY = localY;
+        }
+        else
+        {
+            f32 deltaX = localX - m_lastMouseX;
+            f32 deltaY = localY - m_lastMouseY;
+            m_panX += deltaX / m_zoom;
+            m_panY += deltaY / m_zoom;
+        }
+    }
+    else
+    {
+        m_isPanning = false;
+    }
 
     // Handle left click selection
-    // if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-    // {
-    //     bool addToSelection = ImGui::GetIO().KeyShift;
-    //     selectObjectAtPosition(localX, localY, addToSelection);
-    // }
+    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsWindowHovered())
+    {
+        bool addToSelection = io.KeyShift;
+        selectObjectAtPosition(localX, localY, addToSelection);
+    }
 
-    // Handle dragging
-    // if (ImGui::IsMouseDragging(ImGuiMouseButton_Left) && getSelection().hasSelection())
-    // {
-    //     f32 deltaX = localX - m_lastMouseX;
-    //     f32 deltaY = localY - m_lastMouseY;
-    //     moveSelectedObjects(deltaX / m_zoom, deltaY / m_zoom);
-    // }
+    // Handle dragging selected objects
+    if (ImGui::IsMouseDragging(ImGuiMouseButton_Left) && getSelection().hasSelection() &&
+        !m_isPanning && ImGui::IsWindowHovered())
+    {
+        if (m_lastMouseX >= 0 && m_lastMouseY >= 0)
+        {
+            f32 deltaX = localX - m_lastMouseX;
+            f32 deltaY = localY - m_lastMouseY;
+            moveSelectedObjects(deltaX / m_zoom, deltaY / m_zoom);
+        }
+    }
 
-    // m_lastMouseX = localX;
-    // m_lastMouseY = localY;
+    m_lastMouseX = localX;
+    m_lastMouseY = localY;
+#else
+    (void)m_isHovered;
+#endif
 }
 
 void SceneViewPanel::handleKeyboardInput()
 {
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     if (!m_isFocused)
     {
         return;
     }
 
+    ImGuiIO& io = ImGui::GetIO();
+
     // Tool shortcuts
-    // if (ImGui::IsKeyPressed(ImGuiKey_Q)) setCurrentTool(TransformTool::Select);
-    // if (ImGui::IsKeyPressed(ImGuiKey_W)) setCurrentTool(TransformTool::Move);
-    // if (ImGui::IsKeyPressed(ImGuiKey_E)) setCurrentTool(TransformTool::Rotate);
-    // if (ImGui::IsKeyPressed(ImGuiKey_R)) setCurrentTool(TransformTool::Scale);
-    // if (ImGui::IsKeyPressed(ImGuiKey_T)) setCurrentTool(TransformTool::Rect);
+    if (ImGui::IsKeyPressed(ImGuiKey_Q)) setCurrentTool(TransformTool::Select);
+    if (ImGui::IsKeyPressed(ImGuiKey_W)) setCurrentTool(TransformTool::Move);
+    if (ImGui::IsKeyPressed(ImGuiKey_E)) setCurrentTool(TransformTool::Rotate);
+    if (ImGui::IsKeyPressed(ImGuiKey_R)) setCurrentTool(TransformTool::Scale);
+    if (ImGui::IsKeyPressed(ImGuiKey_T)) setCurrentTool(TransformTool::Rect);
 
     // View shortcuts
-    // if (ImGui::IsKeyPressed(ImGuiKey_Home)) resetView();
-    // if (ImGui::IsKeyPressed(ImGuiKey_F) && ImGui::GetIO().KeyShift) zoomToFit();
+    if (ImGui::IsKeyPressed(ImGuiKey_Home)) resetView();
+    if (ImGui::IsKeyPressed(ImGuiKey_F) && io.KeyShift) zoomToFit();
 
-    // Delete selected
-    // if (ImGui::IsKeyPressed(ImGuiKey_Delete))
-    // {
-    //     // Delete selected objects
-    // }
+    // Toggle grid and snapping
+    if (ImGui::IsKeyPressed(ImGuiKey_G)) setGridVisible(!m_showGrid);
+    if (ImGui::IsKeyPressed(ImGuiKey_S) && io.KeyCtrl) setSnappingEnabled(!m_snapEnabled);
+
+    // Delete selected objects
+    if (ImGui::IsKeyPressed(ImGuiKey_Delete) || (ImGui::IsKeyPressed(ImGuiKey_Backspace) && io.KeyCtrl))
+    {
+        auto selectedIds = getSelection().getSelectedObjectIds();
+        for (const auto& id : selectedIds)
+        {
+            // TODO: Delete object through scene system
+            // This should trigger Undo/Redo and event publication
+            (void)id;
+        }
+        if (!selectedIds.empty())
+        {
+            getSelection().clearSelection();
+            SceneModifiedEvent event;
+            publishEvent(event);
+        }
+    }
+
+    // Duplicate selected (Ctrl+D)
+    if (ImGui::IsKeyPressed(ImGuiKey_D) && io.KeyCtrl && !io.KeyShift)
+    {
+        auto selectedIds = getSelection().getSelectedObjectIds();
+        if (!selectedIds.empty())
+        {
+            // TODO: Duplicate objects through scene system
+            // This should trigger Undo/Redo and event publication
+        }
+    }
+
+    // Select all (Ctrl+A)
+    if (ImGui::IsKeyPressed(ImGuiKey_A) && io.KeyCtrl)
+    {
+        // TODO: Select all scene objects
+    }
+#else
+    (void)m_isFocused;
+#endif
 }
 
 void SceneViewPanel::handleDragDrop()
 {
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     // Handle drag-drop of assets into scene
-    // if (ImGui::BeginDragDropTarget())
-    // {
-    //     if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
-    //     {
-    //         const char* assetPath = (const char*)payload->Data;
-    //         // Create object from dropped asset
-    //     }
-    //     ImGui::EndDragDropTarget();
-    // }
+    if (ImGui::BeginDragDropTarget())
+    {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+        {
+            const char* assetPath = static_cast<const char*>(payload->Data);
+
+            // Get drop position in scene coordinates
+            ImVec2 mousePos = ImGui::GetMousePos();
+            ImVec2 contentMin = ImGui::GetWindowPos();
+            contentMin.y += ImGui::GetFrameHeight();
+            f32 localX = mousePos.x - contentMin.x;
+            f32 localY = mousePos.y - contentMin.y;
+
+            auto [sceneX, sceneY] = screenToScene(localX, localY);
+
+            // TODO: Create scene object at position from asset
+            // Determine asset type and create appropriate object
+            // This should trigger Undo/Redo and event publication
+            (void)assetPath;
+            (void)sceneX;
+            (void)sceneY;
+
+            SceneModifiedEvent event;
+            publishEvent(event);
+        }
+
+        // Support other drag-drop types
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_OBJECT"))
+        {
+            // Dragging object from hierarchy - potentially reparent or move
+            const char* objectId = static_cast<const char*>(payload->Data);
+            (void)objectId;
+        }
+
+        ImGui::EndDragDropTarget();
+    }
+#endif
 }
 
 void SceneViewPanel::selectObjectAtPosition(f32 x, f32 y, bool addToSelection)

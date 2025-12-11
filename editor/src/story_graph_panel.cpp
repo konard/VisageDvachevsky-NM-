@@ -1109,18 +1109,176 @@ void StoryGraphPanel::renderPendingConnection()
 
 void StoryGraphPanel::handleMouseInput()
 {
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     if (!m_isHovered)
     {
         return;
     }
+
+    ImGuiIO& io = ImGui::GetIO();
+    ImVec2 mousePos = ImGui::GetMousePos();
+    ImVec2 contentMin = ImGui::GetCursorScreenPos();
+    f32 localX = mousePos.x - contentMin.x;
+    f32 localY = mousePos.y - contentMin.y;
+
+    // Mouse wheel zoom
+    f32 wheel = io.MouseWheel;
+    if (wheel != 0.0f && ImGui::IsWindowHovered())
+    {
+        f32 zoomFactor = 1.0f + wheel * 0.1f;
+        setZoom(m_zoom * zoomFactor);
+    }
+
+    // Middle mouse panning
+    if (ImGui::IsMouseDown(ImGuiMouseButton_Middle) && ImGui::IsWindowHovered())
+    {
+        if (!m_isPanning)
+        {
+            m_isPanning = true;
+        }
+        else
+        {
+            ImVec2 delta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Middle, 0.0f);
+            m_viewOffsetX += delta.x / m_zoom;
+            m_viewOffsetY += delta.y / m_zoom;
+            ImGui::ResetMouseDragDelta(ImGuiMouseButton_Middle);
+        }
+    }
+    else
+    {
+        m_isPanning = false;
+    }
+
+    // Left click - node selection or connection creation
+    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsWindowHovered())
+    {
+        auto nodeHit = hitTestNode(localX, localY);
+        if (nodeHit)
+        {
+            // Check if clicking on output pin to start connection
+            f32 nodeScreenX = (*nodeHit * 1.0f + m_viewOffsetX) * m_zoom;  // TODO: Get actual node position
+            // For now, just select the node
+            if (!io.KeyShift)
+            {
+                getSelection().clearSelectionOfType(SelectionType::StoryGraphNode);
+            }
+            getSelection().selectNode(*nodeHit);
+        }
+        else
+        {
+            // Clicked on empty space - clear selection
+            if (!io.KeyShift)
+            {
+                getSelection().clearSelectionOfType(SelectionType::StoryGraphNode);
+            }
+        }
+    }
+
+    // Dragging nodes
+    if (ImGui::IsMouseDragging(ImGuiMouseButton_Left, 2.0f) && !m_isPanning &&
+        getSelection().hasSelectionOfType(SelectionType::StoryGraphNode))
+    {
+        ImVec2 delta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left, 0.0f);
+        ImGui::ResetMouseDragDelta(ImGuiMouseButton_Left);
+
+        f32 graphDeltaX = delta.x / m_zoom;
+        f32 graphDeltaY = delta.y / m_zoom;
+
+        // Move selected nodes
+        auto selectedIds = getSelection().getSelectedNodeIds();
+        for (auto nodeId : selectedIds)
+        {
+            auto* node = m_activeGraph->findNode(nodeId);
+            if (node)
+            {
+                node->x += graphDeltaX;
+                node->y += graphDeltaY;
+            }
+        }
+
+        GraphModifiedEvent event;
+        publishEvent(event);
+    }
+#else
+    (void)m_isHovered;
+#endif
 }
 
 void StoryGraphPanel::handleKeyboardInput()
 {
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     if (!m_isFocused)
     {
         return;
     }
+
+    ImGuiIO& io = ImGui::GetIO();
+
+    // Delete selected nodes
+    if (ImGui::IsKeyPressed(ImGuiKey_Delete) || (ImGui::IsKeyPressed(ImGuiKey_Backspace) && io.KeyCtrl))
+    {
+        deleteSelectedNodes();
+    }
+
+    // Copy
+    if (ImGui::IsKeyPressed(ImGuiKey_C) && io.KeyCtrl)
+    {
+        copySelectedNodes();
+    }
+
+    // Cut
+    if (ImGui::IsKeyPressed(ImGuiKey_X) && io.KeyCtrl)
+    {
+        copySelectedNodes();
+        deleteSelectedNodes();
+    }
+
+    // Paste
+    if (ImGui::IsKeyPressed(ImGuiKey_V) && io.KeyCtrl)
+    {
+        pasteNodes();
+    }
+
+    // Duplicate
+    if (ImGui::IsKeyPressed(ImGuiKey_D) && io.KeyCtrl)
+    {
+        duplicateSelectedNodes();
+    }
+
+    // Frame all
+    if (ImGui::IsKeyPressed(ImGuiKey_F) && !io.KeyShift)
+    {
+        frameAll();
+    }
+
+    // Frame selection
+    if (ImGui::IsKeyPressed(ImGuiKey_F) && io.KeyShift)
+    {
+        frameSelection();
+    }
+
+    // Reset view
+    if (ImGui::IsKeyPressed(ImGuiKey_Home))
+    {
+        resetView();
+    }
+
+    // Select all
+    if (ImGui::IsKeyPressed(ImGuiKey_A) && io.KeyCtrl)
+    {
+        if (m_activeGraph)
+        {
+            std::vector<scripting::NodeId> allIds;
+            for (const auto& node : m_activeGraph->getNodes())
+            {
+                allIds.push_back(node.id);
+            }
+            getSelection().selectNodes(allIds);
+        }
+    }
+#else
+    (void)m_isFocused;
+#endif
 }
 
 void StoryGraphPanel::handleDragDrop()
