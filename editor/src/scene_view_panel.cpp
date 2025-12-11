@@ -141,31 +141,38 @@ std::vector<ToolbarItem> SceneViewPanel::getToolbarItems() const
 {
     std::vector<ToolbarItem> items;
 
-    // Transform tools
-    items.push_back({"Q", "Select (Q)", [this]() { const_cast<SceneViewPanel*>(this)->setCurrentTool(TransformTool::Select); },
+    // Transform tools with enhanced tooltips
+    items.push_back({"Q", "Select Tool (Q) - Click to select objects, drag to box select",
+                     [this]() { const_cast<SceneViewPanel*>(this)->setCurrentTool(TransformTool::Select); },
                      []() { return true; }, [this]() { return m_currentTool == TransformTool::Select; }});
-    items.push_back({"W", "Move (W)", [this]() { const_cast<SceneViewPanel*>(this)->setCurrentTool(TransformTool::Move); },
+    items.push_back({"W", "Move Tool (W) - Drag objects to reposition them in the scene",
+                     [this]() { const_cast<SceneViewPanel*>(this)->setCurrentTool(TransformTool::Move); },
                      []() { return true; }, [this]() { return m_currentTool == TransformTool::Move; }});
-    items.push_back({"E", "Rotate (E)", [this]() { const_cast<SceneViewPanel*>(this)->setCurrentTool(TransformTool::Rotate); },
+    items.push_back({"E", "Rotate Tool (E) - Drag to rotate selected objects around their center",
+                     [this]() { const_cast<SceneViewPanel*>(this)->setCurrentTool(TransformTool::Rotate); },
                      []() { return true; }, [this]() { return m_currentTool == TransformTool::Rotate; }});
-    items.push_back({"R", "Scale (R)", [this]() { const_cast<SceneViewPanel*>(this)->setCurrentTool(TransformTool::Scale); },
+    items.push_back({"R", "Scale Tool (R) - Drag handles to resize selected objects",
+                     [this]() { const_cast<SceneViewPanel*>(this)->setCurrentTool(TransformTool::Scale); },
                      []() { return true; }, [this]() { return m_currentTool == TransformTool::Scale; }});
-    items.push_back({"T", "Rect Tool (T)", [this]() { const_cast<SceneViewPanel*>(this)->setCurrentTool(TransformTool::Rect); },
+    items.push_back({"T", "Rect Tool (T) - Draw or edit rectangular bounds",
+                     [this]() { const_cast<SceneViewPanel*>(this)->setCurrentTool(TransformTool::Rect); },
                      []() { return true; }, [this]() { return m_currentTool == TransformTool::Rect; }});
 
     items.push_back(ToolbarItem::separator());
 
-    // Gizmo space toggle
-    items.push_back({"L/G", "Toggle Local/Global Space",
+    // Gizmo space toggle with enhanced tooltip
+    items.push_back({"L/G", "Toggle Local/Global Space - Switch between object-relative and world-relative coordinates",
                      [this]() { const_cast<SceneViewPanel*>(this)->toggleGizmoSpace(); },
                      []() { return true; }, [this]() { return m_gizmoSpace == GizmoSpace::Local; }});
 
     items.push_back(ToolbarItem::separator());
 
-    // View controls
-    items.push_back({"#", "Toggle Grid", [this]() { const_cast<SceneViewPanel*>(this)->setGridVisible(!m_showGrid); },
+    // View controls with enhanced tooltips
+    items.push_back({"#", "Toggle Grid - Show/hide alignment grid for easier positioning",
+                     [this]() { const_cast<SceneViewPanel*>(this)->setGridVisible(!m_showGrid); },
                      []() { return true; }, [this]() { return m_showGrid; }});
-    items.push_back({"S", "Toggle Snapping", [this]() { const_cast<SceneViewPanel*>(this)->setSnappingEnabled(!m_snapEnabled); },
+    items.push_back({"S", "Toggle Snapping - Enable/disable snap-to-grid when moving objects",
+                     [this]() { const_cast<SceneViewPanel*>(this)->setSnappingEnabled(!m_snapEnabled); },
                      []() { return true; }, [this]() { return m_snapEnabled; }});
 
     return items;
@@ -177,17 +184,21 @@ std::vector<MenuItem> SceneViewPanel::getContextMenuItems() const
 
     bool hasSelection = getSelection().hasSelection();
 
-    items.push_back({"Cut", "Ctrl+X", []() { /* Cut action */ }, [hasSelection]() { return hasSelection; }});
-    items.push_back({"Copy", "Ctrl+C", []() { /* Copy action */ }, [hasSelection]() { return hasSelection; }});
-    items.push_back({"Paste", "Ctrl+V", []() { /* Paste action */ }});
-    items.push_back({"Delete", "Delete", []() { /* Delete action */ }, [hasSelection]() { return hasSelection; }});
+    items.push_back({"Cut", "Ctrl+X", []() { /* TODO: Cut selected objects to clipboard */ },
+                     [hasSelection]() { return hasSelection; }});
+    items.push_back({"Copy", "Ctrl+C", []() { /* TODO: Copy selected objects to clipboard */ },
+                     [hasSelection]() { return hasSelection; }});
+    items.push_back({"Paste", "Ctrl+V", []() { /* TODO: Paste objects from clipboard */ }});
+    items.push_back({"Delete", "Delete", []() { /* TODO: Delete selected objects from scene */ },
+                     [hasSelection]() { return hasSelection; }});
     items.push_back(MenuItem::separator());
-    items.push_back({"Duplicate", "Ctrl+D", []() { /* Duplicate action */ }, [hasSelection]() { return hasSelection; }});
+    items.push_back({"Duplicate", "Ctrl+D", []() { /* TODO: Duplicate selected objects */ },
+                     [hasSelection]() { return hasSelection; }});
     items.push_back(MenuItem::separator());
-    items.push_back({"Create Empty", "", []() { /* Create empty object */ }});
-    items.push_back({"Create Character", "", []() { /* Create character sprite */ }});
-    items.push_back({"Create Background", "", []() { /* Create background */ }});
-    items.push_back({"Create UI Element", "", []() { /* Create UI element */ }});
+    items.push_back({"Create Empty Object", "", []() { /* TODO: Create empty scene object */ }});
+    items.push_back({"Create Character Sprite", "", []() { /* TODO: Add new character to scene */ }});
+    items.push_back({"Create Background", "", []() { /* TODO: Add new background layer */ }});
+    items.push_back({"Create UI Element", "", []() { /* TODO: Add new UI component */ }});
 
     return items;
 }

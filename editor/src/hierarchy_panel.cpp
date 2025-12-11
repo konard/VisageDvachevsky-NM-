@@ -492,8 +492,8 @@ std::vector<ToolbarItem> HierarchyPanel::getToolbarItems() const
 {
     std::vector<ToolbarItem> items;
 
-    items.push_back({"+", "Create Object", [this]() { const_cast<HierarchyPanel*>(this)->createEmpty(); }});
-    items.push_back({"Refresh", "Refresh Hierarchy", [this]() { const_cast<HierarchyPanel*>(this)->refresh(); }});
+    items.push_back({"+", "Create Object - Add a new empty object to the scene", [this]() { const_cast<HierarchyPanel*>(this)->createEmpty(); }});
+    items.push_back({"Refresh", "Refresh Hierarchy - Reload scene hierarchy from SceneGraph", [this]() { const_cast<HierarchyPanel*>(this)->refresh(); }});
 
     return items;
 }
