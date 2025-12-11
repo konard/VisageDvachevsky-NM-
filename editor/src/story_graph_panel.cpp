@@ -491,33 +491,33 @@ std::vector<MenuItem> StoryGraphPanel::getMenuItems() const
     MenuItem editMenu;
     editMenu.label = "Edit";
     editMenu.subItems = {
-        {"Undo", "Ctrl+Z", []() { }},
-        {"Redo", "Ctrl+Y", []() { }},
+        {"Undo", "Ctrl+Z", []() { }, []() { return true; }, nullptr, false, {}},
+        {"Redo", "Ctrl+Y", []() { }, []() { return true; }, nullptr, false, {}},
         MenuItem::separator(),
         {"Cut", "Ctrl+X", [this]() { const_cast<StoryGraphPanel*>(this)->copySelectedNodes(); const_cast<StoryGraphPanel*>(this)->deleteSelectedNodes(); },
-         [hasSelection]() { return hasSelection; }},
+         [hasSelection]() { return hasSelection; }, nullptr, false, {}},
         {"Copy", "Ctrl+C", [this]() { const_cast<StoryGraphPanel*>(this)->copySelectedNodes(); },
-         [hasSelection]() { return hasSelection; }},
+         [hasSelection]() { return hasSelection; }, nullptr, false, {}},
         {"Paste", "Ctrl+V", [this]() { const_cast<StoryGraphPanel*>(this)->pasteNodes(); },
-         [this]() { return !m_clipboardNodes.empty(); }},
+         [this]() { return !m_clipboardNodes.empty(); }, nullptr, false, {}},
         {"Delete", "Delete", [this]() { const_cast<StoryGraphPanel*>(this)->deleteSelectedNodes(); },
-         [hasSelection]() { return hasSelection; }},
+         [hasSelection]() { return hasSelection; }, nullptr, false, {}},
         MenuItem::separator(),
         {"Duplicate", "Ctrl+D", [this]() { const_cast<StoryGraphPanel*>(this)->duplicateSelectedNodes(); },
-         [hasSelection]() { return hasSelection; }},
+         [hasSelection]() { return hasSelection; }, nullptr, false, {}},
     };
     items.push_back(editMenu);
 
     MenuItem viewMenu;
     viewMenu.label = "View";
     viewMenu.subItems = {
-        {"Frame All", "F", [this]() { const_cast<StoryGraphPanel*>(this)->frameAll(); }},
+        {"Frame All", "F", [this]() { const_cast<StoryGraphPanel*>(this)->frameAll(); }, []() { return true; }, nullptr, false, {}},
         {"Frame Selection", "Shift+F", [this]() { const_cast<StoryGraphPanel*>(this)->frameSelection(); },
-         [hasSelection]() { return hasSelection; }},
-        {"Reset View", "Home", [this]() { const_cast<StoryGraphPanel*>(this)->resetView(); }},
+         [hasSelection]() { return hasSelection; }, nullptr, false, {}},
+        {"Reset View", "Home", [this]() { const_cast<StoryGraphPanel*>(this)->resetView(); }, []() { return true; }, nullptr, false, {}},
         MenuItem::separator(),
         {"Show Minimap", "", [this]() { const_cast<StoryGraphPanel*>(this)->setMinimapVisible(!m_showMinimap); },
-         []() { return true; }, [this]() { return m_showMinimap; }},
+         []() { return true; }, [this]() { return m_showMinimap; }, false, {}},
     };
     items.push_back(viewMenu);
 
@@ -560,23 +560,23 @@ std::vector<MenuItem> StoryGraphPanel::getContextMenuItems() const
         {"Dialogue", "", [this]() {
             const_cast<StoryGraphPanel*>(this)->createNode(scripting::IRNodeType::Dialogue,
                 m_nodeCreationMenuX, m_nodeCreationMenuY);
-        }},
+        }, []() { return true; }, nullptr, false, {}},
         {"Choice", "", [this]() {
             const_cast<StoryGraphPanel*>(this)->createNode(scripting::IRNodeType::Choice,
                 m_nodeCreationMenuX, m_nodeCreationMenuY);
-        }},
+        }, []() { return true; }, nullptr, false, {}},
         {"Set Variable", "", [this]() {
             const_cast<StoryGraphPanel*>(this)->createNode(scripting::IRNodeType::SetVariable,
                 m_nodeCreationMenuX, m_nodeCreationMenuY);
-        }},
+        }, []() { return true; }, nullptr, false, {}},
         {"Goto", "", [this]() {
             const_cast<StoryGraphPanel*>(this)->createNode(scripting::IRNodeType::Goto,
                 m_nodeCreationMenuX, m_nodeCreationMenuY);
-        }},
+        }, []() { return true; }, nullptr, false, {}},
         {"Label", "", [this]() {
             const_cast<StoryGraphPanel*>(this)->createNode(scripting::IRNodeType::Label,
                 m_nodeCreationMenuX, m_nodeCreationMenuY);
-        }},
+        }, []() { return true; }, nullptr, false, {}},
     };
     items.push_back(createMenu);
 
@@ -585,22 +585,22 @@ std::vector<MenuItem> StoryGraphPanel::getContextMenuItems() const
     items.push_back({"Cut", "Ctrl+X", [this]() {
         const_cast<StoryGraphPanel*>(this)->copySelectedNodes();
         const_cast<StoryGraphPanel*>(this)->deleteSelectedNodes();
-    }, [hasSelection]() { return hasSelection; }});
+    }, [hasSelection]() { return hasSelection; }, nullptr, false, {}});
     items.push_back({"Copy", "Ctrl+C", [this]() {
         const_cast<StoryGraphPanel*>(this)->copySelectedNodes();
-    }, [hasSelection]() { return hasSelection; }});
+    }, [hasSelection]() { return hasSelection; }, nullptr, false, {}});
     items.push_back({"Paste", "Ctrl+V", [this]() {
         const_cast<StoryGraphPanel*>(this)->pasteNodes();
-    }, [this]() { return !m_clipboardNodes.empty(); }});
+    }, [this]() { return !m_clipboardNodes.empty(); }, nullptr, false, {}});
     items.push_back({"Delete", "Delete", [this]() {
         const_cast<StoryGraphPanel*>(this)->deleteSelectedNodes();
-    }, [hasSelection]() { return hasSelection; }});
+    }, [hasSelection]() { return hasSelection; }, nullptr, false, {}});
 
     items.push_back(MenuItem::separator());
 
     items.push_back({"Duplicate", "Ctrl+D", [this]() {
         const_cast<StoryGraphPanel*>(this)->duplicateSelectedNodes();
-    }, [hasSelection]() { return hasSelection; }});
+    }, [hasSelection]() { return hasSelection; }, nullptr, false, {}});
 
     return items;
 }
