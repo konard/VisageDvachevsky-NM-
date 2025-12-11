@@ -427,25 +427,25 @@ std::vector<MenuItem> AssetBrowserPanel::getContextMenuItems() const
 
     items.push_back({"Duplicate", "Ctrl+D",
         [this]() { const_cast<AssetBrowserPanel*>(this)->duplicateSelected(); },
-        [hasSelection]() { return hasSelection; }});
+        [hasSelection]() { return hasSelection; }, {}});
     items.push_back({"Rename", "F2",
         [this]() { const_cast<AssetBrowserPanel*>(this)->renameSelected(); },
-        [hasSelection]() { return hasSelection; }});
+        [hasSelection]() { return hasSelection; }, {}});
     items.push_back({"Delete", "Delete",
         [this]() { const_cast<AssetBrowserPanel*>(this)->deleteSelected(); },
-        [hasSelection]() { return hasSelection; }});
+        [hasSelection]() { return hasSelection; }, {}});
 
     items.push_back(MenuItem::separator());
 
     items.push_back({"Reimport", "",
         [this]() { const_cast<AssetBrowserPanel*>(this)->reimportSelected(); },
-        [hasSelection]() { return hasSelection; }});
+        [hasSelection]() { return hasSelection; }, {}});
     items.push_back({"Show in Explorer", "",
         [this]() { const_cast<AssetBrowserPanel*>(this)->showInExplorer(); },
-        [hasSelection]() { return hasSelection; }});
+        [hasSelection]() { return hasSelection; }, {}});
     items.push_back({"Copy Path", "",
         [this]() { const_cast<AssetBrowserPanel*>(this)->copyPathToClipboard(); },
-        [hasSelection]() { return hasSelection; }});
+        [hasSelection]() { return hasSelection; }, {}});
 
     return items;
 }
@@ -1534,6 +1534,7 @@ void AssetBrowserPanel::loadDirectory(const std::string& path)
                 {
                     entry.size = std::filesystem::file_size(dirEntry);
                     auto ftime = std::filesystem::last_write_time(dirEntry);
+                    (void)ftime; // Reserved for future use
                     // Convert to readable string (simplified)
                     entry.modifiedTime = ""; // Would format properly
                 }
