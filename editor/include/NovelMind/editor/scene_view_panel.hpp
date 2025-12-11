@@ -19,6 +19,10 @@
 #include <vector>
 #include <memory>
 
+namespace NovelMind::scene {
+class SceneGraph;
+}
+
 namespace NovelMind::editor {
 
 /**
@@ -290,6 +294,9 @@ private:
     renderer::Color m_gizmoXColor{255, 80, 80, 255};
     renderer::Color m_gizmoYColor{80, 255, 80, 255};
     renderer::Color m_gizmoXYColor{255, 255, 80, 255};
+
+    // Scene integration (populated during onInitialize())
+    scene::SceneGraph* m_sceneGraph = nullptr;
 };
 
 } // namespace NovelMind::editor

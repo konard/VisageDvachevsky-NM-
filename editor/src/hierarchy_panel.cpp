@@ -4,7 +4,9 @@
  */
 
 #include "NovelMind/editor/hierarchy_panel.hpp"
+#include "NovelMind/editor/editor_app.hpp"
 #include "NovelMind/editor/imgui_integration.hpp"
+#include "NovelMind/scene/scene_graph.hpp"
 #include <algorithm>
 #include <cstring>
 
@@ -21,59 +23,60 @@ HierarchyPanel::HierarchyPanel()
 
 void HierarchyPanel::refresh()
 {
-    // Would reload from scene manager
+    // Reload from scene graph
     m_rootNodes.clear();
 
-    // Placeholder data for demonstration
-    HierarchyNode background;
-    background.id = "bg_001";
-    background.name = "Background";
-    background.type = "Background";
-    background.layer = 0;
-    background.sortOrder = 0;
+    if (!m_sceneGraph)
+    {
+        // No scene graph available - show empty hierarchy
+        return;
+    }
 
-    HierarchyNode character1;
-    character1.id = "char_001";
-    character1.name = "Character: Alice";
-    character1.type = "CharacterSprite";
-    character1.layer = 1;
-    character1.sortOrder = 0;
+    // Helper lambda to convert SceneObject to HierarchyNode
+    auto convertToNode = [](const scene::SceneObjectBase* obj, i32 layer) -> HierarchyNode {
+        HierarchyNode node;
+        node.id = obj->getId();
+        node.name = obj->getId(); // Can be enhanced with custom names
+        node.type = obj->getTypeName();
+        node.visible = obj->isVisible();
+        node.locked = false; // Can be enhanced with lock state
+        node.expanded = true;
+        node.sortOrder = obj->getZOrder();
+        node.layer = layer;
 
-    HierarchyNode character2;
-    character2.id = "char_002";
-    character2.name = "Character: Bob";
-    character2.type = "CharacterSprite";
-    character2.layer = 1;
-    character2.sortOrder = 1;
+        // Recursively convert children
+        for (const auto& child : obj->getChildren())
+        {
+            node.children.push_back(convertToNode(child.get(), layer));
+        }
 
-    HierarchyNode ui;
-    ui.id = "ui_001";
-    ui.name = "UI";
-    ui.type = "Container";
-    ui.layer = 2;
-    ui.sortOrder = 0;
+        return node;
+    };
 
-    HierarchyNode dialogueBox;
-    dialogueBox.id = "dlg_001";
-    dialogueBox.name = "Dialogue Box";
-    dialogueBox.type = "DialogueBox";
-    dialogueBox.layer = 2;
-    dialogueBox.sortOrder = 0;
-    ui.children.push_back(dialogueBox);
+    // Process all layers
+    // Background layer (layer 0)
+    for (const auto& obj : m_sceneGraph->getBackgroundLayer().getObjects())
+    {
+        m_rootNodes.push_back(convertToNode(obj.get(), 0));
+    }
 
-    HierarchyNode choiceMenu;
-    choiceMenu.id = "choice_001";
-    choiceMenu.name = "Choice Menu";
-    choiceMenu.type = "ChoiceMenu";
-    choiceMenu.visible = false;
-    choiceMenu.layer = 2;
-    choiceMenu.sortOrder = 1;
-    ui.children.push_back(choiceMenu);
+    // Character layer (layer 1)
+    for (const auto& obj : m_sceneGraph->getCharacterLayer().getObjects())
+    {
+        m_rootNodes.push_back(convertToNode(obj.get(), 1));
+    }
 
-    m_rootNodes.push_back(background);
-    m_rootNodes.push_back(character1);
-    m_rootNodes.push_back(character2);
-    m_rootNodes.push_back(ui);
+    // UI layer (layer 2)
+    for (const auto& obj : m_sceneGraph->getUILayer().getObjects())
+    {
+        m_rootNodes.push_back(convertToNode(obj.get(), 2));
+    }
+
+    // Effect layer (layer 3)
+    for (const auto& obj : m_sceneGraph->getEffectLayer().getObjects())
+    {
+        m_rootNodes.push_back(convertToNode(obj.get(), 3));
+    }
 }
 
 // =========================================================================
@@ -489,8 +492,8 @@ std::vector<ToolbarItem> HierarchyPanel::getToolbarItems() const
 {
     std::vector<ToolbarItem> items;
 
-    items.push_back({"+", "Create Object", [this]() { const_cast<HierarchyPanel*>(this)->createEmpty(); }});
-    items.push_back({"Refresh", "Refresh Hierarchy", [this]() { const_cast<HierarchyPanel*>(this)->refresh(); }});
+    items.push_back({"+", "Create Object - Add a new empty object to the scene", [this]() { const_cast<HierarchyPanel*>(this)->createEmpty(); }});
+    items.push_back({"Refresh", "Refresh Hierarchy - Reload scene hierarchy from SceneGraph", [this]() { const_cast<HierarchyPanel*>(this)->refresh(); }});
 
     return items;
 }
@@ -585,6 +588,12 @@ std::vector<MenuItem> HierarchyPanel::getContextMenuItems() const
 
 void HierarchyPanel::onInitialize()
 {
+    // Get SceneGraph reference from EditorApp
+    if (getApp())
+    {
+        m_sceneGraph = getApp()->getSceneGraph();
+    }
+
     refresh();
 
     subscribeEvent<SceneObjectEvent>(

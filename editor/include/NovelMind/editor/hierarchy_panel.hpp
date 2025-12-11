@@ -19,6 +19,10 @@
 #include <string>
 #include <vector>
 
+namespace NovelMind::scene {
+class SceneGraph;
+}
+
 namespace NovelMind::editor {
 
 /**
@@ -236,6 +240,9 @@ private:
     // Callbacks
     HierarchyOperationCallback m_onDoubleClick;
     HierarchyReparentCallback m_onReparent;
+
+    // Scene integration (populated during onInitialize())
+    scene::SceneGraph* m_sceneGraph = nullptr;
 };
 
 } // namespace NovelMind::editor

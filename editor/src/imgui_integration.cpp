@@ -11,6 +11,13 @@
 // This allows the editor to compile without ImGui for testing purposes.
 // When ImGui is available (NOVELMIND_HAS_IMGUI), real implementation is used.
 
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+#include <imgui.h>
+#include <backends/imgui_impl_sdl2.h>
+#include <backends/imgui_impl_opengl3.h>
+#include <SDL.h>
+#endif
+
 namespace NovelMind::editor {
 
 // ============================================================================
@@ -321,16 +328,38 @@ Result<void> ImGuiLayer::initialize(void* windowHandle, void* glContext)
     m_windowHandle = windowHandle;
     m_glContext = glContext;
 
-    // Note: Actual ImGui initialization requires imgui.h and backends
-    // This is a stub that sets up the state without ImGui
-    // When ImGui is available:
-    // - Create ImGui context
-    // - Initialize SDL2 backend
-    // - Initialize OpenGL/Vulkan backend
-    // - Set up docking
-    // - Load fonts
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    // Create ImGui context
+    m_context = ImGui::CreateContext();
+    if (!m_context)
+    {
+        return Result<void>::error("Failed to create ImGui context");
+    }
 
-    m_context = nullptr; // Would be ImGui::CreateContext()
+    // Setup ImGui IO
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // Enable Docking
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;    // Enable Multi-Viewport
+
+    // Initialize SDL2 backend
+    if (!ImGui_ImplSDL2_InitForOpenGL(static_cast<SDL_Window*>(windowHandle), glContext))
+    {
+        ImGui::DestroyContext();
+        return Result<void>::error("Failed to initialize SDL2 backend");
+    }
+
+    // Initialize OpenGL3 backend
+    const char* glsl_version = "#version 130";
+    if (!ImGui_ImplOpenGL3_Init(glsl_version))
+    {
+        ImGui_ImplSDL2_Shutdown();
+        ImGui::DestroyContext();
+        return Result<void>::error("Failed to initialize OpenGL3 backend");
+    }
+#else
+    m_context = nullptr;
+#endif
 
     setupDefaultStyle();
     setupDockspace();
@@ -346,10 +375,12 @@ void ImGuiLayer::shutdown()
         return;
     }
 
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     // Cleanup ImGui backends and context
-    // ImGui_ImplOpenGL3_Shutdown();
-    // ImGui_ImplSDL2_Shutdown();
-    // ImGui::DestroyContext();
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
+#endif
 
     m_context = nullptr;
     m_windowHandle = nullptr;
@@ -365,10 +396,12 @@ void ImGuiLayer::beginFrame()
         return;
     }
 
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     // Begin new ImGui frame
-    // ImGui_ImplOpenGL3_NewFrame();
-    // ImGui_ImplSDL2_NewFrame();
-    // ImGui::NewFrame();
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL2_NewFrame();
+    ImGui::NewFrame();
+#endif
 
     if (m_dockingEnabled)
     {
@@ -388,29 +421,35 @@ void ImGuiLayer::endFrame()
         endDockspace();
     }
 
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     // Render ImGui
-    // ImGui::Render();
-    // ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     // Handle viewport windows for docking
-    // ImGuiIO& io = ImGui::GetIO();
-    // if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-    // {
-    //     ImGui::UpdatePlatformWindows();
-    //     ImGui::RenderPlatformWindowsDefault();
-    // }
+    ImGuiIO& io = ImGui::GetIO();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+    }
+#endif
 }
 
-bool ImGuiLayer::processEvent(void* /*sdlEvent*/)
+bool ImGuiLayer::processEvent(void* sdlEvent)
 {
     if (!m_initialized)
     {
         return false;
     }
 
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     // Process SDL event
-    // return ImGui_ImplSDL2_ProcessEvent((SDL_Event*)sdlEvent);
+    return ImGui_ImplSDL2_ProcessEvent(static_cast<SDL_Event*>(sdlEvent));
+#else
+    (void)sdlEvent;
     return false;
+#endif
 }
 
 bool ImGuiLayer::wantsKeyboard() const
@@ -419,8 +458,11 @@ bool ImGuiLayer::wantsKeyboard() const
     {
         return false;
     }
-    // return ImGui::GetIO().WantCaptureKeyboard;
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    return ImGui::GetIO().WantCaptureKeyboard;
+#else
     return false;
+#endif
 }
 
 bool ImGuiLayer::wantsMouse() const
@@ -429,8 +471,11 @@ bool ImGuiLayer::wantsMouse() const
     {
         return false;
     }
-    // return ImGui::GetIO().WantCaptureMouse;
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    return ImGui::GetIO().WantCaptureMouse;
+#else
     return false;
+#endif
 }
 
 void ImGuiLayer::applyTheme(const EditorTheme& theme)
@@ -442,14 +487,33 @@ void ImGuiLayer::applyTheme(const EditorTheme& theme)
         return;
     }
 
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     // Apply theme to ImGui style
-    // ImGuiStyle& style = ImGui::GetStyle();
-    //
-    // style.WindowRounding = theme.windowRounding;
-    // style.FrameRounding = theme.frameRounding;
-    // style.ScrollbarRounding = theme.scrollbarRounding;
-    // style.GrabRounding = theme.grabRounding;
-    // etc.
+    ImGuiStyle& style = ImGui::GetStyle();
+
+    style.WindowRounding = theme.windowRounding;
+    style.FrameRounding = theme.frameRounding;
+    style.ScrollbarRounding = theme.scrollbarRounding;
+    style.GrabRounding = theme.grabRounding;
+    style.TabRounding = theme.tabRounding;
+
+    // Colors
+    auto toImVec4 = [](const renderer::Color& c) {
+        return ImVec4(c.r / 255.0f, c.g / 255.0f, c.b / 255.0f, c.a / 255.0f);
+    };
+
+    ImVec4* colors = style.Colors;
+    colors[ImGuiCol_WindowBg] = toImVec4(theme.background);
+    colors[ImGuiCol_ChildBg] = toImVec4(theme.backgroundLight);
+    colors[ImGuiCol_PopupBg] = toImVec4(theme.backgroundLight);
+    colors[ImGuiCol_Border] = toImVec4(theme.border);
+    colors[ImGuiCol_Text] = toImVec4(theme.foreground);
+    colors[ImGuiCol_TextDisabled] = toImVec4(theme.foregroundDim);
+    colors[ImGuiCol_Button] = toImVec4(theme.accent);
+    colors[ImGuiCol_ButtonHovered] = toImVec4(theme.accentHover);
+    colors[ImGuiCol_ButtonActive] = toImVec4(theme.accentActive);
+    // Additional colors can be set as needed
+#endif
 }
 
 void ImGuiLayer::setUIScale(f32 scale)
@@ -461,9 +525,14 @@ void ImGuiLayer::setUIScale(f32 scale)
         return;
     }
 
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     // Apply scale to ImGui
-    // ImGuiStyle& style = ImGui::GetStyle();
-    // style.ScaleAllSizes(m_uiScale);
+    ImGuiStyle& style = ImGui::GetStyle();
+    ImGuiStyle defaultStyle;  // Get default style
+    style = defaultStyle;     // Reset to default
+    style.ScaleAllSizes(m_uiScale);
+    applyTheme(m_currentTheme);  // Reapply theme after scaling
+#endif
 }
 
 void ImGuiLayer::setDockingEnabled(bool enabled)
@@ -475,12 +544,14 @@ void ImGuiLayer::setDockingEnabled(bool enabled)
         return;
     }
 
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     // Update ImGui config flags
-    // ImGuiIO& io = ImGui::GetIO();
-    // if (enabled)
-    //     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    // else
-    //     io.ConfigFlags &= ~ImGuiConfigFlags_DockingEnable;
+    ImGuiIO& io = ImGui::GetIO();
+    if (enabled)
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    else
+        io.ConfigFlags &= ~ImGuiConfigFlags_DockingEnable;
+#endif
 }
 
 void ImGuiLayer::applyLayout(const DockingLayout& layout)
@@ -514,26 +585,28 @@ void ImGuiLayer::beginDockspace()
         return;
     }
 
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     // Create main dockspace
-    // ImGuiWindowFlags flags = ImGuiWindowFlags_NoDocking |
-    //     ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
-    //     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
-    //     ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-    //
-    // ImGuiViewport* viewport = ImGui::GetMainViewport();
-    // ImGui::SetNextWindowPos(viewport->WorkPos);
-    // ImGui::SetNextWindowSize(viewport->WorkSize);
-    // ImGui::SetNextWindowViewport(viewport->ID);
-    //
-    // ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-    // ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-    // ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-    //
-    // ImGui::Begin("DockSpace", nullptr, flags);
-    // ImGui::PopStyleVar(3);
-    //
-    // ImGuiID dockspace_id = ImGui::GetID("MainDockspace");
-    // ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoDocking |
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
+        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(viewport->WorkPos);
+    ImGui::SetNextWindowSize(viewport->WorkSize);
+    ImGui::SetNextWindowViewport(viewport->ID);
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+    ImGui::Begin("DockSpace", nullptr, flags);
+    ImGui::PopStyleVar(3);
+
+    ImGuiID dockspace_id = ImGui::GetID("MainDockspace");
+    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
+#endif
 }
 
 void ImGuiLayer::endDockspace()
@@ -543,7 +616,9 @@ void ImGuiLayer::endDockspace()
         return;
     }
 
-    // ImGui::End(); // End DockSpace window
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGui::End(); // End DockSpace window
+#endif
 }
 
 Result<void> ImGuiLayer::loadFont(const std::string& name, const std::string& filepath, f32 size)
@@ -553,41 +628,63 @@ Result<void> ImGuiLayer::loadFont(const std::string& name, const std::string& fi
         return Result<void>::error("ImGui not initialized");
     }
 
-    // Would load font using ImGui
-    // ImGuiIO& io = ImGui::GetIO();
-    // ImFont* font = io.Fonts->AddFontFromFileTTF(filepath.c_str(), size * m_uiScale);
-    // if (!font) return Result<void>::error("Failed to load font: " + filepath);
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    // Load font using ImGui
+    ImGuiIO& io = ImGui::GetIO();
+    ImFont* font = io.Fonts->AddFontFromFileTTF(filepath.c_str(), size * m_uiScale);
+    if (!font)
+    {
+        return Result<void>::error("Failed to load font: " + filepath);
+    }
 
     FontEntry entry;
     entry.path = filepath;
     entry.size = size;
-    entry.font = nullptr; // Would be ImFont*
+    entry.font = font;
     m_fonts[name] = entry;
+#else
+    FontEntry entry;
+    entry.path = filepath;
+    entry.size = size;
+    entry.font = nullptr;
+    m_fonts[name] = entry;
+#endif
 
     return Result<void>::ok();
 }
 
 Result<void> ImGuiLayer::loadIconFont(const std::string& name, const std::string& filepath,
-                                       f32 size, u16 /*iconRangeStart*/, u16 /*iconRangeEnd*/)
+                                       f32 size, u16 iconRangeStart, u16 iconRangeEnd)
 {
     if (!m_initialized)
     {
         return Result<void>::error("ImGui not initialized");
     }
 
-    // Would load icon font with glyph range
-    // static const ImWchar iconRanges[] = { iconRangeStart, iconRangeEnd, 0 };
-    // ImFontConfig config;
-    // config.MergeMode = true;
-    // config.GlyphMinAdvanceX = size;
-    // ImGuiIO& io = ImGui::GetIO();
-    // ImFont* font = io.Fonts->AddFontFromFileTTF(filepath.c_str(), size, &config, iconRanges);
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    // Load icon font with glyph range
+    static const ImWchar iconRanges[] = { static_cast<ImWchar>(iconRangeStart),
+                                          static_cast<ImWchar>(iconRangeEnd), 0 };
+    ImFontConfig config;
+    config.MergeMode = true;
+    config.GlyphMinAdvanceX = size;
+    ImGuiIO& io = ImGui::GetIO();
+    ImFont* font = io.Fonts->AddFontFromFileTTF(filepath.c_str(), size, &config, iconRanges);
 
+    FontEntry entry;
+    entry.path = filepath;
+    entry.size = size;
+    entry.font = font;
+    m_fonts[name] = entry;
+#else
+    (void)iconRangeStart;
+    (void)iconRangeEnd;
     FontEntry entry;
     entry.path = filepath;
     entry.size = size;
     entry.font = nullptr;
     m_fonts[name] = entry;
+#endif
 
     return Result<void>::ok();
 }
@@ -602,7 +699,9 @@ void ImGuiLayer::pushFont(const std::string& name)
     auto it = m_fonts.find(name);
     if (it != m_fonts.end() && it->second.font != nullptr)
     {
-        // ImGui::PushFont((ImFont*)it->second.font);
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+        ImGui::PushFont(static_cast<ImFont*>(it->second.font));
+#endif
     }
 }
 
@@ -612,7 +711,9 @@ void ImGuiLayer::popFont()
     {
         return;
     }
-    // ImGui::PopFont();
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGui::PopFont();
+#endif
 }
 
 void ImGuiLayer::setupDefaultStyle()
@@ -628,11 +729,13 @@ void ImGuiLayer::setupDockspace()
         return;
     }
 
-    // ImGuiIO& io = ImGui::GetIO();
-    // io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-    // io.ConfigDockingWithShift = false;
-    // io.ConfigViewportsNoTaskBarIcon = true;
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    io.ConfigDockingWithShift = false;
+    io.ConfigViewportsNoTaskBarIcon = true;
+#endif
 }
 
 // ============================================================================
