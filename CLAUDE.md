@@ -1,7 +1,0 @@
-Issue to solve: https://github.com/VisageDvachevsky/NM-/issues/24
-Your prepared branch: issue-24-0d7e8beabfaf
-Your prepared working directory: /tmp/gh-issue-solver-1765475566828
-Your forked repository: konard/VisageDvachevsky-NM-
-Original repository (upstream): VisageDvachevsky/NM-
-
-Proceed.
