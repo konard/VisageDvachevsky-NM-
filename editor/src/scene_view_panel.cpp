@@ -109,13 +109,13 @@ std::vector<MenuItem> SceneViewPanel::getMenuItems() const
     MenuItem viewMenu;
     viewMenu.label = "View";
     viewMenu.subItems = {
-        {"Reset View", "Home", [this]() { const_cast<SceneViewPanel*>(this)->resetView(); }},
-        {"Zoom to Fit", "Shift+F", [this]() { const_cast<SceneViewPanel*>(this)->zoomToFit(); }},
+        {"Reset View", "Home", [this]() { const_cast<SceneViewPanel*>(this)->resetView(); }, []() { return true; }, nullptr, false, {}},
+        {"Zoom to Fit", "Shift+F", [this]() { const_cast<SceneViewPanel*>(this)->zoomToFit(); }, []() { return true; }, nullptr, false, {}},
         MenuItem::separator(),
         {"Show Grid", "", [this]() { const_cast<SceneViewPanel*>(this)->setGridVisible(!m_showGrid); },
-         []() { return true; }, [this]() { return m_showGrid; }},
+         []() { return true; }, [this]() { return m_showGrid; }, false, {}},
         {"Enable Snapping", "", [this]() { const_cast<SceneViewPanel*>(this)->setSnappingEnabled(!m_snapEnabled); },
-         []() { return true; }, [this]() { return m_snapEnabled; }},
+         []() { return true; }, [this]() { return m_snapEnabled; }, false, {}},
     };
     items.push_back(viewMenu);
 
@@ -124,13 +124,13 @@ std::vector<MenuItem> SceneViewPanel::getMenuItems() const
     renderMenu.label = "Render Mode";
     renderMenu.subItems = {
         {"Textured", "", [this]() { const_cast<SceneViewPanel*>(this)->setRenderMode(SceneRenderMode::Textured); },
-         []() { return true; }, [this]() { return m_renderMode == SceneRenderMode::Textured; }},
+         []() { return true; }, [this]() { return m_renderMode == SceneRenderMode::Textured; }, false, {}},
         {"Wireframe", "", [this]() { const_cast<SceneViewPanel*>(this)->setRenderMode(SceneRenderMode::Wireframe); },
-         []() { return true; }, [this]() { return m_renderMode == SceneRenderMode::Wireframe; }},
+         []() { return true; }, [this]() { return m_renderMode == SceneRenderMode::Wireframe; }, false, {}},
         {"Bounds", "", [this]() { const_cast<SceneViewPanel*>(this)->setRenderMode(SceneRenderMode::Bounds); },
-         []() { return true; }, [this]() { return m_renderMode == SceneRenderMode::Bounds; }},
+         []() { return true; }, [this]() { return m_renderMode == SceneRenderMode::Bounds; }, false, {}},
         {"Layers", "", [this]() { const_cast<SceneViewPanel*>(this)->setRenderMode(SceneRenderMode::Layers); },
-         []() { return true; }, [this]() { return m_renderMode == SceneRenderMode::Layers; }},
+         []() { return true; }, [this]() { return m_renderMode == SceneRenderMode::Layers; }, false, {}},
     };
     items.push_back(renderMenu);
 
@@ -185,20 +185,20 @@ std::vector<MenuItem> SceneViewPanel::getContextMenuItems() const
     bool hasSelection = getSelection().hasSelection();
 
     items.push_back({"Cut", "Ctrl+X", []() { /* TODO: Cut selected objects to clipboard */ },
-                     [hasSelection]() { return hasSelection; }});
+                     [hasSelection]() { return hasSelection; }, nullptr, false, {}});
     items.push_back({"Copy", "Ctrl+C", []() { /* TODO: Copy selected objects to clipboard */ },
-                     [hasSelection]() { return hasSelection; }});
-    items.push_back({"Paste", "Ctrl+V", []() { /* TODO: Paste objects from clipboard */ }});
+                     [hasSelection]() { return hasSelection; }, nullptr, false, {}});
+    items.push_back({"Paste", "Ctrl+V", []() { /* TODO: Paste objects from clipboard */ }, []() { return true; }, nullptr, false, {}});
     items.push_back({"Delete", "Delete", []() { /* TODO: Delete selected objects from scene */ },
-                     [hasSelection]() { return hasSelection; }});
+                     [hasSelection]() { return hasSelection; }, nullptr, false, {}});
     items.push_back(MenuItem::separator());
     items.push_back({"Duplicate", "Ctrl+D", []() { /* TODO: Duplicate selected objects */ },
-                     [hasSelection]() { return hasSelection; }});
+                     [hasSelection]() { return hasSelection; }, nullptr, false, {}});
     items.push_back(MenuItem::separator());
-    items.push_back({"Create Empty Object", "", []() { /* TODO: Create empty scene object */ }});
-    items.push_back({"Create Character Sprite", "", []() { /* TODO: Add new character to scene */ }});
-    items.push_back({"Create Background", "", []() { /* TODO: Add new background layer */ }});
-    items.push_back({"Create UI Element", "", []() { /* TODO: Add new UI component */ }});
+    items.push_back({"Create Empty Object", "", []() { /* TODO: Create empty scene object */ }, []() { return true; }, nullptr, false, {}});
+    items.push_back({"Create Character Sprite", "", []() { /* TODO: Add new character to scene */ }, []() { return true; }, nullptr, false, {}});
+    items.push_back({"Create Background", "", []() { /* TODO: Add new background layer */ }, []() { return true; }, nullptr, false, {}});
+    items.push_back({"Create UI Element", "", []() { /* TODO: Add new UI component */ }, []() { return true; }, nullptr, false, {}});
 
     return items;
 }

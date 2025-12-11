@@ -433,22 +433,22 @@ std::vector<MenuItem> TimelinePanel::getMenuItems() const
     MenuItem editMenu;
     editMenu.label = "Edit";
     editMenu.subItems = {
-        {"Add Keyframe", "K", [this]() { /* Add keyframe at current time */ }},
+        {"Add Keyframe", "K", [this]() { /* Add keyframe at current time */ }, []() { return true; }, nullptr, false, {}},
         {"Delete Keyframes", "Delete", [this]() { const_cast<TimelinePanel*>(this)->deleteSelectedKeyframes(); },
-         [this]() { return !m_selectedKeyframes.empty(); }},
+         [this]() { return !m_selectedKeyframes.empty(); }, nullptr, false, {}},
         MenuItem::separator(),
-        {"Select All Keyframes", "Ctrl+A", []() { /* Select all */ }},
+        {"Select All Keyframes", "Ctrl+A", []() { /* Select all */ }, []() { return true; }, nullptr, false, {}},
     };
     items.push_back(editMenu);
 
     MenuItem viewMenu;
     viewMenu.label = "View";
     viewMenu.subItems = {
-        {"Zoom to Fit", "F", [this]() { const_cast<TimelinePanel*>(this)->zoomToFit(); }},
-        {"Reset View", "Home", [this]() { const_cast<TimelinePanel*>(this)->resetView(); }},
+        {"Zoom to Fit", "F", [this]() { const_cast<TimelinePanel*>(this)->zoomToFit(); }, []() { return true; }, nullptr, false, {}},
+        {"Reset View", "Home", [this]() { const_cast<TimelinePanel*>(this)->resetView(); }, []() { return true; }, nullptr, false, {}},
         MenuItem::separator(),
         {"Show Curve Editor", "", [this]() { const_cast<TimelinePanel*>(this)->m_showCurveEditor = !m_showCurveEditor; },
-         []() { return true; }, [this]() { return m_showCurveEditor; }},
+         []() { return true; }, [this]() { return m_showCurveEditor; }, false, {}},
     };
     items.push_back(viewMenu);
 
