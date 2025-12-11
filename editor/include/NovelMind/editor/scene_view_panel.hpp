@@ -224,6 +224,7 @@ private:
     void renderSceneContent();
     void renderGrid();
     void renderGizmos();
+    void renderPlaceholderObjects();
     void renderSelectionHighlight();
     void renderOverlays();
     void renderLayerControls();

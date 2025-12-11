@@ -595,13 +595,37 @@ void HierarchyPanel::onInitialize()
 
 void HierarchyPanel::onRender()
 {
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     // Search bar
-    if (widgets::SearchInput("##HierarchySearch", m_searchBuffer, sizeof(m_searchBuffer), "Search..."))
+    ImGui::SetNextItemWidth(-1);
+    if (ImGui::InputTextWithHint("##HierarchySearch", "Search...", m_searchBuffer, sizeof(m_searchBuffer)))
     {
         m_filter = m_searchBuffer;
     }
 
-    // Render tree
+    ImGui::Separator();
+
+    // Render tree in child region
+    ImGui::BeginChild("HierarchyTree", ImVec2(0, 0), false);
+
+    // Handle context menu for empty space
+    if (ImGui::BeginPopupContextWindow("HierarchyContextMenu"))
+    {
+        if (ImGui::BeginMenu("Create"))
+        {
+            if (ImGui::MenuItem("Empty Object")) createEmpty();
+            if (ImGui::MenuItem("Character")) { /* create character */ }
+            if (ImGui::MenuItem("Background")) { /* create background */ }
+            if (ImGui::MenuItem("UI Element")) { /* create UI */ }
+            ImGui::EndMenu();
+        }
+        ImGui::Separator();
+        if (ImGui::MenuItem("Show All")) showAll();
+        if (ImGui::MenuItem("Refresh")) refresh();
+        ImGui::EndPopup();
+    }
+
+    // Render tree nodes
     for (const auto& node : m_rootNodes)
     {
         renderNode(node);
@@ -610,16 +634,44 @@ void HierarchyPanel::onRender()
     // Handle scroll to selected
     if (m_needsScroll)
     {
-        // Would scroll to m_scrollTargetId
         m_needsScroll = false;
     }
+
+    ImGui::EndChild();
 
     // Handle rename completion
     if (m_isRenaming)
     {
-        // Check for Enter/Escape keys would happen here
-        // For now, assume rename completes on next focus change
+        // Check for Enter/Escape keys
+        if (ImGui::IsKeyPressed(ImGuiKey_Enter) || ImGui::IsKeyPressed(ImGuiKey_Escape))
+        {
+            if (ImGui::IsKeyPressed(ImGuiKey_Enter))
+            {
+                if (HierarchyNode* node = findNode(m_renamingNodeId))
+                {
+                    node->name = m_renameBuffer;
+                }
+            }
+            m_isRenaming = false;
+            m_renamingNodeId.clear();
+        }
     }
+#else
+    if (widgets::SearchInput("##HierarchySearch", m_searchBuffer, sizeof(m_searchBuffer), "Search..."))
+    {
+        m_filter = m_searchBuffer;
+    }
+
+    for (const auto& node : m_rootNodes)
+    {
+        renderNode(node);
+    }
+
+    if (m_needsScroll)
+    {
+        m_needsScroll = false;
+    }
+#endif
 }
 
 void HierarchyPanel::renderToolbar()
@@ -688,33 +740,98 @@ void HierarchyPanel::renderNode(const HierarchyNode& node, int depth)
     bool isSelected = getSelection().isObjectSelected(node.id);
     bool isLeaf = node.children.empty();
 
-    // Display visibility indicator
-    std::string displayName = node.name;
-    if (!node.visible)
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow |
+                                ImGuiTreeNodeFlags_OpenOnDoubleClick |
+                                ImGuiTreeNodeFlags_SpanAvailWidth;
+    if (isLeaf) flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+    if (isSelected) flags |= ImGuiTreeNodeFlags_Selected;
+
+    // Build display name with icons
+    std::string displayName;
+    if (!node.visible) displayName += "[H] ";
+    if (node.locked) displayName += "[L] ";
+    displayName += node.name;
+
+    // Different coloring based on type
+    ImVec4 textColor(0.9f, 0.9f, 0.9f, 1.0f);
+    if (!node.visible) textColor = ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
+
+    ImGui::PushStyleColor(ImGuiCol_Text, textColor);
+    ImGui::PushID(node.id.c_str());
+
+    bool isExpanded = ImGui::TreeNodeEx(displayName.c_str(), flags);
+
+    // Handle selection
+    if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
     {
-        displayName = "[H] " + displayName;
+        bool ctrl = ImGui::GetIO().KeyCtrl;
+        bool shift = ImGui::GetIO().KeyShift;
+        handleNodeSelection(node.id, ctrl, shift);
     }
-    if (node.locked)
+
+    // Handle double-click for rename
+    if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
     {
-        displayName = "[L] " + displayName;
+        if (m_onDoubleClick)
+        {
+            m_onDoubleClick(node.id);
+        }
     }
 
-    // Render rename input if this node is being renamed
-    if (m_isRenaming && m_renamingNodeId == node.id)
+    // Context menu
+    if (ImGui::BeginPopupContextItem())
     {
-        // Would render text input here
-        displayName = std::string(m_renameBuffer);
+        if (ImGui::MenuItem("Rename", "F2")) startRename(node.id);
+        if (ImGui::MenuItem("Duplicate", "Ctrl+D"))
+        {
+            getSelection().selectObject(node.id);
+            duplicateSelected();
+        }
+        if (ImGui::MenuItem("Delete", "Del"))
+        {
+            getSelection().selectObject(node.id);
+            deleteSelected();
+        }
+        ImGui::Separator();
+        if (ImGui::MenuItem("Create Child")) createChild(node.id);
+        ImGui::Separator();
+        if (ImGui::MenuItem(node.visible ? "Hide" : "Show")) setObjectVisible(node.id, !node.visible);
+        if (ImGui::MenuItem(node.locked ? "Unlock" : "Lock")) setObjectLocked(node.id, !node.locked);
+        if (ImGui::MenuItem("Isolate")) isolateObject(node.id);
+        ImGui::Separator();
+        if (ImGui::BeginMenu("Order"))
+        {
+            if (ImGui::MenuItem("Bring to Front")) moveToFront(node.id);
+            if (ImGui::MenuItem("Send to Back")) moveToBack(node.id);
+            if (ImGui::MenuItem("Move Up")) moveNodeUp(node.id);
+            if (ImGui::MenuItem("Move Down")) moveNodeDown(node.id);
+            ImGui::EndMenu();
+        }
+        ImGui::EndPopup();
     }
 
-    // Tree node
-    bool isExpanded = widgets::TreeNode(displayName.c_str(), isLeaf, isSelected,
-                                        "HIERARCHY_NODE", (void*)node.id.c_str());
+    // Drag source
+    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+    {
+        ImGui::SetDragDropPayload("HIERARCHY_NODE", node.id.c_str(), node.id.size() + 1);
+        ImGui::Text("%s", node.name.c_str());
+        ImGui::EndDragDropSource();
+    }
 
-    // Handle double-click
-    // Would trigger m_onDoubleClick(node.id) to focus in SceneView
+    // Drop target
+    if (ImGui::BeginDragDropTarget())
+    {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
+        {
+            std::string draggedId(static_cast<const char*>(payload->Data));
+            handleDragDrop(draggedId, node.id, HierarchyDropPosition::Inside);
+        }
+        ImGui::EndDragDropTarget();
+    }
 
-    // Render context menu
-    renderNodeContextMenu(node);
+    ImGui::PopID();
+    ImGui::PopStyleColor();
 
     // Render children
     if (isExpanded && !isLeaf)
@@ -723,7 +840,27 @@ void HierarchyPanel::renderNode(const HierarchyNode& node, int depth)
         {
             renderNode(child, depth + 1);
         }
+        ImGui::TreePop();
     }
+#else
+    // Stub for non-ImGui builds
+    std::string displayName = node.name;
+    if (!node.visible) displayName = "[H] " + displayName;
+    if (node.locked) displayName = "[L] " + displayName;
+
+    bool isExpanded = widgets::TreeNode(displayName.c_str(), isLeaf, isSelected,
+                                        "HIERARCHY_NODE", (void*)node.id.c_str());
+
+    renderNodeContextMenu(node);
+
+    if (isExpanded && !isLeaf)
+    {
+        for (const auto& child : node.children)
+        {
+            renderNode(child, depth + 1);
+        }
+    }
+#endif
 
     (void)depth;
 }

@@ -807,6 +807,79 @@ void StoryGraphPanel::renderConnections()
 
 void StoryGraphPanel::renderMinimap()
 {
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    if (!m_activeGraph || m_activeGraph->getNodes().empty())
+    {
+        return;
+    }
+
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImVec2 contentMin = ImGui::GetCursorScreenPos();
+
+    f32 minimapWidth = 150.0f;
+    f32 minimapHeight = 100.0f;
+    f32 minimapX = contentMin.x + m_contentWidth - minimapWidth - 10;
+    f32 minimapY = contentMin.y + 10;
+
+    // Draw minimap background
+    drawList->AddRectFilled(
+        ImVec2(minimapX, minimapY),
+        ImVec2(minimapX + minimapWidth, minimapY + minimapHeight),
+        IM_COL32(30, 30, 30, 200));
+    drawList->AddRect(
+        ImVec2(minimapX, minimapY),
+        ImVec2(minimapX + minimapWidth, minimapY + minimapHeight),
+        IM_COL32(80, 80, 80, 255));
+
+    // Calculate bounds
+    f32 minX = std::numeric_limits<f32>::max();
+    f32 minY = std::numeric_limits<f32>::max();
+    f32 maxX = std::numeric_limits<f32>::lowest();
+    f32 maxY = std::numeric_limits<f32>::lowest();
+
+    for (const auto& node : m_activeGraph->getNodes())
+    {
+        minX = std::min(minX, node.x);
+        minY = std::min(minY, node.y);
+        maxX = std::max(maxX, node.x + m_nodeStyle.nodeWidth);
+        maxY = std::max(maxY, node.y + calculateNodeHeight(node));
+    }
+
+    f32 rangeX = maxX - minX;
+    f32 rangeY = maxY - minY;
+    if (rangeX < 1.0f) rangeX = 1.0f;
+    if (rangeY < 1.0f) rangeY = 1.0f;
+
+    f32 padding = 10.0f;
+    f32 scaleX = (minimapWidth - 2 * padding) / rangeX;
+    f32 scaleY = (minimapHeight - 2 * padding) / rangeY;
+    f32 scale = std::min(scaleX, scaleY);
+
+    // Draw nodes on minimap
+    for (const auto& node : m_activeGraph->getNodes())
+    {
+        f32 nx = minimapX + padding + (node.x - minX) * scale;
+        f32 ny = minimapY + padding + (node.y - minY) * scale;
+        f32 nw = m_nodeStyle.nodeWidth * scale;
+        f32 nh = calculateNodeHeight(node) * scale;
+
+        bool isSelected = getSelection().isNodeSelected(node.id);
+        ImU32 nodeColor = isSelected ? IM_COL32(0, 150, 255, 255) : IM_COL32(100, 100, 100, 255);
+
+        drawList->AddRectFilled(ImVec2(nx, ny), ImVec2(nx + nw, ny + nh), nodeColor);
+    }
+
+    // Draw viewport indicator
+    f32 viewLeft = minimapX + padding + (-m_viewOffsetX - minX) * scale;
+    f32 viewTop = minimapY + padding + (-m_viewOffsetY - minY) * scale;
+    f32 viewRight = viewLeft + (m_contentWidth / m_zoom) * scale;
+    f32 viewBottom = viewTop + (m_contentHeight / m_zoom) * scale;
+
+    drawList->AddRect(
+        ImVec2(viewLeft, viewTop),
+        ImVec2(viewRight, viewBottom),
+        IM_COL32(255, 200, 0, 255), 0.0f, 0, 2.0f);
+#endif
 }
 
 void StoryGraphPanel::renderNodeCreationMenu()
@@ -819,27 +892,123 @@ void StoryGraphPanel::renderSearchBar()
 
 void StoryGraphPanel::renderNode(const scripting::VisualGraphNode& node)
 {
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImVec2 contentMin = ImGui::GetCursorScreenPos();
+
+    f32 screenX = (node.x + m_viewOffsetX) * m_zoom + contentMin.x;
+    f32 screenY = (node.y + m_viewOffsetY) * m_zoom + contentMin.y;
+    f32 nodeWidth = m_nodeStyle.nodeWidth * m_zoom;
+    f32 nodeHeight = calculateNodeHeight(node) * m_zoom;
+    f32 headerHeight = m_nodeStyle.headerHeight * m_zoom;
+
+    bool isSelected = getSelection().isNodeSelected(node.id);
+    bool isSearchResult = std::find(m_searchResults.begin(), m_searchResults.end(), node.id) != m_searchResults.end();
+    bool hasError = std::find(m_errorNodes.begin(), m_errorNodes.end(), node.id) != m_errorNodes.end();
+
+    // Get category color
+    scripting::IRNodeType nodeType = scripting::IRNodeType::Custom;
+    if (node.type == "dialogue") nodeType = scripting::IRNodeType::Dialogue;
+    else if (node.type == "choice") nodeType = scripting::IRNodeType::Choice;
+    else if (node.type == "branch") nodeType = scripting::IRNodeType::Branch;
+    else if (node.type == "set_variable") nodeType = scripting::IRNodeType::SetVariable;
+    else if (node.type == "get_variable") nodeType = scripting::IRNodeType::GetVariable;
+    else if (node.type == "goto") nodeType = scripting::IRNodeType::Goto;
+    else if (node.type == "label") nodeType = scripting::IRNodeType::Label;
+    else if (node.type == "show_character") nodeType = scripting::IRNodeType::ShowCharacter;
+    else if (node.type == "play_music") nodeType = scripting::IRNodeType::PlayMusic;
+    else if (node.type == "comment") nodeType = scripting::IRNodeType::Comment;
+
+    NodeCategory cat = getNodeCategory(nodeType);
+    renderer::Color catColor = getCategoryColor(cat);
+
+    // Draw node shadow
+    drawList->AddRectFilled(
+        ImVec2(screenX + 3, screenY + 3),
+        ImVec2(screenX + nodeWidth + 3, screenY + nodeHeight + 3),
+        IM_COL32(0, 0, 0, 80), m_nodeStyle.cornerRadius * m_zoom);
+
+    // Draw node body
+    drawList->AddRectFilled(
+        ImVec2(screenX, screenY),
+        ImVec2(screenX + nodeWidth, screenY + nodeHeight),
+        IM_COL32(40, 40, 40, 240), m_nodeStyle.cornerRadius * m_zoom);
+
+    // Draw header
+    drawList->AddRectFilled(
+        ImVec2(screenX, screenY),
+        ImVec2(screenX + nodeWidth, screenY + headerHeight),
+        IM_COL32(catColor.r, catColor.g, catColor.b, 255),
+        m_nodeStyle.cornerRadius * m_zoom, ImDrawFlags_RoundCornersTop);
+
+    // Draw node title
+    std::string title = getNodeTitle(node);
+    ImVec2 titleSize = ImGui::CalcTextSize(title.c_str());
+    drawList->AddText(
+        ImVec2(screenX + (nodeWidth - titleSize.x) / 2, screenY + (headerHeight - titleSize.y) / 2),
+        IM_COL32(255, 255, 255, 255), title.c_str());
+
+    // Draw body content (properties)
+    f32 contentY = screenY + headerHeight + 5 * m_zoom;
+    for (const auto& [key, value] : node.properties)
+    {
+        std::string propText = key + ": " + value;
+        if (propText.length() > 30) propText = propText.substr(0, 27) + "...";
+        drawList->AddText(
+            ImVec2(screenX + 8 * m_zoom, contentY),
+            IM_COL32(200, 200, 200, 255), propText.c_str());
+        contentY += 18 * m_zoom;
+    }
+
+    // Draw input pin (left side)
+    f32 pinY = screenY + headerHeight / 2;
+    drawList->AddCircleFilled(
+        ImVec2(screenX, pinY),
+        m_nodeStyle.pinRadius * m_zoom,
+        IM_COL32(200, 200, 200, 255));
+
+    // Draw output pin (right side)
+    drawList->AddCircleFilled(
+        ImVec2(screenX + nodeWidth, pinY),
+        m_nodeStyle.pinRadius * m_zoom,
+        IM_COL32(200, 200, 200, 255));
+
+    // Draw border
+    ImU32 borderColor = IM_COL32(60, 60, 60, 255);
+    if (isSelected) borderColor = IM_COL32(0, 150, 255, 255);
+    else if (isSearchResult) borderColor = IM_COL32(255, 200, 0, 255);
+    else if (hasError) borderColor = IM_COL32(255, 80, 80, 255);
+
+    drawList->AddRect(
+        ImVec2(screenX, screenY),
+        ImVec2(screenX + nodeWidth, screenY + nodeHeight),
+        borderColor, m_nodeStyle.cornerRadius * m_zoom, 0, isSelected ? 3.0f : 1.0f);
+
+#else
     f32 screenX = (node.x + m_viewOffsetX) * m_zoom;
     f32 screenY = (node.y + m_viewOffsetY) * m_zoom;
     f32 nodeWidth = m_nodeStyle.nodeWidth * m_zoom;
     f32 nodeHeight = calculateNodeHeight(node) * m_zoom;
-
-    renderNodeHeader(node, screenX, screenY, nodeWidth);
-    renderNodeBody(node, screenX, screenY + m_nodeStyle.headerHeight * m_zoom,
-                   nodeWidth, nodeHeight - m_nodeStyle.headerHeight * m_zoom);
-    renderNodePins(node, screenX, screenY, nodeWidth, nodeHeight);
+    (void)screenX; (void)screenY; (void)nodeWidth; (void)nodeHeight;
+#endif
 }
 
-void StoryGraphPanel::renderNodeHeader(const scripting::VisualGraphNode& /*node*/, f32 /*x*/, f32 /*y*/, f32 /*width*/)
+void StoryGraphPanel::renderNodeHeader(const scripting::VisualGraphNode& node, f32 x, f32 y, f32 width)
 {
+    (void)node; (void)x; (void)y; (void)width;
+    // Rendering handled in renderNode
 }
 
-void StoryGraphPanel::renderNodeBody(const scripting::VisualGraphNode& /*node*/, f32 /*x*/, f32 /*y*/, f32 /*width*/, f32 /*height*/)
+void StoryGraphPanel::renderNodeBody(const scripting::VisualGraphNode& node, f32 x, f32 y, f32 width, f32 height)
 {
+    (void)node; (void)x; (void)y; (void)width; (void)height;
+    // Rendering handled in renderNode
 }
 
-void StoryGraphPanel::renderNodePins(const scripting::VisualGraphNode& /*node*/, f32 /*x*/, f32 /*y*/, f32 /*width*/, f32 /*height*/)
+void StoryGraphPanel::renderNodePins(const scripting::VisualGraphNode& node, f32 x, f32 y, f32 width, f32 height)
 {
+    (void)node; (void)x; (void)y; (void)width; (void)height;
+    // Rendering handled in renderNode
 }
 
 void StoryGraphPanel::renderConnection(const scripting::VisualGraphEdge& edge)
@@ -852,12 +1021,90 @@ void StoryGraphPanel::renderConnection(const scripting::VisualGraphEdge& edge)
         return;
     }
 
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImVec2 contentMin = ImGui::GetCursorScreenPos();
+
+    // Calculate start point (right side of source node)
+    f32 fromX = (fromNode->x + m_viewOffsetX + m_nodeStyle.nodeWidth) * m_zoom + contentMin.x;
+    f32 fromY = (fromNode->y + m_viewOffsetY + m_nodeStyle.headerHeight / 2) * m_zoom + contentMin.y;
+
+    // Calculate end point (left side of target node)
+    f32 toX = (toNode->x + m_viewOffsetX) * m_zoom + contentMin.x;
+    f32 toY = (toNode->y + m_viewOffsetY + m_nodeStyle.headerHeight / 2) * m_zoom + contentMin.y;
+
+    // Draw bezier curve
+    f32 tangentX = std::abs(toX - fromX) * 0.5f;
+    ImVec2 p1(fromX, fromY);
+    ImVec2 p2(fromX + tangentX, fromY);
+    ImVec2 p3(toX - tangentX, toY);
+    ImVec2 p4(toX, toY);
+
+    // Connection color
+    ImU32 connectionColor = IM_COL32(150, 150, 150, 200);
+
+    // Check if either node is selected
+    if (getSelection().isNodeSelected(edge.sourceNode) ||
+        getSelection().isNodeSelected(edge.targetNode))
+    {
+        connectionColor = IM_COL32(0, 150, 255, 255);
+    }
+
+    drawList->AddBezierCubic(p1, p2, p3, p4, connectionColor, 2.5f);
+
+    // Draw arrow at end
+    ImVec2 dir(toX - p3.x, toY - p3.y);
+    f32 len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+    if (len > 0)
+    {
+        dir.x /= len;
+        dir.y /= len;
+        f32 arrowSize = 8.0f * m_zoom;
+        ImVec2 arrowP1(toX - dir.x * arrowSize - dir.y * arrowSize * 0.5f,
+                       toY - dir.y * arrowSize + dir.x * arrowSize * 0.5f);
+        ImVec2 arrowP2(toX - dir.x * arrowSize + dir.y * arrowSize * 0.5f,
+                       toY - dir.y * arrowSize - dir.x * arrowSize * 0.5f);
+        drawList->AddTriangleFilled(ImVec2(toX, toY), arrowP1, arrowP2, connectionColor);
+    }
+#else
     (void)fromNode;
     (void)toNode;
+#endif
 }
 
 void StoryGraphPanel::renderPendingConnection()
 {
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    if (!m_isCreatingConnection || !m_activeGraph)
+    {
+        return;
+    }
+
+    const auto* sourceNode = m_activeGraph->findNode(m_connectionSourceNode);
+    if (!sourceNode)
+    {
+        return;
+    }
+
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImVec2 contentMin = ImGui::GetCursorScreenPos();
+
+    // Start point
+    f32 fromX = (sourceNode->x + m_viewOffsetX + m_nodeStyle.nodeWidth) * m_zoom + contentMin.x;
+    f32 fromY = (sourceNode->y + m_viewOffsetY + m_nodeStyle.headerHeight / 2) * m_zoom + contentMin.y;
+
+    // End point (mouse position)
+    ImVec2 mousePos = ImGui::GetMousePos();
+
+    // Draw bezier curve to mouse
+    f32 tangentX = std::abs(mousePos.x - fromX) * 0.5f;
+    ImVec2 p1(fromX, fromY);
+    ImVec2 p2(fromX + tangentX, fromY);
+    ImVec2 p3(mousePos.x - tangentX, mousePos.y);
+    ImVec2 p4(mousePos.x, mousePos.y);
+
+    drawList->AddBezierCubic(p1, p2, p3, p4, IM_COL32(100, 200, 255, 200), 2.0f);
+#endif
 }
 
 void StoryGraphPanel::handleMouseInput()

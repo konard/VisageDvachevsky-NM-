@@ -220,20 +220,21 @@ void ConsolePanel::onInitialize()
 
 void ConsolePanel::onRender()
 {
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     // Search bar
-    // ImGui::SetNextItemWidth(200);
+    ImGui::SetNextItemWidth(200);
     widgets::SearchInput("##ConsoleSearch", m_searchBuffer, sizeof(m_searchBuffer), "Filter...");
     m_searchFilter = m_searchBuffer;
 
-    // ImGui::SameLine();
+    ImGui::SameLine();
 
     // Auto-scroll toggle
-    // ImGui::Checkbox("Auto-scroll", &m_autoScroll);
+    ImGui::Checkbox("Auto-scroll", &m_autoScroll);
 
-    // ImGui::Separator();
+    ImGui::Separator();
 
     // Messages area
-    // ImGui::BeginChild("ConsoleMessages", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
+    ImGui::BeginChild("ConsoleMessages", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
 
     std::string filterLower = m_searchFilter;
     std::transform(filterLower.begin(), filterLower.end(), filterLower.begin(), ::tolower);
@@ -267,7 +268,40 @@ void ConsolePanel::onRender()
         m_scrollToBottom = false;
     }
 
-    // ImGui::EndChild();
+    ImGui::EndChild();
+#else
+    widgets::SearchInput("##ConsoleSearch", m_searchBuffer, sizeof(m_searchBuffer), "Filter...");
+    m_searchFilter = m_searchBuffer;
+
+    std::string filterLower = m_searchFilter;
+    std::transform(filterLower.begin(), filterLower.end(), filterLower.begin(), ::tolower);
+
+    for (const auto& msg : m_messages)
+    {
+        if (msg.severity == LogSeverity::Info && !m_showInfo) continue;
+        if (msg.severity == LogSeverity::Debug && !m_showDebug) continue;
+        if (msg.severity == LogSeverity::Warning && !m_showWarnings) continue;
+        if (msg.severity == LogSeverity::Error && !m_showErrors) continue;
+
+        if (!filterLower.empty())
+        {
+            std::string textLower = msg.text;
+            std::transform(textLower.begin(), textLower.end(), textLower.begin(), ::tolower);
+            if (textLower.find(filterLower) == std::string::npos)
+            {
+                continue;
+            }
+        }
+
+        renderMessage(msg);
+    }
+
+    if (m_scrollToBottom)
+    {
+        scrollToBottom();
+        m_scrollToBottom = false;
+    }
+#endif
 }
 
 void ConsolePanel::renderToolbar()
@@ -282,33 +316,39 @@ void ConsolePanel::renderMessage(const LogMessage& msg)
     renderer::Color color = getSeverityColor(msg.severity);
     const char* icon = getSeverityIcon(msg.severity);
 
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     // Format: [time] [icon] message (count) [file:line]
-    // ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, 1.0f));
 
-    // ImGui::Text("[%s] %s %s", msg.timestamp.c_str(), icon, msg.text.c_str());
+    ImGui::Text("[%s] %s %s", msg.timestamp.c_str(), icon, msg.text.c_str());
 
     if (msg.count > 1)
     {
-        // ImGui::SameLine();
-        // ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "(%d)", msg.count);
+        ImGui::SameLine();
+        ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "(%d)", msg.count);
     }
 
     if (!msg.file.empty())
     {
-        // ImGui::SameLine();
-        // ImGui::TextColored(ImVec4(0.4f, 0.4f, 0.8f, 1.0f), "[%s:%u]", msg.file.c_str(), msg.line);
+        ImGui::SameLine();
+        ImGui::TextColored(ImVec4(0.4f, 0.4f, 0.8f, 1.0f), "[%s:%u]", msg.file.c_str(), msg.line);
 
         // Double-click to open file
-        // if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
-        // {
-        //     // Would open file in editor
-        // }
+        if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
+        {
+            // Would open file in editor - publish event
+            // FileOpenRequestEvent event;
+            // event.filePath = msg.file;
+            // event.line = msg.line;
+            // publishEvent(event);
+        }
     }
 
-    // ImGui::PopStyleColor();
-
+    ImGui::PopStyleColor();
+#else
     (void)color;
     (void)icon;
+#endif
 }
 
 renderer::Color ConsolePanel::getSeverityColor(LogSeverity severity) const
@@ -347,7 +387,9 @@ const char* ConsolePanel::getSeverityIcon(LogSeverity severity) const
 
 void ConsolePanel::scrollToBottom()
 {
-    // ImGui::SetScrollHereY(1.0f);
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGui::SetScrollHereY(1.0f);
+#endif
 }
 
 } // namespace NovelMind::editor

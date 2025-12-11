@@ -639,16 +639,27 @@ void ImGuiLayer::setupDockspace()
 // Custom Widgets Implementation
 // ============================================================================
 
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+#include <imgui.h>
+#include <imgui_internal.h>
+#include <cstring>
+#endif
+
 namespace widgets {
 
-bool PropertyLabel(const char* label, f32 /*labelWidth*/)
+bool PropertyLabel(const char* label, f32 labelWidth)
 {
-    // Would render a property label
-    // ImGui::Text("%s", label);
-    // ImGui::SameLine();
-    // ImGui::SetCursorPosX(labelWidth);
-    (void)label;
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGui::AlignTextToFramePadding();
+    ImGui::Text("%s", label);
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(labelWidth);
     return true;
+#else
+    (void)label;
+    (void)labelWidth;
+    return true;
+#endif
 }
 
 bool PropertyRow(const char* label, const std::function<bool()>& valueWidget, f32 labelWidth)
@@ -657,50 +668,88 @@ bool PropertyRow(const char* label, const std::function<bool()>& valueWidget, f3
     return valueWidget();
 }
 
-bool CollapsingHeader(const char* label, bool* isOpen, bool /*defaultOpen*/)
+bool CollapsingHeader(const char* label, bool* isOpen, bool defaultOpen)
 {
-    // Would render collapsing header
-    // return ImGui::CollapsingHeader(label, isOpen,
-    //     defaultOpen ? ImGuiTreeNodeFlags_DefaultOpen : 0);
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_AllowItemOverlap;
+    if (defaultOpen) flags |= ImGuiTreeNodeFlags_DefaultOpen;
+    bool result = ImGui::CollapsingHeader(label, flags);
+    if (isOpen) *isOpen = result;
+    return result;
+#else
     if (isOpen) *isOpen = true;
     (void)label;
+    (void)defaultOpen;
     return true;
+#endif
 }
 
 void SectionHeader(const char* label)
 {
-    // Would render section header with styling
-    // ImGui::Spacing();
-    // ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "%s", label);
-    // ImGui::Separator();
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGui::Spacing();
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.7f, 0.7f, 0.7f, 1.0f));
+    ImGui::Text("%s", label);
+    ImGui::PopStyleColor();
+    ImGui::Separator();
+    ImGui::Spacing();
+#else
     (void)label;
+#endif
 }
 
 void Separator(const char* label)
 {
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     if (label)
     {
-        // ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "%s", label);
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+        ImGui::Text("%s", label);
+        ImGui::PopStyleColor();
     }
-    // ImGui::Separator();
+    ImGui::Separator();
+#else
     (void)label;
+#endif
 }
 
 bool ToolbarButton(const char* icon, const char* tooltip, bool selected)
 {
-    // Would render toolbar button
-    // bool clicked = ImGui::Button(icon);
-    // if (tooltip && ImGui::IsItemHovered())
-    //     ImGui::SetTooltip("%s", tooltip);
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGui::PushID(icon);
+
+    if (selected)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.4f, 0.7f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.5f, 0.8f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.15f, 0.35f, 0.6f, 1.0f));
+    }
+
+    bool clicked = ImGui::Button(icon, ImVec2(24, 24));
+
+    if (selected)
+    {
+        ImGui::PopStyleColor(3);
+    }
+
+    if (tooltip && ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
+    {
+        ImGui::SetTooltip("%s", tooltip);
+    }
+
+    ImGui::SameLine();
+    ImGui::PopID();
+    return clicked;
+#else
     (void)icon;
     (void)tooltip;
     (void)selected;
     return false;
+#endif
 }
 
 bool ToolbarToggle(const char* icon, bool* value, const char* tooltip)
 {
-    // Would render toggle button
     bool clicked = ToolbarButton(icon, tooltip, *value);
     if (clicked)
     {
@@ -711,212 +760,618 @@ bool ToolbarToggle(const char* icon, bool* value, const char* tooltip)
 
 void ToolbarSeparator()
 {
-    // ImGui::SameLine();
-    // ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
-    // ImGui::SameLine();
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGui::SameLine();
+    ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
+    ImGui::SameLine();
+#endif
 }
 
 bool SearchInput(const char* label, char* buffer, size_t bufferSize, const char* hint)
 {
-    // Would render search input
-    // return ImGui::InputTextWithHint(label, hint, buffer, bufferSize);
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGui::PushItemWidth(-1);
+    bool changed = ImGui::InputTextWithHint(label, hint, buffer, bufferSize);
+    ImGui::PopItemWidth();
+    return changed;
+#else
     (void)label;
     (void)buffer;
     (void)bufferSize;
     (void)hint;
     return false;
+#endif
 }
 
-bool ColorPickerButton(const char* label, f32* color4, bool /*showAlpha*/)
+bool ColorPickerButton(const char* label, f32* color4, bool showAlpha)
 {
-    // Would render color picker button
-    // return ImGui::ColorEdit4(label, color4, showAlpha ? 0 : ImGuiColorEditFlags_NoAlpha);
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGuiColorEditFlags flags = ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel;
+    if (!showAlpha) flags |= ImGuiColorEditFlags_NoAlpha;
+
+    bool changed = false;
+    ImGui::PushID(label);
+
+    // Color preview button
+    if (ImGui::ColorButton("##preview", ImVec4(color4[0], color4[1], color4[2], color4[3]), flags, ImVec2(20, 20)))
+    {
+        ImGui::OpenPopup("##colorpicker");
+    }
+
+    // Color picker popup
+    if (ImGui::BeginPopup("##colorpicker"))
+    {
+        if (showAlpha)
+        {
+            changed = ImGui::ColorPicker4("##picker", color4, ImGuiColorEditFlags_AlphaBar);
+        }
+        else
+        {
+            changed = ImGui::ColorPicker3("##picker", color4);
+        }
+        ImGui::EndPopup();
+    }
+
+    ImGui::SameLine();
+    ImGui::Text("%s", label);
+    ImGui::PopID();
+    return changed;
+#else
     (void)label;
     (void)color4;
+    (void)showAlpha;
     return false;
+#endif
 }
 
 bool Vector2Input(const char* label, f32* values, f32 speed)
 {
-    // Would render vector2 input
-    // return ImGui::DragFloat2(label, values, speed);
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGui::PushID(label);
+    ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
+
+    bool changed = false;
+
+    // X component
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.5f, 0.2f, 0.2f, 1.0f));
+    changed |= ImGui::DragFloat("##X", &values[0], speed, 0.0f, 0.0f, "X: %.2f");
+    ImGui::PopStyleColor();
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+
+    // Y component
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.2f, 0.5f, 0.2f, 1.0f));
+    changed |= ImGui::DragFloat("##Y", &values[1], speed, 0.0f, 0.0f, "Y: %.2f");
+    ImGui::PopStyleColor();
+    ImGui::PopItemWidth();
+
+    ImGui::SameLine();
+    ImGui::Text("%s", label);
+    ImGui::PopID();
+    return changed;
+#else
     (void)label;
     (void)values;
     (void)speed;
     return false;
+#endif
 }
 
 bool Vector3Input(const char* label, f32* values, f32 speed)
 {
-    // Would render vector3 input
-    // return ImGui::DragFloat3(label, values, speed);
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGui::PushID(label);
+    ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+
+    bool changed = false;
+
+    // X component
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.5f, 0.2f, 0.2f, 1.0f));
+    changed |= ImGui::DragFloat("##X", &values[0], speed, 0.0f, 0.0f, "X: %.2f");
+    ImGui::PopStyleColor();
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+
+    // Y component
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.2f, 0.5f, 0.2f, 1.0f));
+    changed |= ImGui::DragFloat("##Y", &values[1], speed, 0.0f, 0.0f, "Y: %.2f");
+    ImGui::PopStyleColor();
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+
+    // Z component
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.2f, 0.2f, 0.5f, 1.0f));
+    changed |= ImGui::DragFloat("##Z", &values[2], speed, 0.0f, 0.0f, "Z: %.2f");
+    ImGui::PopStyleColor();
+    ImGui::PopItemWidth();
+
+    ImGui::SameLine();
+    ImGui::Text("%s", label);
+    ImGui::PopID();
+    return changed;
+#else
     (void)label;
     (void)values;
     (void)speed;
     return false;
+#endif
 }
 
-bool AssetReference(const char* label, std::string& /*assetPath*/, const char* /*assetType*/)
+bool AssetReference(const char* label, std::string& assetPath, const char* assetType)
 {
-    // Would render asset reference field with browse button
-    // char buffer[256];
-    // strncpy(buffer, assetPath.c_str(), sizeof(buffer));
-    // bool changed = ImGui::InputText(label, buffer, sizeof(buffer));
-    // if (changed) assetPath = buffer;
-    //
-    // ImGui::SameLine();
-    // if (ImGui::Button("..."))
-    //     // Open asset picker
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    bool changed = false;
+    ImGui::PushID(label);
+
+    char buffer[256];
+    std::strncpy(buffer, assetPath.c_str(), sizeof(buffer) - 1);
+    buffer[sizeof(buffer) - 1] = '\0';
+
+    float buttonWidth = 30.0f;
+    ImGui::SetNextItemWidth(ImGui::CalcItemWidth() - buttonWidth - ImGui::GetStyle().ItemSpacing.x);
+
+    if (ImGui::InputText("##path", buffer, sizeof(buffer)))
+    {
+        assetPath = buffer;
+        changed = true;
+    }
+
+    ImGui::SameLine();
+    if (ImGui::Button("...", ImVec2(buttonWidth, 0)))
+    {
+        // Would open asset picker dialog
+        // For now, just a placeholder
+    }
+
+    if (ImGui::IsItemHovered())
+    {
+        ImGui::SetTooltip("Browse for %s", assetType);
+    }
+
+    // Drag-drop target
+    if (ImGui::BeginDragDropTarget())
+    {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+        {
+            const char* droppedPath = static_cast<const char*>(payload->Data);
+            assetPath = droppedPath;
+            changed = true;
+        }
+        ImGui::EndDragDropTarget();
+    }
+
+    ImGui::SameLine();
+    ImGui::Text("%s", label);
+    ImGui::PopID();
+    return changed;
+#else
     (void)label;
+    (void)assetPath;
+    (void)assetType;
     return false;
+#endif
 }
 
 bool Dropdown(const char* label, i32* currentIndex, const std::vector<std::string>& items)
 {
-    // Would render dropdown combo
-    // const char* preview = (*currentIndex >= 0 && *currentIndex < items.size()) ?
-    //     items[*currentIndex].c_str() : "";
-    // if (ImGui::BeginCombo(label, preview))
-    // {
-    //     for (int i = 0; i < items.size(); i++)
-    //     {
-    //         bool selected = (i == *currentIndex);
-    //         if (ImGui::Selectable(items[i].c_str(), selected))
-    //             *currentIndex = i;
-    //     }
-    //     ImGui::EndCombo();
-    // }
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    bool changed = false;
+    const char* preview = (*currentIndex >= 0 && static_cast<size_t>(*currentIndex) < items.size()) ?
+        items[static_cast<size_t>(*currentIndex)].c_str() : "";
+
+    if (ImGui::BeginCombo(label, preview))
+    {
+        for (size_t i = 0; i < items.size(); i++)
+        {
+            bool selected = (static_cast<size_t>(*currentIndex) == i);
+            if (ImGui::Selectable(items[i].c_str(), selected))
+            {
+                *currentIndex = static_cast<i32>(i);
+                changed = true;
+            }
+            if (selected)
+            {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndCombo();
+    }
+    return changed;
+#else
     (void)label;
     (void)currentIndex;
     (void)items;
     return false;
+#endif
 }
 
 bool TreeNode(const char* label, bool isLeaf, bool isSelected,
-              const char* /*dragDropType*/, void* /*dragDropData*/)
+              const char* dragDropType, void* dragDropData)
 {
-    // Would render tree node with optional drag/drop
-    // ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow |
-    //     ImGuiTreeNodeFlags_SpanAvailWidth;
-    // if (isLeaf) flags |= ImGuiTreeNodeFlags_Leaf;
-    // if (isSelected) flags |= ImGuiTreeNodeFlags_Selected;
-    // return ImGui::TreeNodeEx(label, flags);
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow |
+                                ImGuiTreeNodeFlags_OpenOnDoubleClick |
+                                ImGuiTreeNodeFlags_SpanAvailWidth;
+    if (isLeaf) flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+    if (isSelected) flags |= ImGuiTreeNodeFlags_Selected;
+
+    bool isOpen = ImGui::TreeNodeEx(label, flags);
+
+    // Handle drag source
+    if (dragDropType && dragDropData && ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+    {
+        ImGui::SetDragDropPayload(dragDropType, &dragDropData, sizeof(void*));
+        ImGui::Text("%s", label);
+        ImGui::EndDragDropSource();
+    }
+
+    // Handle drag target
+    if (dragDropType && ImGui::BeginDragDropTarget())
+    {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(dragDropType))
+        {
+            // Payload accepted - caller would handle via callback
+        }
+        ImGui::EndDragDropTarget();
+    }
+
+    // Handle click selection
+    if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+    {
+        // Selection would be handled by caller
+    }
+
+    return isOpen;
+#else
     (void)label;
     (void)isLeaf;
     (void)isSelected;
+    (void)dragDropType;
+    (void)dragDropData;
     return false;
+#endif
 }
 
 void TimelineRuler(f32 startTime, f32 endTime, f32 currentTime,
-                   f32& /*viewStart*/, f32& /*viewEnd*/)
+                   f32& viewStart, f32& viewEnd)
 {
-    // Would render timeline ruler
-    // Draw time markers, frame numbers, playhead indicator
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImVec2 canvasPos = ImGui::GetCursorScreenPos();
+    ImVec2 canvasSize = ImGui::GetContentRegionAvail();
+    canvasSize.y = 30.0f; // Fixed ruler height
+
+    // Draw ruler background
+    drawList->AddRectFilled(canvasPos,
+                            ImVec2(canvasPos.x + canvasSize.x, canvasPos.y + canvasSize.y),
+                            IM_COL32(40, 40, 40, 255));
+
+    // Calculate time range
+    f32 timeRange = viewEnd - viewStart;
+    if (timeRange <= 0) timeRange = endTime - startTime;
+
+    // Draw time markers
+    f32 majorInterval = 1.0f; // 1 second major ticks
+    if (timeRange > 10.0f) majorInterval = 5.0f;
+    if (timeRange > 60.0f) majorInterval = 10.0f;
+
+    for (f32 t = std::floor(viewStart / majorInterval) * majorInterval; t <= viewEnd; t += majorInterval)
+    {
+        if (t < viewStart) continue;
+
+        f32 x = canvasPos.x + ((t - viewStart) / timeRange) * canvasSize.x;
+
+        // Major tick
+        drawList->AddLine(ImVec2(x, canvasPos.y + canvasSize.y - 10),
+                          ImVec2(x, canvasPos.y + canvasSize.y),
+                          IM_COL32(150, 150, 150, 255), 1.0f);
+
+        // Time label
+        char timeLabel[16];
+        int minutes = static_cast<int>(t) / 60;
+        int seconds = static_cast<int>(t) % 60;
+        std::snprintf(timeLabel, sizeof(timeLabel), "%d:%02d", minutes, seconds);
+        drawList->AddText(ImVec2(x + 2, canvasPos.y + 2), IM_COL32(200, 200, 200, 255), timeLabel);
+    }
+
+    // Draw current time playhead
+    f32 playheadX = canvasPos.x + ((currentTime - viewStart) / timeRange) * canvasSize.x;
+    if (playheadX >= canvasPos.x && playheadX <= canvasPos.x + canvasSize.x)
+    {
+        drawList->AddLine(ImVec2(playheadX, canvasPos.y),
+                          ImVec2(playheadX, canvasPos.y + canvasSize.y),
+                          IM_COL32(255, 100, 100, 255), 2.0f);
+        // Playhead triangle
+        drawList->AddTriangleFilled(
+            ImVec2(playheadX - 5, canvasPos.y),
+            ImVec2(playheadX + 5, canvasPos.y),
+            ImVec2(playheadX, canvasPos.y + 8),
+            IM_COL32(255, 100, 100, 255));
+    }
+
+    // Handle invisible button for scrubbing
+    ImGui::SetCursorScreenPos(canvasPos);
+    ImGui::InvisibleButton("##ruler", canvasSize);
+    if (ImGui::IsItemActive())
+    {
+        f32 mouseX = ImGui::GetMousePos().x - canvasPos.x;
+        // currentTime = viewStart + (mouseX / canvasSize.x) * timeRange;
+        // Caller would handle updating current time
+    }
+
+    (void)startTime;
+    (void)endTime;
+#else
     (void)startTime;
     (void)endTime;
     (void)currentTime;
+    (void)viewStart;
+    (void)viewEnd;
+#endif
 }
 
-bool KeyframeMarker(f32 /*time*/, bool /*selected*/, renderer::Color /*color*/)
+bool KeyframeMarker(f32 time, bool selected, renderer::Color color)
 {
-    // Would render keyframe marker
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImVec2 pos = ImGui::GetCursorScreenPos();
+
+    f32 size = selected ? 8.0f : 6.0f;
+    ImU32 fillColor = IM_COL32(color.r, color.g, color.b, color.a);
+    ImU32 borderColor = selected ? IM_COL32(255, 255, 255, 255) : IM_COL32(80, 80, 80, 255);
+
+    // Draw diamond shape
+    ImVec2 center(pos.x + size, pos.y + size);
+    drawList->AddQuadFilled(
+        ImVec2(center.x, center.y - size),
+        ImVec2(center.x + size, center.y),
+        ImVec2(center.x, center.y + size),
+        ImVec2(center.x - size, center.y),
+        fillColor);
+    drawList->AddQuad(
+        ImVec2(center.x, center.y - size),
+        ImVec2(center.x + size, center.y),
+        ImVec2(center.x, center.y + size),
+        ImVec2(center.x - size, center.y),
+        borderColor, 1.5f);
+
+    // Handle click
+    ImGui::SetCursorScreenPos(ImVec2(pos.x, pos.y));
+    ImGui::InvisibleButton("##keyframe", ImVec2(size * 2, size * 2));
+    bool clicked = ImGui::IsItemClicked();
+
+    (void)time;
+    return clicked;
+#else
+    (void)time;
+    (void)selected;
+    (void)color;
     return false;
+#endif
 }
 
-void NodeGraphMinimap(f32 /*x*/, f32 /*y*/, f32 /*width*/, f32 /*height*/,
-                      const std::vector<std::pair<f32, f32>>& /*nodePositions*/)
+void NodeGraphMinimap(f32 x, f32 y, f32 width, f32 height,
+                      const std::vector<std::pair<f32, f32>>& nodePositions)
 {
-    // Would render minimap of node graph
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImVec2 canvasPos(x, y);
+    ImVec2 canvasSize(width, height);
+
+    // Draw minimap background
+    drawList->AddRectFilled(canvasPos,
+                            ImVec2(canvasPos.x + canvasSize.x, canvasPos.y + canvasSize.y),
+                            IM_COL32(30, 30, 30, 200));
+    drawList->AddRect(canvasPos,
+                      ImVec2(canvasPos.x + canvasSize.x, canvasPos.y + canvasSize.y),
+                      IM_COL32(80, 80, 80, 255));
+
+    if (nodePositions.empty()) return;
+
+    // Calculate bounds
+    f32 minX = nodePositions[0].first, maxX = minX;
+    f32 minY = nodePositions[0].second, maxY = minY;
+    for (const auto& [nx, ny] : nodePositions)
+    {
+        minX = std::min(minX, nx);
+        maxX = std::max(maxX, nx);
+        minY = std::min(minY, ny);
+        maxY = std::max(maxY, ny);
+    }
+
+    f32 rangeX = maxX - minX;
+    f32 rangeY = maxY - minY;
+    if (rangeX < 1.0f) rangeX = 1.0f;
+    if (rangeY < 1.0f) rangeY = 1.0f;
+
+    // Draw node markers
+    for (const auto& [nx, ny] : nodePositions)
+    {
+        f32 mx = canvasPos.x + ((nx - minX) / rangeX) * (canvasSize.x - 10) + 5;
+        f32 my = canvasPos.y + ((ny - minY) / rangeY) * (canvasSize.y - 10) + 5;
+        drawList->AddRectFilled(ImVec2(mx - 2, my - 2), ImVec2(mx + 2, my + 2),
+                                IM_COL32(0, 122, 204, 255));
+    }
+#else
+    (void)x; (void)y; (void)width; (void)height;
+    (void)nodePositions;
+#endif
 }
 
-bool Splitter(bool /*splitVertically*/, f32 /*thickness*/, f32* size1, f32* size2,
+bool Splitter(bool splitVertically, f32 thickness, f32* size1, f32* size2,
               f32 minSize1, f32 minSize2)
 {
-    // Would render resizable splitter
-    // ImGuiContext& g = *GImGui;
-    // ImGuiWindow* window = g.CurrentWindow;
-    //
-    // ImGuiID id = window->GetID("##Splitter");
-    // ImRect bb;
-    // bb.Min = window->DC.CursorPos + (splitVertically ? ImVec2(*size1, 0.0f) : ImVec2(0.0f, *size1));
-    // bb.Max = bb.Min + CalcItemSize(splitVertically ? ImVec2(thickness, -1.0f) : ImVec2(-1.0f, thickness), 0.0f, 0.0f);
-    // return SplitterBehavior(bb, id, splitVertically ? ImGuiAxis_X : ImGuiAxis_Y, size1, size2, minSize1, minSize2, 0.0f);
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGuiContext& g = *GImGui;
+    ImGuiWindow* window = g.CurrentWindow;
+    ImGuiID id = window->GetID("##Splitter");
+
+    ImRect bb;
+    bb.Min = window->DC.CursorPos + (splitVertically ? ImVec2(*size1, 0.0f) : ImVec2(0.0f, *size1));
+    bb.Max = bb.Min + (splitVertically ? ImVec2(thickness, window->Size.y) : ImVec2(window->Size.x, thickness));
+
+    return ImGui::SplitterBehavior(bb, id, splitVertically ? ImGuiAxis_X : ImGuiAxis_Y, size1, size2, minSize1, minSize2, 0.0f);
+#else
+    (void)splitVertically;
+    (void)thickness;
     (void)size1;
     (void)size2;
     (void)minSize1;
     (void)minSize2;
     return false;
+#endif
 }
 
-void BeginToolbar(const char* /*id*/, f32 /*height*/)
+void BeginToolbar(const char* id, f32 height)
 {
-    // Would begin toolbar
-    // ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(4, 4));
-    // ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 4));
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGui::PushID(id);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(4, 4));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 4));
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 4));
+
+    // Draw toolbar background
+    ImVec2 pos = ImGui::GetCursorPos();
+    ImVec2 size = ImVec2(ImGui::GetContentRegionAvail().x, height);
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImVec2 screenPos = ImGui::GetCursorScreenPos();
+    drawList->AddRectFilled(screenPos, ImVec2(screenPos.x + size.x, screenPos.y + size.y),
+                            IM_COL32(45, 45, 45, 255));
+
+    ImGui::SetCursorPosY(pos.y + 3);
+#else
+    (void)id;
+    (void)height;
+#endif
 }
 
 void EndToolbar()
 {
-    // Would end toolbar
-    // ImGui::PopStyleVar(2);
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGui::PopStyleVar(3);
+    ImGui::PopID();
+    ImGui::Spacing();
+#endif
 }
 
 bool BeginPanel(const char* name, bool* open, i32 flags)
 {
-    // Would begin panel window
-    // return ImGui::Begin(name, open, flags);
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    return ImGui::Begin(name, open, static_cast<ImGuiWindowFlags>(flags));
+#else
     (void)name;
     (void)open;
     (void)flags;
     return true;
+#endif
 }
 
 void EndPanel()
 {
-    // Would end panel window
-    // ImGui::End();
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGui::End();
+#endif
 }
 
 void RichTooltip(const std::function<void()>& content)
 {
-    // Would show rich tooltip
-    // if (ImGui::IsItemHovered())
-    // {
-    //     ImGui::BeginTooltip();
-    //     content();
-    //     ImGui::EndTooltip();
-    // }
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
+    {
+        ImGui::BeginTooltip();
+        ImGui::PushTextWrapPos(350.0f);
+        content();
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
+#else
     (void)content;
+#endif
 }
 
 void LoadingSpinner(const char* label, f32 radius, f32 thickness)
 {
-    // Would draw animated spinner
-    // Using ImGui circle drawing with rotation animation
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImVec2 pos = ImGui::GetCursorScreenPos();
+    ImVec2 center(pos.x + radius, pos.y + radius);
+
+    // Animated rotation
+    f32 time = static_cast<f32>(ImGui::GetTime());
+    f32 numSegments = 30;
+    f32 startAngle = time * 3.0f;
+    f32 arcLength = 3.14159f * 1.5f;
+
+    // Draw spinning arc
+    for (int i = 0; i < static_cast<int>(numSegments * 0.75f); i++)
+    {
+        f32 a1 = startAngle + (static_cast<f32>(i) / numSegments) * 2.0f * 3.14159f;
+        f32 a2 = startAngle + (static_cast<f32>(i + 1) / numSegments) * 2.0f * 3.14159f;
+
+        if (a2 - startAngle > arcLength) break;
+
+        drawList->AddLine(
+            ImVec2(center.x + std::cos(a1) * radius, center.y + std::sin(a1) * radius),
+            ImVec2(center.x + std::cos(a2) * radius, center.y + std::sin(a2) * radius),
+            IM_COL32(0, 122, 204, 255), thickness);
+    }
+
+    ImGui::Dummy(ImVec2(radius * 2, radius * 2));
+    if (label && label[0])
+    {
+        ImGui::SameLine();
+        ImGui::Text("%s", label);
+    }
+#else
     (void)label;
     (void)radius;
     (void)thickness;
+#endif
 }
 
-void ProgressBarLabeled(f32 progress, const char* label, f32 /*height*/)
+void ProgressBarLabeled(f32 progress, const char* label, f32 height)
 {
-    // Would draw progress bar with label
-    // ImGui::ProgressBar(progress, ImVec2(-1, height));
-    // ImGui::SameLine();
-    // ImGui::Text("%s", label);
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGui::ProgressBar(progress, ImVec2(-1, height));
+    if (label && label[0])
+    {
+        ImGui::SameLine();
+        ImGui::Text("%s", label);
+    }
+#else
     (void)progress;
     (void)label;
+    (void)height;
+#endif
 }
 
-void NotificationBadge(i32 count, renderer::Color /*color*/)
+void NotificationBadge(i32 count, renderer::Color color)
 {
-    // Would draw notification badge
-    // if (count > 0)
-    // {
-    //     ImDrawList* draw_list = ImGui::GetWindowDrawList();
-    //     // Draw circle with count
-    // }
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    if (count <= 0) return;
+
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImVec2 pos = ImGui::GetCursorScreenPos();
+
+    char countStr[16];
+    std::snprintf(countStr, sizeof(countStr), "%d", count > 99 ? 99 : count);
+    ImVec2 textSize = ImGui::CalcTextSize(countStr);
+
+    f32 badgeRadius = std::max(textSize.x, textSize.y) / 2.0f + 3.0f;
+    ImVec2 center(pos.x + badgeRadius, pos.y + badgeRadius);
+
+    // Draw badge circle
+    drawList->AddCircleFilled(center, badgeRadius, IM_COL32(color.r, color.g, color.b, color.a));
+
+    // Draw count text
+    drawList->AddText(ImVec2(center.x - textSize.x / 2.0f, center.y - textSize.y / 2.0f),
+                      IM_COL32(255, 255, 255, 255), countStr);
+
+    ImGui::Dummy(ImVec2(badgeRadius * 2, badgeRadius * 2));
+#else
     (void)count;
+    (void)color;
+#endif
 }
 
 } // namespace widgets

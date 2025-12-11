@@ -465,10 +465,72 @@ void AssetBrowserPanel::onUpdate(f64 /*deltaTime*/)
 
 void AssetBrowserPanel::onRender()
 {
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImVec2 availSize = ImGui::GetContentRegionAvail();
+    m_contentWidth = availSize.x;
+
     // Breadcrumb navigation
     renderBreadcrumb();
+    ImGui::Separator();
 
     // Split: directory tree on left, content on right
+    f32 treeWidth = 200.0f;
+    f32 previewWidth = m_showPreview ? 250.0f : 0.0f;
+    f32 contentWidth = availSize.x - treeWidth - previewWidth - 20.0f;
+
+    // Directory tree on left
+    ImGui::BeginChild("DirectoryTree", ImVec2(treeWidth, 0), true);
+    renderDirectoryTree();
+    ImGui::EndChild();
+
+    ImGui::SameLine();
+
+    // Main content area
+    ImGui::BeginChild("AssetContent", ImVec2(contentWidth, 0), true);
+    if (m_isGridView)
+    {
+        renderAssetGrid();
+    }
+    else
+    {
+        renderAssetList();
+    }
+    ImGui::EndChild();
+
+    // Preview panel (optional)
+    if (m_showPreview && !m_selectedAssets.empty())
+    {
+        ImGui::SameLine();
+        ImGui::BeginChild("PreviewPanel", ImVec2(previewWidth, 0), true);
+        renderPreviewPanel();
+        ImGui::EndChild();
+    }
+
+    // Handle drop target for entire panel
+    handleDropTarget();
+
+    // Handle keyboard shortcuts
+    if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows))
+    {
+        if (ImGui::IsKeyPressed(ImGuiKey_Delete) && !m_selectedAssets.empty())
+        {
+            deleteSelected();
+        }
+        if (ImGui::IsKeyPressed(ImGuiKey_F2) && !m_selectedAssets.empty())
+        {
+            renameSelected();
+        }
+        if (ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_D) && !m_selectedAssets.empty())
+        {
+            duplicateSelected();
+        }
+        if (ImGui::IsKeyPressed(ImGuiKey_Backspace))
+        {
+            navigateUp();
+        }
+    }
+#else
+    renderBreadcrumb();
     renderDirectoryTree();
 
     if (m_isGridView)
@@ -480,14 +542,13 @@ void AssetBrowserPanel::onRender()
         renderAssetList();
     }
 
-    // Preview panel (optional)
     if (m_showPreview && !m_selectedAssets.empty())
     {
         renderPreviewPanel();
     }
 
-    // Handle drop target for entire panel
     handleDropTarget();
+#endif
 }
 
 void AssetBrowserPanel::renderToolbar()
@@ -496,17 +557,46 @@ void AssetBrowserPanel::renderToolbar()
 
     renderToolbarItems(getToolbarItems());
 
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(200);
+#endif
+
     // Search input
     if (widgets::SearchInput("##Search", m_searchBuffer, sizeof(m_searchBuffer), "Search assets..."))
     {
         m_filter = m_searchBuffer;
     }
 
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     // Thumbnail size slider (in grid view)
     if (m_isGridView)
     {
-        // Would add slider for thumbnail size
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(100);
+        if (ImGui::SliderFloat("##ThumbnailSize", &m_thumbnailSize, m_minThumbnailSize, m_maxThumbnailSize, "%.0f"))
+        {
+            // Thumbnail size changed
+        }
+        if (ImGui::IsItemHovered())
+        {
+            ImGui::SetTooltip("Thumbnail Size");
+        }
     }
+
+    // Type filter dropdown
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(100);
+    static const char* typeNames[] = {
+        "All Types", "Images", "Audio", "Scripts", "Scenes",
+        "Characters", "Backgrounds", "Fonts", "Videos", "Data"
+    };
+    int currentType = static_cast<int>(m_typeFilter);
+    if (ImGui::Combo("##TypeFilter", &currentType, typeNames, IM_ARRAYSIZE(typeNames)))
+    {
+        m_typeFilter = static_cast<AssetType>(currentType);
+    }
+#endif
 
     widgets::EndToolbar();
 }
@@ -525,14 +615,196 @@ void AssetBrowserPanel::renderBreadcrumb()
         paths.push_back(accumulated.string());
     }
 
-    // Would render clickable breadcrumb items
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    // Navigation buttons
+    if (ImGui::Button("<##Back"))
+    {
+        navigateBack();
+    }
+    if (ImGui::IsItemHovered() && !ImGui::IsItemActive())
+    {
+        ImGui::SetTooltip("Back");
+    }
+
+    ImGui::SameLine();
+    if (ImGui::Button(">##Forward"))
+    {
+        navigateForward();
+    }
+    if (ImGui::IsItemHovered() && !ImGui::IsItemActive())
+    {
+        ImGui::SetTooltip("Forward");
+    }
+
+    ImGui::SameLine();
+    if (ImGui::Button("^##Up"))
+    {
+        navigateUp();
+    }
+    if (ImGui::IsItemHovered() && !ImGui::IsItemActive())
+    {
+        ImGui::SetTooltip("Up");
+    }
+
+    ImGui::SameLine();
+    ImGui::Text("|");
+    ImGui::SameLine();
+
+    // Render clickable breadcrumb items
+    for (size_t i = 0; i < parts.size(); ++i)
+    {
+        if (i > 0)
+        {
+            ImGui::SameLine();
+            ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), ">");
+            ImGui::SameLine();
+        }
+
+        // Make each part clickable
+        bool isLast = (i == parts.size() - 1);
+        if (isLast)
+        {
+            // Current directory (highlighted)
+            ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "%s", parts[i].c_str());
+        }
+        else
+        {
+            // Clickable parent directory
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
+            if (ImGui::Button(parts[i].c_str()))
+            {
+                navigateTo(paths[i]);
+            }
+            ImGui::PopStyleColor(2);
+        }
+    }
+
+    // Refresh button on the right
+    ImGui::SameLine(ImGui::GetContentRegionAvail().x - 25);
+    if (ImGui::Button("R##Refresh"))
+    {
+        refresh();
+    }
+    if (ImGui::IsItemHovered())
+    {
+        ImGui::SetTooltip("Refresh");
+    }
+#else
     (void)parts;
     (void)paths;
+#endif
 }
 
 void AssetBrowserPanel::renderDirectoryTree()
 {
-    // Recursive tree of directories
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Folders");
+    ImGui::Separator();
+
+    // Root folder
+    ImGuiTreeNodeFlags rootFlags = ImGuiTreeNodeFlags_OpenOnArrow |
+                                   ImGuiTreeNodeFlags_SpanAvailWidth |
+                                   ImGuiTreeNodeFlags_DefaultOpen;
+
+    if (m_currentPath == m_rootPath)
+    {
+        rootFlags |= ImGuiTreeNodeFlags_Selected;
+    }
+
+    bool rootOpen = ImGui::TreeNodeEx("Assets", rootFlags);
+    if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+    {
+        navigateTo(m_rootPath);
+    }
+
+    if (rootOpen)
+    {
+        // Render directory entries
+        for (const auto& entry : m_entries)
+        {
+            if (!entry.isDirectory)
+            {
+                continue;
+            }
+
+            ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow |
+                                           ImGuiTreeNodeFlags_SpanAvailWidth |
+                                           ImGuiTreeNodeFlags_Leaf; // Simplified: treat all as leaf
+
+            bool isSelected = (entry.path == m_currentPath);
+            if (isSelected)
+            {
+                nodeFlags |= ImGuiTreeNodeFlags_Selected;
+            }
+
+            // Folder icon
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.8f, 0.4f, 1.0f));
+            bool nodeOpen = ImGui::TreeNodeEx(entry.name.c_str(), nodeFlags);
+            ImGui::PopStyleColor();
+
+            if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+            {
+                navigateTo(entry.path);
+            }
+
+            // Context menu for folders
+            if (ImGui::BeginPopupContextItem())
+            {
+                if (ImGui::MenuItem("Open"))
+                {
+                    navigateTo(entry.path);
+                }
+                if (ImGui::MenuItem("New Folder"))
+                {
+                    // Would create subfolder
+                }
+                ImGui::Separator();
+                if (ImGui::MenuItem("Delete"))
+                {
+                    selectAsset(entry.path);
+                    deleteSelected();
+                }
+                if (ImGui::MenuItem("Rename"))
+                {
+                    selectAsset(entry.path);
+                    renameSelected();
+                }
+                ImGui::EndPopup();
+            }
+
+            if (nodeOpen)
+            {
+                ImGui::TreePop();
+            }
+        }
+
+        ImGui::TreePop();
+    }
+
+    // Quick access section
+    ImGui::Spacing();
+    ImGui::Spacing();
+    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Quick Access");
+    ImGui::Separator();
+
+    if (ImGui::Selectable("Images", m_typeFilter == AssetType::Image))
+    {
+        m_typeFilter = (m_typeFilter == AssetType::Image) ? AssetType::Unknown : AssetType::Image;
+    }
+    if (ImGui::Selectable("Audio", m_typeFilter == AssetType::Audio))
+    {
+        m_typeFilter = (m_typeFilter == AssetType::Audio) ? AssetType::Unknown : AssetType::Audio;
+    }
+    if (ImGui::Selectable("Scripts", m_typeFilter == AssetType::Script))
+    {
+        m_typeFilter = (m_typeFilter == AssetType::Script) ? AssetType::Unknown : AssetType::Script;
+    }
+    if (ImGui::Selectable("Scenes", m_typeFilter == AssetType::Scene))
+    {
+        m_typeFilter = (m_typeFilter == AssetType::Scene) ? AssetType::Unknown : AssetType::Scene;
+    }
+#else
     for (const auto& entry : m_entries)
     {
         if (entry.isDirectory)
@@ -542,26 +814,58 @@ void AssetBrowserPanel::renderDirectoryTree()
             {
                 isExpanded = true;
             }
-
-            if (isExpanded)
-            {
-                // Would recursively render subdirectories
-            }
+            (void)isExpanded;
         }
     }
+#endif
 }
 
 void AssetBrowserPanel::renderAssetGrid()
 {
     f32 padding = 10.0f;
     f32 cellSize = m_thumbnailSize + padding;
-    i32 columns = std::max(1, static_cast<i32>(m_contentWidth / cellSize));
+
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    f32 contentWidth = ImGui::GetContentRegionAvail().x;
+    i32 columns = std::max(1, static_cast<i32>(contentWidth / cellSize));
 
     std::string filterLower = m_filter;
     std::transform(filterLower.begin(), filterLower.end(), filterLower.begin(), ::tolower);
 
+    // Context menu for empty area
+    if (ImGui::BeginPopupContextWindow("AssetGridContext", ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
+    {
+        if (ImGui::MenuItem("New Folder"))
+        {
+            createFolder();
+        }
+        if (ImGui::MenuItem("Import Assets..."))
+        {
+            importAssets();
+        }
+        ImGui::Separator();
+        if (ImGui::MenuItem("Paste", "Ctrl+V"))
+        {
+            // Would paste from clipboard
+        }
+        ImGui::Separator();
+        if (ImGui::MenuItem("Refresh"))
+        {
+            refresh();
+        }
+        ImGui::EndPopup();
+    }
+
+    // Grid layout
+    i32 columnIndex = 0;
     for (const auto& entry : m_entries)
     {
+        // Skip directories in grid view (they're shown in tree)
+        if (entry.isDirectory && !m_showDirectoriesInGrid)
+        {
+            continue;
+        }
+
         // Apply text filter
         if (!filterLower.empty())
         {
@@ -573,7 +877,99 @@ void AssetBrowserPanel::renderAssetGrid()
             }
         }
 
-        // Apply type filter
+        // Apply type filter (for files only)
+        if (!entry.isDirectory && m_typeFilter != AssetType::Unknown && entry.type != m_typeFilter)
+        {
+            continue;
+        }
+
+        // Begin cell
+        ImGui::PushID(entry.path.c_str());
+
+        ImGui::BeginGroup();
+
+        renderAssetEntry(entry);
+
+        ImGui::EndGroup();
+
+        // Handle selection
+        if (ImGui::IsItemClicked())
+        {
+            if (ImGui::GetIO().KeyCtrl)
+            {
+                if (isAssetSelected(entry.path))
+                {
+                    removeFromSelection(entry.path);
+                }
+                else
+                {
+                    addToSelection(entry.path);
+                }
+            }
+            else
+            {
+                selectAsset(entry.path);
+            }
+        }
+
+        // Handle double-click
+        if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
+        {
+            handleAssetDoubleClick(entry);
+        }
+
+        // Context menu
+        renderAssetContextMenu(entry);
+
+        // Drag source
+        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+        {
+            ImGui::SetDragDropPayload("ASSET_BROWSER_ITEM", entry.path.c_str(), entry.path.size() + 1);
+            ImGui::Text("%s", entry.name.c_str());
+            ImGui::EndDragDropSource();
+        }
+
+        ImGui::PopID();
+
+        // Grid layout: move to next column or new row
+        ++columnIndex;
+        if (columnIndex < columns)
+        {
+            ImGui::SameLine();
+        }
+        else
+        {
+            columnIndex = 0;
+        }
+    }
+
+    // Empty state
+    if (m_entries.empty() || (filterLower.length() > 0 && columnIndex == 0))
+    {
+        ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "No assets found");
+        if (!filterLower.empty())
+        {
+            ImGui::TextColored(ImVec4(0.4f, 0.4f, 0.4f, 1.0f), "Try adjusting your search filter");
+        }
+    }
+#else
+    i32 columns = std::max(1, static_cast<i32>(m_contentWidth / cellSize));
+
+    std::string filterLower = m_filter;
+    std::transform(filterLower.begin(), filterLower.end(), filterLower.begin(), ::tolower);
+
+    for (const auto& entry : m_entries)
+    {
+        if (!filterLower.empty())
+        {
+            std::string nameLower = entry.name;
+            std::transform(nameLower.begin(), nameLower.end(), nameLower.begin(), ::tolower);
+            if (nameLower.find(filterLower) == std::string::npos)
+            {
+                continue;
+            }
+        }
+
         if (m_typeFilter != AssetType::Unknown && entry.type != m_typeFilter)
         {
             continue;
@@ -584,12 +980,32 @@ void AssetBrowserPanel::renderAssetGrid()
 
     (void)columns;
     (void)cellSize;
+#endif
 }
 
 void AssetBrowserPanel::renderAssetList()
 {
     std::string filterLower = m_filter;
     std::transform(filterLower.begin(), filterLower.end(), filterLower.begin(), ::tolower);
+
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    // Column headers
+    ImGui::Columns(4, "AssetListColumns", true);
+    ImGui::SetColumnWidth(0, 250);
+    ImGui::SetColumnWidth(1, 80);
+    ImGui::SetColumnWidth(2, 100);
+    ImGui::SetColumnWidth(3, 150);
+
+    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Name");
+    ImGui::NextColumn();
+    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Type");
+    ImGui::NextColumn();
+    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Size");
+    ImGui::NextColumn();
+    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Modified");
+    ImGui::NextColumn();
+
+    ImGui::Separator();
 
     for (const auto& entry : m_entries)
     {
@@ -604,17 +1020,214 @@ void AssetBrowserPanel::renderAssetList()
             }
         }
 
+        // Apply type filter
+        if (!entry.isDirectory && m_typeFilter != AssetType::Unknown && entry.type != m_typeFilter)
+        {
+            continue;
+        }
+
         bool isSelected = isAssetSelected(entry.path);
-        // Would render selectable list item
+
+        ImGui::PushID(entry.path.c_str());
+
+        // Name column with icon
+        const char* icon = entry.isDirectory ? "[DIR]" : getAssetTypeIcon(entry.type);
+        ImVec4 iconColor = entry.isDirectory ? ImVec4(0.9f, 0.8f, 0.4f, 1.0f) : getAssetTypeColor(entry.type);
+
+        if (ImGui::Selectable("##row", isSelected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick))
+        {
+            if (ImGui::GetIO().KeyCtrl)
+            {
+                if (isSelected)
+                {
+                    removeFromSelection(entry.path);
+                }
+                else
+                {
+                    addToSelection(entry.path);
+                }
+            }
+            else
+            {
+                selectAsset(entry.path);
+            }
+
+            if (ImGui::IsMouseDoubleClicked(0))
+            {
+                handleAssetDoubleClick(entry);
+            }
+        }
+
+        // Context menu
+        renderAssetContextMenu(entry);
+
+        // Drag source
+        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+        {
+            ImGui::SetDragDropPayload("ASSET_BROWSER_ITEM", entry.path.c_str(), entry.path.size() + 1);
+            ImGui::Text("%s", entry.name.c_str());
+            ImGui::EndDragDropSource();
+        }
+
+        ImGui::SameLine();
+        ImGui::TextColored(iconColor, "%s", icon);
+        ImGui::SameLine();
+        ImGui::Text("%s", entry.name.c_str());
+
+        ImGui::NextColumn();
+
+        // Type column
+        if (entry.isDirectory)
+        {
+            ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "Folder");
+        }
+        else
+        {
+            ImGui::Text("%s", getAssetTypeName(entry.type).c_str());
+        }
+        ImGui::NextColumn();
+
+        // Size column
+        if (!entry.isDirectory)
+        {
+            ImGui::Text("%s", formatFileSize(entry.size).c_str());
+        }
+        ImGui::NextColumn();
+
+        // Modified column
+        ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "%s", entry.modifiedTime.c_str());
+        ImGui::NextColumn();
+
+        ImGui::PopID();
+    }
+
+    ImGui::Columns(1);
+
+    // Empty state
+    if (m_entries.empty())
+    {
+        ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "No assets in this folder");
+    }
+#else
+    for (const auto& entry : m_entries)
+    {
+        if (!filterLower.empty())
+        {
+            std::string nameLower = entry.name;
+            std::transform(nameLower.begin(), nameLower.end(), nameLower.begin(), ::tolower);
+            if (nameLower.find(filterLower) == std::string::npos)
+            {
+                continue;
+            }
+        }
+
+        bool isSelected = isAssetSelected(entry.path);
         (void)isSelected;
     }
+#endif
 }
 
 void AssetBrowserPanel::renderAssetEntry(const AssetBrowserEntry& entry)
 {
     bool isSelected = isAssetSelected(entry.path);
 
-    // Icon based on type
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImVec2 pos = ImGui::GetCursorScreenPos();
+
+    // Draw thumbnail background
+    ImU32 bgColor = isSelected ? IM_COL32(70, 100, 150, 255) : IM_COL32(50, 50, 50, 255);
+    drawList->AddRectFilled(pos, ImVec2(pos.x + m_thumbnailSize, pos.y + m_thumbnailSize + 20), bgColor, 4.0f);
+
+    // Draw selection highlight
+    if (isSelected)
+    {
+        drawList->AddRect(pos, ImVec2(pos.x + m_thumbnailSize, pos.y + m_thumbnailSize + 20),
+                          IM_COL32(100, 150, 200, 255), 4.0f, 0, 2.0f);
+    }
+
+    // Draw icon/thumbnail
+    const char* icon = getAssetTypeIcon(entry.type);
+    if (entry.isDirectory)
+    {
+        icon = "[DIR]";
+    }
+
+    ImVec4 iconColor = entry.isDirectory ? ImVec4(0.9f, 0.8f, 0.4f, 1.0f) : getAssetTypeColor(entry.type);
+
+    // Center the icon in the thumbnail area
+    ImVec2 iconSize = ImGui::CalcTextSize(icon);
+    ImVec2 iconPos(pos.x + (m_thumbnailSize - iconSize.x) / 2, pos.y + (m_thumbnailSize - iconSize.y) / 2);
+    drawList->AddText(iconPos, ImGui::GetColorU32(iconColor), icon);
+
+    // Draw name below thumbnail
+    ImVec2 namePos(pos.x, pos.y + m_thumbnailSize + 2);
+
+    // Truncate name if too long
+    std::string displayName = entry.name;
+    f32 maxWidth = m_thumbnailSize - 4;
+    ImVec2 nameSize = ImGui::CalcTextSize(displayName.c_str());
+    if (nameSize.x > maxWidth)
+    {
+        while (displayName.length() > 3 && ImGui::CalcTextSize((displayName + "...").c_str()).x > maxWidth)
+        {
+            displayName.pop_back();
+        }
+        displayName += "...";
+    }
+
+    // Handle rename mode
+    if (m_isRenaming && m_renamingAsset == entry.path)
+    {
+        ImGui::SetCursorScreenPos(namePos);
+        ImGui::SetNextItemWidth(m_thumbnailSize - 4);
+        ImGui::SetKeyboardFocusHere();
+        if (ImGui::InputText("##rename", m_renameBuffer, sizeof(m_renameBuffer),
+                             ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+        {
+            // Commit rename
+            std::filesystem::path oldPath(entry.path);
+            std::filesystem::path newPath = oldPath.parent_path() / m_renameBuffer;
+            try
+            {
+                std::filesystem::rename(oldPath, newPath);
+                refresh();
+            }
+            catch (...)
+            {
+                // Handle error
+            }
+            m_isRenaming = false;
+        }
+        if (ImGui::IsKeyPressed(ImGuiKey_Escape))
+        {
+            m_isRenaming = false;
+        }
+    }
+    else
+    {
+        // Center the name
+        nameSize = ImGui::CalcTextSize(displayName.c_str());
+        namePos.x = pos.x + (m_thumbnailSize - nameSize.x) / 2;
+        drawList->AddText(namePos, IM_COL32(220, 220, 220, 255), displayName.c_str());
+    }
+
+    // Reserve space for the entry
+    ImGui::Dummy(ImVec2(m_thumbnailSize, m_thumbnailSize + 20));
+
+    // Tooltip with full name and info
+    if (ImGui::IsItemHovered())
+    {
+        ImGui::BeginTooltip();
+        ImGui::Text("%s", entry.name.c_str());
+        if (!entry.isDirectory)
+        {
+            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "Type: %s", getAssetTypeName(entry.type).c_str());
+            ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "Size: %s", formatFileSize(entry.size).c_str());
+        }
+        ImGui::EndTooltip();
+    }
+#else
     const char* icon = entry.isDirectory ? "[DIR]" : "[FILE]";
     switch (entry.type)
     {
@@ -632,16 +1245,9 @@ void AssetBrowserPanel::renderAssetEntry(const AssetBrowserEntry& entry)
         case AssetType::Localization: icon = "[LOC]"; break;
         default: break;
     }
-
-    // Render rename input if this asset is being renamed
-    if (m_isRenaming && m_renamingAsset == entry.path)
-    {
-        // Would render text input
-    }
-
-    // Would render asset with icon, selection highlight, etc.
     (void)icon;
     (void)isSelected;
+#endif
 }
 
 void AssetBrowserPanel::renderPreviewPanel()
@@ -667,37 +1273,233 @@ void AssetBrowserPanel::renderPreviewPanel()
         return;
     }
 
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Preview");
+    ImGui::Separator();
+
+    // Preview thumbnail (larger)
+    f32 previewSize = ImGui::GetContentRegionAvail().x - 10;
+    ImVec2 pos = ImGui::GetCursorScreenPos();
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+    // Draw preview background
+    drawList->AddRectFilled(pos, ImVec2(pos.x + previewSize, pos.y + previewSize),
+                            IM_COL32(40, 40, 40, 255), 4.0f);
+
+    // Draw icon centered
+    const char* icon = selectedEntry->isDirectory ? "[DIR]" : getAssetTypeIcon(selectedEntry->type);
+    ImVec4 iconColor = selectedEntry->isDirectory ?
+                       ImVec4(0.9f, 0.8f, 0.4f, 1.0f) : getAssetTypeColor(selectedEntry->type);
+
+    // Large icon text
+    ImGui::PushFont(ImGui::GetIO().Fonts->Fonts.Size > 0 ? ImGui::GetIO().Fonts->Fonts[0] : nullptr);
+    ImVec2 iconSize = ImGui::CalcTextSize(icon);
+    ImVec2 iconPos(pos.x + (previewSize - iconSize.x) / 2, pos.y + (previewSize - iconSize.y) / 2);
+    drawList->AddText(iconPos, ImGui::GetColorU32(iconColor), icon);
+    ImGui::PopFont();
+
+    ImGui::Dummy(ImVec2(previewSize, previewSize));
+    ImGui::Spacing();
+#endif
+
     renderMetadataSection(*selectedEntry);
 }
 
 void AssetBrowserPanel::renderMetadataSection(const AssetBrowserEntry& entry)
 {
-    // Common metadata
-    // Would render: Name, Path, Type, Size, Modified date
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Info");
+    ImGui::Separator();
 
-    // Type-specific metadata
+    // Name
+    ImGui::Text("Name:");
+    ImGui::SameLine(80);
+    ImGui::TextColored(ImVec4(0.9f, 0.9f, 0.9f, 1.0f), "%s", entry.name.c_str());
+
+    // Type
+    ImGui::Text("Type:");
+    ImGui::SameLine(80);
+    if (entry.isDirectory)
+    {
+        ImGui::TextColored(ImVec4(0.9f, 0.8f, 0.4f, 1.0f), "Folder");
+    }
+    else
+    {
+        ImGui::TextColored(getAssetTypeColor(entry.type), "%s", getAssetTypeName(entry.type).c_str());
+    }
+
+    // Size (for files)
+    if (!entry.isDirectory)
+    {
+        ImGui::Text("Size:");
+        ImGui::SameLine(80);
+        ImGui::Text("%s", formatFileSize(entry.size).c_str());
+    }
+
+    // Path
+    ImGui::Text("Path:");
+    ImGui::SameLine(80);
+    ImGui::TextWrapped("%s", entry.path.c_str());
+
+    // Modified date
+    if (!entry.modifiedTime.empty())
+    {
+        ImGui::Text("Modified:");
+        ImGui::SameLine(80);
+        ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "%s", entry.modifiedTime.c_str());
+    }
+
+    ImGui::Spacing();
+    ImGui::Separator();
+
+    // Type-specific metadata and actions
     switch (entry.type)
     {
         case AssetType::Image:
-            // Dimensions, format
-            // Would show image preview
+            ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Image Properties");
+            ImGui::Separator();
+            // Would show actual dimensions from metadata
+            ImGui::Text("Dimensions: (Load to view)");
+            ImGui::Text("Format: %s", entry.extension.c_str());
             break;
+
         case AssetType::Audio:
-            // Duration, sample rate, channels
-            // Would show waveform and playback controls
+            ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Audio Properties");
+            ImGui::Separator();
+            ImGui::Text("Duration: (Load to view)");
+            ImGui::Text("Format: %s", entry.extension.c_str());
+            // Play button
+            if (ImGui::Button("Play"))
+            {
+                // Would play audio preview
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Stop"))
+            {
+                // Would stop audio preview
+            }
             break;
+
         case AssetType::Video:
-            // Duration, dimensions, frame rate
-            // Would show video thumbnail
+            ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Video Properties");
+            ImGui::Separator();
+            ImGui::Text("Duration: (Load to view)");
+            ImGui::Text("Format: %s", entry.extension.c_str());
             break;
+
+        case AssetType::Script:
+            ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Script");
+            ImGui::Separator();
+            if (ImGui::Button("Open in Editor"))
+            {
+                // Would open script editor
+            }
+            break;
+
+        case AssetType::Scene:
+            ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Scene");
+            ImGui::Separator();
+            if (ImGui::Button("Load Scene"))
+            {
+                // Would load scene
+            }
+            break;
+
         default:
             break;
     }
+
+    ImGui::Spacing();
+
+    // Action buttons
+    ImGui::Separator();
+    if (ImGui::Button("Open"))
+    {
+        handleAssetDoubleClick(entry);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Show in Explorer"))
+    {
+        showInExplorer();
+    }
+#else
+    switch (entry.type)
+    {
+        case AssetType::Image:
+        case AssetType::Audio:
+        case AssetType::Video:
+        default:
+            break;
+    }
+#endif
 }
 
-void AssetBrowserPanel::renderAssetContextMenu(const AssetBrowserEntry& /*entry*/)
+void AssetBrowserPanel::renderAssetContextMenu(const AssetBrowserEntry& entry)
 {
-    // Would render popup context menu
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    if (ImGui::BeginPopupContextItem())
+    {
+        if (ImGui::MenuItem("Open"))
+        {
+            handleAssetDoubleClick(entry);
+        }
+
+        ImGui::Separator();
+
+        if (ImGui::MenuItem("Cut", "Ctrl+X"))
+        {
+            // Would cut to clipboard
+        }
+        if (ImGui::MenuItem("Copy", "Ctrl+C"))
+        {
+            // Would copy to clipboard
+        }
+
+        ImGui::Separator();
+
+        if (ImGui::MenuItem("Duplicate", "Ctrl+D"))
+        {
+            selectAsset(entry.path);
+            duplicateSelected();
+        }
+        if (ImGui::MenuItem("Rename", "F2"))
+        {
+            selectAsset(entry.path);
+            renameSelected();
+        }
+        if (ImGui::MenuItem("Delete", "Delete"))
+        {
+            selectAsset(entry.path);
+            deleteSelected();
+        }
+
+        ImGui::Separator();
+
+        if (!entry.isDirectory)
+        {
+            if (ImGui::MenuItem("Reimport"))
+            {
+                selectAsset(entry.path);
+                reimportSelected();
+            }
+        }
+
+        if (ImGui::MenuItem("Show in Explorer"))
+        {
+            selectAsset(entry.path);
+            showInExplorer();
+        }
+        if (ImGui::MenuItem("Copy Path"))
+        {
+            selectAsset(entry.path);
+            copyPathToClipboard();
+        }
+
+        ImGui::EndPopup();
+    }
+#else
+    (void)entry;
+#endif
 }
 
 // =========================================================================
@@ -946,5 +1748,60 @@ std::string AssetBrowserPanel::getAssetTypeName(AssetType type) const
         default: return "Unknown";
     }
 }
+
+const char* AssetBrowserPanel::getAssetTypeIcon(AssetType type) const
+{
+    switch (type)
+    {
+        case AssetType::Image: return "[IMG]";
+        case AssetType::Audio: return "[SND]";
+        case AssetType::Script: return "[SCR]";
+        case AssetType::Scene: return "[SCN]";
+        case AssetType::Character: return "[CHR]";
+        case AssetType::Background: return "[BG]";
+        case AssetType::Font: return "[FNT]";
+        case AssetType::Video: return "[VID]";
+        case AssetType::Data: return "[DAT]";
+        case AssetType::Prefab: return "[PFB]";
+        case AssetType::Animation: return "[ANM]";
+        case AssetType::Localization: return "[LOC]";
+        default: return "[FILE]";
+    }
+}
+
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+ImVec4 AssetBrowserPanel::getAssetTypeColor(AssetType type) const
+{
+    switch (type)
+    {
+        case AssetType::Image:
+            return ImVec4(0.4f, 0.8f, 0.4f, 1.0f);  // Green
+        case AssetType::Audio:
+            return ImVec4(0.4f, 0.6f, 0.9f, 1.0f);  // Blue
+        case AssetType::Script:
+            return ImVec4(0.9f, 0.7f, 0.4f, 1.0f);  // Orange
+        case AssetType::Scene:
+            return ImVec4(0.8f, 0.4f, 0.8f, 1.0f);  // Purple
+        case AssetType::Character:
+            return ImVec4(0.9f, 0.5f, 0.5f, 1.0f);  // Red
+        case AssetType::Background:
+            return ImVec4(0.5f, 0.7f, 0.9f, 1.0f);  // Light blue
+        case AssetType::Font:
+            return ImVec4(0.7f, 0.7f, 0.7f, 1.0f);  // Gray
+        case AssetType::Video:
+            return ImVec4(0.9f, 0.4f, 0.6f, 1.0f);  // Pink
+        case AssetType::Data:
+            return ImVec4(0.6f, 0.8f, 0.6f, 1.0f);  // Light green
+        case AssetType::Prefab:
+            return ImVec4(0.4f, 0.9f, 0.9f, 1.0f);  // Cyan
+        case AssetType::Animation:
+            return ImVec4(0.9f, 0.9f, 0.4f, 1.0f);  // Yellow
+        case AssetType::Localization:
+            return ImVec4(0.7f, 0.5f, 0.9f, 1.0f);  // Violet
+        default:
+            return ImVec4(0.6f, 0.6f, 0.6f, 1.0f);  // Default gray
+    }
+}
+#endif
 
 } // namespace NovelMind::editor

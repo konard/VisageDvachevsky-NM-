@@ -369,6 +369,10 @@ private:
     // Utility
     std::string formatFileSize(u64 bytes) const;
     std::string getAssetTypeName(AssetType type) const;
+    const char* getAssetTypeIcon(AssetType type) const;
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    struct ImVec4 getAssetTypeColor(AssetType type) const;
+#endif
 
     std::string m_currentPath;
     std::string m_rootPath;
@@ -384,6 +388,8 @@ private:
     f32 m_maxThumbnailSize = 200.0f;
     bool m_showPreview = true;
     bool m_showHiddenFiles = false;
+    bool m_showDirectoriesInGrid = true;
+    f32 m_contentWidth = 800.0f;
 
     // Selection
     std::vector<std::string> m_selectedAssets;

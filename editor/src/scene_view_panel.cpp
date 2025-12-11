@@ -309,13 +309,9 @@ void SceneViewPanel::onSelectionChanged(SelectionType type,
 
 void SceneViewPanel::renderSceneContent()
 {
-    // Get content region
-    // ImVec2 contentMin = ImGui::GetCursorScreenPos();
-    // ImVec2 contentMax = ImVec2(contentMin.x + m_contentWidth, contentMin.y + m_contentHeight);
-    // ImDrawList* drawList = ImGui::GetWindowDrawList();
-
-    // Draw scene background
-    // drawList->AddRectFilled(contentMin, contentMax, IM_COL32(30, 30, 30, 255));
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImVec2 contentMin = ImGui::GetCursorScreenPos();
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
 
     // Draw grid if enabled
     if (m_showGrid)
@@ -324,17 +320,33 @@ void SceneViewPanel::renderSceneContent()
     }
 
     // Draw scene bounds indicator
-    // f32 sceneLeft, sceneTop, sceneRight, sceneBottom;
-    // std::tie(sceneLeft, sceneTop) = sceneToScreen(0, 0);
-    // std::tie(sceneRight, sceneBottom) = sceneToScreen(m_sceneWidth, m_sceneHeight);
-    // drawList->AddRect(
-    //     ImVec2(sceneLeft, sceneTop),
-    //     ImVec2(sceneRight, sceneBottom),
-    //     IM_COL32(100, 100, 100, 255), 0.0f, 0, 2.0f);
+    f32 sceneLeft, sceneTop, sceneRight, sceneBottom;
+    std::tie(sceneLeft, sceneTop) = sceneToScreen(0, 0);
+    std::tie(sceneRight, sceneBottom) = sceneToScreen(m_sceneWidth, m_sceneHeight);
+
+    // Offset by content position
+    sceneLeft += contentMin.x;
+    sceneTop += contentMin.y;
+    sceneRight += contentMin.x;
+    sceneBottom += contentMin.y;
+
+    // Draw scene bounds border
+    drawList->AddRect(
+        ImVec2(sceneLeft, sceneTop),
+        ImVec2(sceneRight, sceneBottom),
+        IM_COL32(100, 100, 100, 255), 0.0f, 0, 2.0f);
 
     // Render scene objects based on render mode
     // This would iterate through scene objects and draw them
-    // For now, this is a placeholder for actual scene rendering
+    // For now, draw placeholder objects for demonstration
+    renderPlaceholderObjects();
+
+#else
+    if (m_showGrid)
+    {
+        renderGrid();
+    }
+#endif
 
     // Render selection highlight
     renderSelectionHighlight();
@@ -348,9 +360,9 @@ void SceneViewPanel::renderSceneContent()
 
 void SceneViewPanel::renderGrid()
 {
-    // Draw grid lines
-    // ImDrawList* drawList = ImGui::GetWindowDrawList();
-    // ImVec2 contentMin = ImGui::GetCursorScreenPos();
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImVec2 contentMin = ImGui::GetCursorScreenPos();
 
     f32 scaledGridSize = m_gridSize * m_zoom;
 
@@ -361,91 +373,250 @@ void SceneViewPanel::renderGrid()
     }
 
     // Calculate grid offset based on pan
-    // f32 startX = std::fmod(m_panX * m_zoom + m_contentWidth / 2.0f, scaledGridSize);
-    // f32 startY = std::fmod(m_panY * m_zoom + m_contentHeight / 2.0f, scaledGridSize);
+    f32 startX = std::fmod(m_panX * m_zoom + m_contentWidth / 2.0f, scaledGridSize);
+    f32 startY = std::fmod(m_panY * m_zoom + m_contentHeight / 2.0f, scaledGridSize);
+    if (startX < 0) startX += scaledGridSize;
+    if (startY < 0) startY += scaledGridSize;
+
+    ImU32 gridColor = IM_COL32(m_gridColor.r, m_gridColor.g, m_gridColor.b, m_gridColor.a);
+    ImU32 majorGridColor = IM_COL32(80, 80, 80, 150);
 
     // Draw vertical lines
-    // for (f32 x = startX; x < m_contentWidth; x += scaledGridSize)
-    // {
-    //     drawList->AddLine(
-    //         ImVec2(contentMin.x + x, contentMin.y),
-    //         ImVec2(contentMin.x + x, contentMin.y + m_contentHeight),
-    //         IM_COL32(m_gridColor.r, m_gridColor.g, m_gridColor.b, m_gridColor.a));
-    // }
+    int lineIdx = 0;
+    for (f32 x = startX; x < m_contentWidth; x += scaledGridSize)
+    {
+        bool isMajor = (lineIdx % 5 == 0);
+        drawList->AddLine(
+            ImVec2(contentMin.x + x, contentMin.y),
+            ImVec2(contentMin.x + x, contentMin.y + m_contentHeight),
+            isMajor ? majorGridColor : gridColor, isMajor ? 1.5f : 1.0f);
+        lineIdx++;
+    }
 
     // Draw horizontal lines
-    // for (f32 y = startY; y < m_contentHeight; y += scaledGridSize)
-    // {
-    //     drawList->AddLine(
-    //         ImVec2(contentMin.x, contentMin.y + y),
-    //         ImVec2(contentMin.x + m_contentWidth, contentMin.y + y),
-    //         IM_COL32(m_gridColor.r, m_gridColor.g, m_gridColor.b, m_gridColor.a));
-    // }
+    lineIdx = 0;
+    for (f32 y = startY; y < m_contentHeight; y += scaledGridSize)
+    {
+        bool isMajor = (lineIdx % 5 == 0);
+        drawList->AddLine(
+            ImVec2(contentMin.x, contentMin.y + y),
+            ImVec2(contentMin.x + m_contentWidth, contentMin.y + y),
+            isMajor ? majorGridColor : gridColor, isMajor ? 1.5f : 1.0f);
+        lineIdx++;
+    }
+#else
+    f32 scaledGridSize = m_gridSize * m_zoom;
     (void)scaledGridSize;
+#endif
 }
 
 void SceneViewPanel::renderGizmos()
 {
-    // Get selected object positions
     auto selectedIds = getSelection().getSelectedObjectIds();
     if (selectedIds.empty())
     {
         return;
     }
 
-    // Calculate gizmo center (average of selected object positions)
-    // For now, use placeholder position
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImVec2 contentMin = ImGui::GetCursorScreenPos();
+
+    // Calculate gizmo center (would use actual object position in real implementation)
     f32 gizmoX = m_contentWidth / 2.0f;
     f32 gizmoY = m_contentHeight / 2.0f;
-
-    // ImDrawList* drawList = ImGui::GetWindowDrawList();
-    // ImVec2 contentMin = ImGui::GetCursorScreenPos();
-    // ImVec2 gizmoCenter(contentMin.x + gizmoX, contentMin.y + gizmoY);
+    ImVec2 gizmoCenter(contentMin.x + gizmoX, contentMin.y + gizmoY);
 
     f32 gizmoSize = 80.0f;
+    f32 arrowHeadSize = 10.0f;
+
+    ImU32 xColor = IM_COL32(m_gizmoXColor.r, m_gizmoXColor.g, m_gizmoXColor.b, m_gizmoXColor.a);
+    ImU32 yColor = IM_COL32(m_gizmoYColor.r, m_gizmoYColor.g, m_gizmoYColor.b, m_gizmoYColor.a);
+    ImU32 xyColor = IM_COL32(m_gizmoXYColor.r, m_gizmoXYColor.g, m_gizmoXYColor.b, 128);
 
     switch (m_currentTool)
     {
         case TransformTool::Move:
-            // Draw move gizmo (arrows)
+        {
             // X axis (red arrow)
-            // drawList->AddLine(gizmoCenter,
-            //     ImVec2(gizmoCenter.x + gizmoSize, gizmoCenter.y),
-            //     IM_COL32(m_gizmoXColor.r, m_gizmoXColor.g, m_gizmoXColor.b, m_gizmoXColor.a), 2.0f);
-            // Y axis (green arrow)
-            // drawList->AddLine(gizmoCenter,
-            //     ImVec2(gizmoCenter.x, gizmoCenter.y - gizmoSize),
-            //     IM_COL32(m_gizmoYColor.r, m_gizmoYColor.g, m_gizmoYColor.b, m_gizmoYColor.a), 2.0f);
-            // XY plane (yellow square)
-            // drawList->AddRectFilled(
-            //     ImVec2(gizmoCenter.x + 5, gizmoCenter.y - 25),
-            //     ImVec2(gizmoCenter.x + 25, gizmoCenter.y - 5),
-            //     IM_COL32(m_gizmoXYColor.r, m_gizmoXYColor.g, m_gizmoXYColor.b, 128));
+            drawList->AddLine(gizmoCenter,
+                ImVec2(gizmoCenter.x + gizmoSize, gizmoCenter.y),
+                xColor, 3.0f);
+            // X arrow head
+            drawList->AddTriangleFilled(
+                ImVec2(gizmoCenter.x + gizmoSize + arrowHeadSize, gizmoCenter.y),
+                ImVec2(gizmoCenter.x + gizmoSize - 5, gizmoCenter.y - arrowHeadSize/2),
+                ImVec2(gizmoCenter.x + gizmoSize - 5, gizmoCenter.y + arrowHeadSize/2),
+                xColor);
+
+            // Y axis (green arrow pointing up)
+            drawList->AddLine(gizmoCenter,
+                ImVec2(gizmoCenter.x, gizmoCenter.y - gizmoSize),
+                yColor, 3.0f);
+            // Y arrow head
+            drawList->AddTriangleFilled(
+                ImVec2(gizmoCenter.x, gizmoCenter.y - gizmoSize - arrowHeadSize),
+                ImVec2(gizmoCenter.x - arrowHeadSize/2, gizmoCenter.y - gizmoSize + 5),
+                ImVec2(gizmoCenter.x + arrowHeadSize/2, gizmoCenter.y - gizmoSize + 5),
+                yColor);
+
+            // XY plane handle (yellow square)
+            drawList->AddRectFilled(
+                ImVec2(gizmoCenter.x + 10, gizmoCenter.y - 30),
+                ImVec2(gizmoCenter.x + 30, gizmoCenter.y - 10),
+                xyColor);
             break;
+        }
 
         case TransformTool::Rotate:
-            // Draw rotate gizmo (circle)
-            // drawList->AddCircle(gizmoCenter, gizmoSize,
-            //     IM_COL32(m_selectionColor.r, m_selectionColor.g, m_selectionColor.b, m_selectionColor.a), 32, 2.0f);
+        {
+            // Draw rotation circle
+            drawList->AddCircle(gizmoCenter, gizmoSize,
+                IM_COL32(m_selectionColor.r, m_selectionColor.g, m_selectionColor.b, 200), 48, 2.5f);
+
+            // Draw rotation angle indicator
+            f32 angle = 0.0f; // Would be actual rotation
+            f32 indicatorX = gizmoCenter.x + std::cos(angle) * gizmoSize;
+            f32 indicatorY = gizmoCenter.y - std::sin(angle) * gizmoSize;
+            drawList->AddLine(gizmoCenter, ImVec2(indicatorX, indicatorY),
+                IM_COL32(255, 255, 255, 255), 2.0f);
+            drawList->AddCircleFilled(ImVec2(indicatorX, indicatorY), 5.0f,
+                IM_COL32(255, 255, 255, 255));
             break;
+        }
 
         case TransformTool::Scale:
-            // Draw scale gizmo (lines with boxes at ends)
-            // Similar to move but with squares instead of arrows
+        {
+            // X axis scale (red with box)
+            drawList->AddLine(gizmoCenter,
+                ImVec2(gizmoCenter.x + gizmoSize, gizmoCenter.y),
+                xColor, 3.0f);
+            drawList->AddRectFilled(
+                ImVec2(gizmoCenter.x + gizmoSize - 5, gizmoCenter.y - 5),
+                ImVec2(gizmoCenter.x + gizmoSize + 5, gizmoCenter.y + 5),
+                xColor);
+
+            // Y axis scale (green with box)
+            drawList->AddLine(gizmoCenter,
+                ImVec2(gizmoCenter.x, gizmoCenter.y - gizmoSize),
+                yColor, 3.0f);
+            drawList->AddRectFilled(
+                ImVec2(gizmoCenter.x - 5, gizmoCenter.y - gizmoSize - 5),
+                ImVec2(gizmoCenter.x + 5, gizmoCenter.y - gizmoSize + 5),
+                yColor);
+
+            // Uniform scale (center box)
+            drawList->AddRectFilled(
+                ImVec2(gizmoCenter.x - 6, gizmoCenter.y - 6),
+                ImVec2(gizmoCenter.x + 6, gizmoCenter.y + 6),
+                IM_COL32(255, 255, 255, 200));
             break;
+        }
 
         case TransformTool::Rect:
-            // Draw rect transform handles
-            // Draw handles at corners and edges
+        {
+            // Draw rect transform with 8 handles (corners + edges)
+            f32 rectSize = 100.0f;
+            ImVec2 topLeft(gizmoCenter.x - rectSize/2, gizmoCenter.y - rectSize/2);
+            ImVec2 bottomRight(gizmoCenter.x + rectSize/2, gizmoCenter.y + rectSize/2);
+
+            // Rect outline
+            drawList->AddRect(topLeft, bottomRight,
+                IM_COL32(m_selectionColor.r, m_selectionColor.g, m_selectionColor.b, 255), 0.0f, 0, 2.0f);
+
+            // Corner handles
+            f32 handleSize = 6.0f;
+            ImU32 handleColor = IM_COL32(255, 255, 255, 255);
+            // Top-left
+            drawList->AddRectFilled(
+                ImVec2(topLeft.x - handleSize, topLeft.y - handleSize),
+                ImVec2(topLeft.x + handleSize, topLeft.y + handleSize), handleColor);
+            // Top-right
+            drawList->AddRectFilled(
+                ImVec2(bottomRight.x - handleSize, topLeft.y - handleSize),
+                ImVec2(bottomRight.x + handleSize, topLeft.y + handleSize), handleColor);
+            // Bottom-left
+            drawList->AddRectFilled(
+                ImVec2(topLeft.x - handleSize, bottomRight.y - handleSize),
+                ImVec2(topLeft.x + handleSize, bottomRight.y + handleSize), handleColor);
+            // Bottom-right
+            drawList->AddRectFilled(
+                ImVec2(bottomRight.x - handleSize, bottomRight.y - handleSize),
+                ImVec2(bottomRight.x + handleSize, bottomRight.y + handleSize), handleColor);
+
+            // Edge handles
+            // Top
+            drawList->AddRectFilled(
+                ImVec2(gizmoCenter.x - handleSize, topLeft.y - handleSize),
+                ImVec2(gizmoCenter.x + handleSize, topLeft.y + handleSize), handleColor);
+            // Bottom
+            drawList->AddRectFilled(
+                ImVec2(gizmoCenter.x - handleSize, bottomRight.y - handleSize),
+                ImVec2(gizmoCenter.x + handleSize, bottomRight.y + handleSize), handleColor);
+            // Left
+            drawList->AddRectFilled(
+                ImVec2(topLeft.x - handleSize, gizmoCenter.y - handleSize),
+                ImVec2(topLeft.x + handleSize, gizmoCenter.y + handleSize), handleColor);
+            // Right
+            drawList->AddRectFilled(
+                ImVec2(bottomRight.x - handleSize, gizmoCenter.y - handleSize),
+                ImVec2(bottomRight.x + handleSize, gizmoCenter.y + handleSize), handleColor);
             break;
+        }
 
         default:
             break;
     }
+#endif
+}
 
-    (void)gizmoX;
-    (void)gizmoY;
-    (void)gizmoSize;
+void SceneViewPanel::renderPlaceholderObjects()
+{
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    ImVec2 contentMin = ImGui::GetCursorScreenPos();
+
+    // Draw some placeholder objects to demonstrate the scene view
+    // Background layer
+    auto [bgX, bgY] = sceneToScreen(0, 0);
+    auto [bgX2, bgY2] = sceneToScreen(m_sceneWidth, m_sceneHeight);
+    drawList->AddRectFilled(
+        ImVec2(contentMin.x + bgX, contentMin.y + bgY),
+        ImVec2(contentMin.x + bgX2, contentMin.y + bgY2),
+        IM_COL32(60, 80, 100, 100));
+
+    // Character sprite placeholder (centered)
+    auto [charX, charY] = sceneToScreen(m_sceneWidth/2 - 100, m_sceneHeight/2 - 150);
+    auto [charX2, charY2] = sceneToScreen(m_sceneWidth/2 + 100, m_sceneHeight/2 + 150);
+    drawList->AddRectFilled(
+        ImVec2(contentMin.x + charX, contentMin.y + charY),
+        ImVec2(contentMin.x + charX2, contentMin.y + charY2),
+        IM_COL32(180, 140, 100, 200));
+    drawList->AddRect(
+        ImVec2(contentMin.x + charX, contentMin.y + charY),
+        ImVec2(contentMin.x + charX2, contentMin.y + charY2),
+        IM_COL32(120, 100, 80, 255), 0.0f, 0, 2.0f);
+    // Character label
+    drawList->AddText(ImVec2(contentMin.x + charX + 5, contentMin.y + charY + 5),
+        IM_COL32(255, 255, 255, 255), "Character");
+
+    // Dialogue box placeholder (bottom)
+    auto [dlgX, dlgY] = sceneToScreen(100, m_sceneHeight - 200);
+    auto [dlgX2, dlgY2] = sceneToScreen(m_sceneWidth - 100, m_sceneHeight - 50);
+    drawList->AddRectFilled(
+        ImVec2(contentMin.x + dlgX, contentMin.y + dlgY),
+        ImVec2(contentMin.x + dlgX2, contentMin.y + dlgY2),
+        IM_COL32(40, 40, 40, 220));
+    drawList->AddRect(
+        ImVec2(contentMin.x + dlgX, contentMin.y + dlgY),
+        ImVec2(contentMin.x + dlgX2, contentMin.y + dlgY2),
+        IM_COL32(100, 100, 100, 255), 4.0f, 0, 2.0f);
+    // Dialogue text
+    drawList->AddText(ImVec2(contentMin.x + dlgX + 20, contentMin.y + dlgY + 20),
+        IM_COL32(220, 220, 220, 255), "Dialogue Box");
+    drawList->AddText(ImVec2(contentMin.x + dlgX + 20, contentMin.y + dlgY + 45),
+        IM_COL32(180, 180, 180, 255), "Hello, welcome to NovelMind!");
+#endif
 }
 
 void SceneViewPanel::renderSelectionHighlight()
