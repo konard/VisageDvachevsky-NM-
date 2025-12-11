@@ -722,3 +722,221 @@ TEST_CASE("Selection propagation across panels", "[gui][integration]")
     selection.removeFromSelection(item1);
     CHECK(selection.getSelectionCount() == 1);
 }
+
+// =============================================================================
+// Extended v0.2.0 Panel Tests (GUI Enhancements)
+// =============================================================================
+
+TEST_CASE("HierarchyPanel - Selection sync", "[gui][hierarchy]")
+{
+    HierarchyPanel panel;
+
+    // After refresh, panel should have some test data
+    panel.refresh();
+
+    // Test filter functionality
+    panel.setFilter("Character");
+    CHECK(panel.getFilter() == "Character");
+
+    panel.setFilter("");
+}
+
+TEST_CASE("AssetBrowserPanel - Selection management", "[gui][asset_browser]")
+{
+    AssetBrowserPanel panel;
+
+    panel.selectAsset("/path/to/asset.png");
+    CHECK(!panel.getSelectedAssets().empty());
+    CHECK(panel.isAssetSelected("/path/to/asset.png"));
+
+    panel.addToSelection("/path/to/another.png");
+    CHECK(panel.getSelectedAssets().size() == 2);
+
+    panel.removeFromSelection("/path/to/asset.png");
+    CHECK(panel.getSelectedAssets().size() == 1);
+
+    panel.clearSelection();
+    CHECK(panel.getSelectedAssets().empty());
+}
+
+TEST_CASE("AssetBrowserPanel - Thumbnail size", "[gui][asset_browser]")
+{
+    AssetBrowserPanel panel;
+
+    panel.setThumbnailSize(120.0f);
+    CHECK(panel.getThumbnailSize() == 120.0f);
+
+    // Test clamping
+    panel.setThumbnailSize(10.0f);  // Below min
+    CHECK(panel.getThumbnailSize() >= 40.0f);  // Should be clamped to min
+
+    panel.setThumbnailSize(500.0f);  // Above max
+    CHECK(panel.getThumbnailSize() <= 200.0f);  // Should be clamped to max
+}
+
+TEST_CASE("AssetBrowserPanel - Navigation state", "[gui][asset_browser]")
+{
+    AssetBrowserPanel panel;
+
+    // Initial state - can't go back or forward
+    CHECK(!panel.canNavigateBack());
+    CHECK(!panel.canNavigateForward());
+
+    // Navigate somewhere
+    panel.navigateTo("/some/path");
+    panel.navigateTo("/some/other/path");
+
+    CHECK(panel.canNavigateBack());
+    CHECK(!panel.canNavigateForward());
+
+    panel.navigateBack();
+    CHECK(panel.canNavigateForward());
+}
+
+TEST_CASE("AssetBrowserPanel - Type filter", "[gui][asset_browser]")
+{
+    AssetBrowserPanel panel;
+
+    panel.setTypeFilter(AssetType::Image);
+    // Type filter should be set
+    panel.clearTypeFilter();
+    // Type filter should be cleared
+}
+
+TEST_CASE("BuildSettingsPanel - Settings management", "[gui][build_settings]")
+{
+    BuildSettingsPanel panel;
+
+    const auto& settings = panel.getSettings();
+    CHECK(settings.productName == "MyVisualNovel");
+    CHECK(settings.version == "1.0.0");
+
+    // Modify settings
+    BuildSettings newSettings = settings;
+    newSettings.productName = "TestGame";
+    newSettings.version = "2.0.0";
+    newSettings.platform = BuildPlatform::Web;
+    newSettings.config = BuildConfig::Distribution;
+
+    panel.setSettings(newSettings);
+
+    const auto& result = panel.getSettings();
+    CHECK(result.productName == "TestGame");
+    CHECK(result.version == "2.0.0");
+    CHECK(result.platform == BuildPlatform::Web);
+    CHECK(result.config == BuildConfig::Distribution);
+}
+
+TEST_CASE("BuildSettingsPanel - Build state", "[gui][build_settings]")
+{
+    BuildSettingsPanel panel;
+
+    CHECK(!panel.isBuilding());
+    CHECK(panel.getBuildProgress() == 0.0f);
+    CHECK(panel.getBuildStatus().empty());
+}
+
+TEST_CASE("SceneViewPanel - Transform tools", "[gui][scene_view]")
+{
+    SceneViewPanel panel;
+
+    panel.setCurrentTool(TransformTool::Move);
+    CHECK(panel.getCurrentTool() == TransformTool::Move);
+
+    panel.setCurrentTool(TransformTool::Rotate);
+    CHECK(panel.getCurrentTool() == TransformTool::Rotate);
+
+    panel.setCurrentTool(TransformTool::Scale);
+    CHECK(panel.getCurrentTool() == TransformTool::Scale);
+
+    panel.setCurrentTool(TransformTool::Rect);
+    CHECK(panel.getCurrentTool() == TransformTool::Rect);
+
+    panel.setCurrentTool(TransformTool::Select);
+    CHECK(panel.getCurrentTool() == TransformTool::Select);
+}
+
+TEST_CASE("SceneViewPanel - Gizmo space toggle", "[gui][scene_view]")
+{
+    SceneViewPanel panel;
+
+    // Default is Local
+    CHECK(panel.getGizmoSpace() == GizmoSpace::Local);
+
+    panel.toggleGizmoSpace();
+    CHECK(panel.getGizmoSpace() == GizmoSpace::World);
+
+    panel.toggleGizmoSpace();
+    CHECK(panel.getGizmoSpace() == GizmoSpace::Local);
+}
+
+TEST_CASE("SceneViewPanel - Layer visibility", "[gui][scene_view]")
+{
+    SceneViewPanel panel;
+
+    // All layers visible by default
+    CHECK(panel.isLayerVisible(0));
+    CHECK(panel.isLayerVisible(1));
+
+    panel.setLayerVisible(0, false);
+    CHECK(!panel.isLayerVisible(0));
+    CHECK(panel.isLayerVisible(1));
+
+    panel.showAllLayers();
+    CHECK(panel.isLayerVisible(0));
+
+    panel.soloLayer(2);
+    CHECK(!panel.isLayerVisible(0));
+    CHECK(!panel.isLayerVisible(1));
+    CHECK(panel.isLayerVisible(2));
+}
+
+TEST_CASE("SceneViewPanel - Snapping", "[gui][scene_view]")
+{
+    SceneViewPanel panel;
+
+    panel.setSnappingEnabled(true);
+    CHECK(panel.isSnappingEnabled());
+
+    panel.setSnapIncrement(16.0f);
+    CHECK(panel.getSnapIncrement() == 16.0f);
+
+    panel.setSnappingEnabled(false);
+    CHECK(!panel.isSnappingEnabled());
+}
+
+TEST_CASE("SceneViewPanel - Render mode", "[gui][scene_view]")
+{
+    SceneViewPanel panel;
+
+    panel.setRenderMode(SceneRenderMode::Wireframe);
+    CHECK(panel.getRenderMode() == SceneRenderMode::Wireframe);
+
+    panel.setRenderMode(SceneRenderMode::Textured);
+    CHECK(panel.getRenderMode() == SceneRenderMode::Textured);
+
+    panel.setRenderMode(SceneRenderMode::Bounds);
+    CHECK(panel.getRenderMode() == SceneRenderMode::Bounds);
+}
+
+TEST_CASE("TimelinePanel - Zoom management", "[gui][timeline]")
+{
+    TimelinePanel panel;
+
+    panel.setZoom(2.0f);
+    CHECK(panel.getZoom() == 2.0f);
+
+    panel.setScrollX(100.0f);
+    CHECK(panel.getScrollX() == 100.0f);
+}
+
+TEST_CASE("TimelinePanel - Frame rate", "[gui][timeline]")
+{
+    TimelinePanel panel;
+
+    panel.setFrameRate(30.0);
+    CHECK(panel.getFrameRate() == 30.0);
+
+    panel.setFrameRate(60.0);
+    CHECK(panel.getFrameRate() == 60.0);
+}

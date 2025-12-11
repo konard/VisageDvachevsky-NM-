@@ -35,6 +35,29 @@ enum class DiagnosticFilter : u8
 };
 
 /**
+ * @brief Grouping mode for diagnostics
+ */
+enum class DiagnosticGroupMode : u8
+{
+    None,       // Flat list
+    ByFile,     // Group by file
+    BySeverity, // Group by severity level
+    ByCategory  // Group by error category
+};
+
+/**
+ * @brief Sort mode for diagnostics
+ */
+enum class DiagnosticSortMode : u8
+{
+    ByFile,       // Sort by file path
+    BySeverity,   // Sort by severity (errors first)
+    ByLine,       // Sort by line number
+    ByMessage,    // Sort alphabetically by message
+    ByTimestamp   // Sort by when the error was detected
+};
+
+/**
  * @brief Represents a diagnostic entry in the panel
  */
 struct DiagnosticEntry
@@ -43,6 +66,21 @@ struct DiagnosticEntry
     std::string filePath;
     bool isExpanded = false;  // For showing related info
     bool isSelected = false;
+    i64 timestamp = 0;        // When the diagnostic was added
+    std::string category;     // Category for grouping (e.g., "syntax", "semantic", "style")
+};
+
+/**
+ * @brief Group header for grouped diagnostics view
+ */
+struct DiagnosticGroup
+{
+    std::string name;
+    std::vector<size_t> indices;  // Indices into m_diagnostics
+    bool isExpanded = true;
+    size_t errorCount = 0;
+    size_t warningCount = 0;
+    size_t infoCount = 0;
 };
 
 /**
@@ -155,6 +193,31 @@ public:
      */
     [[nodiscard]] const std::string& getSearchQuery() const;
 
+    /**
+     * @brief Set grouping mode
+     */
+    void setGroupMode(DiagnosticGroupMode mode);
+
+    /**
+     * @brief Get grouping mode
+     */
+    [[nodiscard]] DiagnosticGroupMode getGroupMode() const;
+
+    /**
+     * @brief Set sort mode
+     */
+    void setSortMode(DiagnosticSortMode mode);
+
+    /**
+     * @brief Get sort mode
+     */
+    [[nodiscard]] DiagnosticSortMode getSortMode() const;
+
+    /**
+     * @brief Toggle group expanded state
+     */
+    void toggleGroupExpanded(const std::string& groupName);
+
     // =========================================================================
     // Selection and Navigation
     // =========================================================================
@@ -239,11 +302,15 @@ private:
     void renderDiagnosticEntry(const DiagnosticEntry& entry, size_t index);
     void renderSeverityIcon(scripting::Severity severity);
     void renderSummaryBar();
+    void renderGroupedList();
+    void renderGroupHeader(const DiagnosticGroup& group);
 
     // Filtering helpers
     bool matchesFilter(const DiagnosticEntry& entry) const;
     bool matchesSearch(const DiagnosticEntry& entry) const;
     void rebuildFilteredList();
+    void rebuildGroups();
+    void sortDiagnostics();
 
     // All diagnostics
     std::vector<DiagnosticEntry> m_diagnostics;
@@ -252,10 +319,18 @@ private:
     std::vector<size_t> m_filteredIndices;
     bool m_filterDirty = true;
 
+    // Groups (for grouped display)
+    std::vector<DiagnosticGroup> m_groups;
+    bool m_groupsDirty = true;
+
     // Filter state
     DiagnosticFilter m_filter = DiagnosticFilter::All;
     std::string m_fileFilter;
     std::string m_searchQuery;
+
+    // Grouping and sorting
+    DiagnosticGroupMode m_groupMode = DiagnosticGroupMode::None;
+    DiagnosticSortMode m_sortMode = DiagnosticSortMode::BySeverity;
 
     // Selection
     i32 m_selectedIndex = -1;

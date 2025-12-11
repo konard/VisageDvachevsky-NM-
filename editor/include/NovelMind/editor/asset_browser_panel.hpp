@@ -7,13 +7,17 @@
  * The Asset Browser panel provides:
  * - File system navigation for project assets
  * - Asset preview and metadata display
- * - Drag-drop to scene/timeline
- * - Asset import/export
+ * - Drag-drop to scene/timeline/story graph
+ * - Asset import/export/reimport
  * - Search and filtering
+ * - Context menu operations (rename, delete, duplicate, etc.)
+ * - Thumbnail caching with async generation
  */
 
 #include "NovelMind/editor/gui_panel_base.hpp"
+#include <functional>
 #include <string>
+#include <unordered_map>
 #include <vector>
 #include <filesystem>
 
@@ -32,13 +36,43 @@ enum class AssetType : u8 {
     Background,
     Font,
     Video,
-    Data
+    Data,
+    Prefab,
+    Animation,
+    Localization
+};
+
+/**
+ * @brief Asset metadata
+ */
+struct AssetMetadata {
+    // Common metadata
+    std::string uuid;
+    std::string importDate;
+    std::string lastModified;
+
+    // Image metadata
+    i32 imageWidth = 0;
+    i32 imageHeight = 0;
+    std::string imageFormat;
+
+    // Audio metadata
+    f32 audioDuration = 0.0f;
+    i32 audioSampleRate = 0;
+    i32 audioChannels = 0;
+    std::string audioCodec;
+
+    // Video metadata
+    f32 videoDuration = 0.0f;
+    i32 videoWidth = 0;
+    i32 videoHeight = 0;
+    f32 videoFrameRate = 0.0f;
 };
 
 /**
  * @brief Asset entry in browser
  */
-struct AssetEntry {
+struct AssetBrowserEntry {
     std::string name;
     std::string path;
     std::string extension;
@@ -46,7 +80,36 @@ struct AssetEntry {
     bool isDirectory = false;
     u64 size = 0;
     std::string modifiedTime;
+    AssetMetadata metadata;
+    bool hasThumbnail = false;
+    u32 thumbnailId = 0;
 };
+
+/**
+ * @brief Thumbnail cache entry
+ */
+struct ThumbnailCacheEntry {
+    u32 textureId = 0;
+    bool isLoading = false;
+    bool isReady = false;
+    i64 lastAccessed = 0;
+};
+
+/**
+ * @brief Drag drop payload type for assets
+ */
+struct AssetDragPayload {
+    std::string path;
+    AssetType type;
+    std::vector<std::string> selectedPaths; // For multi-selection drag
+};
+
+/**
+ * @brief Callback types
+ */
+using AssetSelectedCallback = std::function<void(const std::string& path, AssetType type)>;
+using AssetDoubleClickCallback = std::function<void(const std::string& path, AssetType type)>;
+using AssetDragCallback = std::function<void(const AssetDragPayload& payload)>;
 
 /**
  * @brief Asset Browser Panel implementation
@@ -55,6 +118,10 @@ class AssetBrowserPanel : public GUIPanelBase {
 public:
     AssetBrowserPanel();
     ~AssetBrowserPanel() override = default;
+
+    // =========================================================================
+    // Navigation
+    // =========================================================================
 
     /**
      * @brief Navigate to directory
@@ -87,6 +154,20 @@ public:
     [[nodiscard]] const std::string& getCurrentPath() const { return m_currentPath; }
 
     /**
+     * @brief Check if can navigate back
+     */
+    [[nodiscard]] bool canNavigateBack() const { return m_historyIndex > 0; }
+
+    /**
+     * @brief Check if can navigate forward
+     */
+    [[nodiscard]] bool canNavigateForward() const { return m_historyIndex < m_history.size() - 1; }
+
+    // =========================================================================
+    // View Options
+    // =========================================================================
+
+    /**
      * @brief Set view mode (grid/list)
      */
     void setGridView(bool gridView) { m_isGridView = gridView; }
@@ -99,12 +180,158 @@ public:
     /**
      * @brief Set thumbnail size
      */
-    void setThumbnailSize(f32 size) { m_thumbnailSize = size; }
+    void setThumbnailSize(f32 size);
+
+    /**
+     * @brief Get thumbnail size
+     */
+    [[nodiscard]] f32 getThumbnailSize() const { return m_thumbnailSize; }
 
     /**
      * @brief Set search filter
      */
     void setFilter(const std::string& filter) { m_filter = filter; }
+
+    /**
+     * @brief Get search filter
+     */
+    [[nodiscard]] const std::string& getFilter() const { return m_filter; }
+
+    /**
+     * @brief Set type filter
+     */
+    void setTypeFilter(AssetType type) { m_typeFilter = type; }
+
+    /**
+     * @brief Clear type filter
+     */
+    void clearTypeFilter() { m_typeFilter = AssetType::Unknown; }
+
+    /**
+     * @brief Toggle preview panel visibility
+     */
+    void setShowPreview(bool show) { m_showPreview = show; }
+
+    /**
+     * @brief Check if preview panel is visible
+     */
+    [[nodiscard]] bool isShowingPreview() const { return m_showPreview; }
+
+    // =========================================================================
+    // Asset Operations
+    // =========================================================================
+
+    /**
+     * @brief Create new folder
+     */
+    void createFolder(const std::string& name = "New Folder");
+
+    /**
+     * @brief Rename selected asset
+     */
+    void renameSelected();
+
+    /**
+     * @brief Delete selected assets
+     */
+    void deleteSelected();
+
+    /**
+     * @brief Duplicate selected assets
+     */
+    void duplicateSelected();
+
+    /**
+     * @brief Reimport selected assets
+     */
+    void reimportSelected();
+
+    /**
+     * @brief Show selected asset in system explorer
+     */
+    void showInExplorer();
+
+    /**
+     * @brief Copy selected asset paths to clipboard
+     */
+    void copyPathToClipboard();
+
+    /**
+     * @brief Import assets from external location
+     */
+    void importAssets();
+
+    /**
+     * @brief Export selected assets
+     */
+    void exportSelected();
+
+    // =========================================================================
+    // Selection
+    // =========================================================================
+
+    /**
+     * @brief Select asset by path
+     */
+    void selectAsset(const std::string& path);
+
+    /**
+     * @brief Add asset to selection
+     */
+    void addToSelection(const std::string& path);
+
+    /**
+     * @brief Remove asset from selection
+     */
+    void removeFromSelection(const std::string& path);
+
+    /**
+     * @brief Clear selection
+     */
+    void clearSelection();
+
+    /**
+     * @brief Get selected asset paths
+     */
+    [[nodiscard]] const std::vector<std::string>& getSelectedAssets() const { return m_selectedAssets; }
+
+    /**
+     * @brief Check if asset is selected
+     */
+    [[nodiscard]] bool isAssetSelected(const std::string& path) const;
+
+    // =========================================================================
+    // Metadata
+    // =========================================================================
+
+    /**
+     * @brief Get metadata for asset
+     */
+    [[nodiscard]] const AssetMetadata* getAssetMetadata(const std::string& path) const;
+
+    /**
+     * @brief Refresh metadata for asset
+     */
+    void refreshMetadata(const std::string& path);
+
+    // =========================================================================
+    // Callbacks
+    // =========================================================================
+
+    /**
+     * @brief Set callback for asset selection
+     */
+    void setOnAssetSelected(AssetSelectedCallback callback) { m_onAssetSelected = std::move(callback); }
+
+    /**
+     * @brief Set callback for asset double-click
+     */
+    void setOnAssetDoubleClick(AssetDoubleClickCallback callback) { m_onAssetDoubleClick = std::move(callback); }
+
+    /**
+     * @brief Set callback for drag start
+     */
+    void setOnDragStart(AssetDragCallback callback) { m_onDragStart = std::move(callback); }
 
     [[nodiscard]] std::vector<MenuItem> getMenuItems() const override;
     [[nodiscard]] std::vector<ToolbarItem> getToolbarItems() const override;
@@ -112,39 +339,76 @@ public:
 
 protected:
     void onInitialize() override;
+    void onUpdate(f64 deltaTime) override;
     void onRender() override;
     void renderToolbar() override;
 
 private:
+    // Rendering helpers
     void renderBreadcrumb();
     void renderDirectoryTree();
     void renderAssetGrid();
     void renderAssetList();
-    void renderAssetEntry(const AssetEntry& entry);
+    void renderAssetEntry(const AssetBrowserEntry& entry);
     void renderPreviewPanel();
+    void renderMetadataSection(const AssetBrowserEntry& entry);
+    void renderAssetContextMenu(const AssetBrowserEntry& entry);
 
+    // Asset operations
     void loadDirectory(const std::string& path);
     AssetType getAssetType(const std::string& extension) const;
-    void handleAssetDoubleClick(const AssetEntry& entry);
-    void handleAssetDragDrop(const AssetEntry& entry);
+    void handleAssetDoubleClick(const AssetBrowserEntry& entry);
+    void handleAssetDragDrop(const AssetBrowserEntry& entry);
+    void handleDropTarget();
+
+    // Thumbnail management
+    void requestThumbnail(const std::string& path);
+    void updateThumbnailCache();
+    void clearThumbnailCache();
+
+    // Utility
+    std::string formatFileSize(u64 bytes) const;
+    std::string getAssetTypeName(AssetType type) const;
 
     std::string m_currentPath;
     std::string m_rootPath;
     std::string m_filter;
-    std::vector<AssetEntry> m_entries;
+    AssetType m_typeFilter = AssetType::Unknown;
+    std::vector<AssetBrowserEntry> m_entries;
     std::vector<std::string> m_history;
     size_t m_historyIndex = 0;
 
     bool m_isGridView = true;
     f32 m_thumbnailSize = 80.0f;
+    f32 m_minThumbnailSize = 40.0f;
+    f32 m_maxThumbnailSize = 200.0f;
     bool m_showPreview = true;
+    bool m_showHiddenFiles = false;
 
     // Selection
-    std::string m_selectedAsset;
     std::vector<std::string> m_selectedAssets;
+
+    // Rename state
+    bool m_isRenaming = false;
+    std::string m_renamingAsset;
+    char m_renameBuffer[256] = {0};
 
     // Search
     char m_searchBuffer[256] = {0};
+
+    // Thumbnail cache
+    std::unordered_map<std::string, ThumbnailCacheEntry> m_thumbnailCache;
+    std::vector<std::string> m_pendingThumbnails;
+    size_t m_maxCacheSize = 1000;
+
+    // Drag state
+    bool m_isDragging = false;
+    std::string m_draggedAsset;
+
+    // Callbacks
+    AssetSelectedCallback m_onAssetSelected;
+    AssetDoubleClickCallback m_onAssetDoubleClick;
+    AssetDragCallback m_onDragStart;
 };
 
 } // namespace NovelMind::editor
