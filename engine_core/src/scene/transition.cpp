@@ -311,7 +311,7 @@ void SlideTransition::update(f64 deltaTime)
         f32 t = 1.0f - progress;
         t = 1.0f - t * t * t;
 
-        f32 startOffset;
+        f32 startOffset = 0.0f;
         switch (m_direction)
         {
             case Direction::Left:
