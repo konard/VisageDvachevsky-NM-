@@ -255,7 +255,7 @@ void DebugOverlayPanel::renderCallStack()
     }
 
     for (i32 i = static_cast<i32>(m_callStack.size()) - 1; i >= 0; --i) {
-        const auto& frame = m_callStack[i];
+        const auto& frame = m_callStack[static_cast<size_t>(i)];
         bool isSelected = (i == m_selectedStackFrame);
 
         // Frame entry: function name @ file:line
@@ -343,8 +343,7 @@ void DebugOverlayPanel::renderAudioChannels()
 
     for (const auto& channel : m_audioChannels) {
         // Channel type icon
-        const char* icon = channel.isVoice ? Icons::Voice :
-                          channel.isMusic ? Icons::Audio : Icons::Audio;
+        const char* icon = channel.isVoice ? Icons::Voice : Icons::Audio;
 
         // ImGui::Text("%s [%d] %s", icon, channel.channelId, channel.soundName.c_str());
 
@@ -602,7 +601,7 @@ std::vector<MenuItem> DebugOverlayPanel::getMenuItems() const
         MenuItem::separator(),
         {"Clear Watches", "", [this]() {
             const_cast<DebugOverlayPanel*>(this)->clearWatches();
-        }}
+        }, nullptr, {}}
     };
 }
 
