@@ -120,10 +120,10 @@ Result<AssetMetadata> ImageImporter::import(
     metadata.sourcePath = sourcePath;
     metadata.importedPath = destPath;
     metadata.type = AssetType::Image;
-    metadata.sourceModifiedTime = std::chrono::duration_cast<std::chrono::seconds>(
-        fs::last_write_time(sourcePath).time_since_epoch()).count();
-    metadata.importedTime = std::chrono::duration_cast<std::chrono::seconds>(
-        std::chrono::system_clock::now().time_since_epoch()).count();
+    metadata.sourceModifiedTime = static_cast<u64>(std::chrono::duration_cast<std::chrono::seconds>(
+        fs::last_write_time(sourcePath).time_since_epoch()).count());
+    metadata.importedTime = static_cast<u64>(std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count());
     metadata.fileSize = fs::file_size(sourcePath);
 
     // Generate thumbnail
@@ -253,10 +253,10 @@ Result<AssetMetadata> AudioImporter::import(
     metadata.sourcePath = sourcePath;
     metadata.importedPath = destPath;
     metadata.type = AssetType::Audio;
-    metadata.sourceModifiedTime = std::chrono::duration_cast<std::chrono::seconds>(
-        fs::last_write_time(sourcePath).time_since_epoch()).count();
-    metadata.importedTime = std::chrono::duration_cast<std::chrono::seconds>(
-        std::chrono::system_clock::now().time_since_epoch()).count();
+    metadata.sourceModifiedTime = static_cast<u64>(std::chrono::duration_cast<std::chrono::seconds>(
+        fs::last_write_time(sourcePath).time_since_epoch()).count());
+    metadata.importedTime = static_cast<u64>(std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count());
     metadata.fileSize = fs::file_size(sourcePath);
 
     return Result<AssetMetadata>::ok(std::move(metadata));
@@ -360,10 +360,10 @@ Result<AssetMetadata> FontImporter::import(
     metadata.sourcePath = sourcePath;
     metadata.importedPath = destPath;
     metadata.type = AssetType::Font;
-    metadata.sourceModifiedTime = std::chrono::duration_cast<std::chrono::seconds>(
-        fs::last_write_time(sourcePath).time_since_epoch()).count();
-    metadata.importedTime = std::chrono::duration_cast<std::chrono::seconds>(
-        std::chrono::system_clock::now().time_since_epoch()).count();
+    metadata.sourceModifiedTime = static_cast<u64>(std::chrono::duration_cast<std::chrono::seconds>(
+        fs::last_write_time(sourcePath).time_since_epoch()).count());
+    metadata.importedTime = static_cast<u64>(std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count());
     metadata.fileSize = fs::file_size(sourcePath);
 
     return Result<AssetMetadata>::ok(std::move(metadata));
@@ -714,8 +714,8 @@ void AssetDatabase::checkForChanges()
             continue;
         }
 
-        u64 currentModTime = std::chrono::duration_cast<std::chrono::seconds>(
-            fs::last_write_time(metadata.sourcePath).time_since_epoch()).count();
+        u64 currentModTime = static_cast<u64>(std::chrono::duration_cast<std::chrono::seconds>(
+            fs::last_write_time(metadata.sourcePath).time_since_epoch()).count());
 
         if (currentModTime != metadata.sourceModifiedTime)
         {
@@ -735,8 +735,8 @@ std::vector<std::string> AssetDatabase::getOutdatedAssets() const
             continue;
         }
 
-        u64 currentModTime = std::chrono::duration_cast<std::chrono::seconds>(
-            fs::last_write_time(metadata.sourcePath).time_since_epoch()).count();
+        u64 currentModTime = static_cast<u64>(std::chrono::duration_cast<std::chrono::seconds>(
+            fs::last_write_time(metadata.sourcePath).time_since_epoch()).count());
 
         if (currentModTime != metadata.sourceModifiedTime)
         {

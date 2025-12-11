@@ -191,7 +191,7 @@ void DiagnosticsPanel::selectDiagnostic(size_t index)
         if (m_selectedIndex >= 0 &&
             m_selectedIndex < static_cast<i32>(m_filteredIndices.size()))
         {
-            m_diagnostics[m_filteredIndices[m_selectedIndex]].isSelected = false;
+            m_diagnostics[m_filteredIndices[static_cast<size_t>(m_selectedIndex)]].isSelected = false;
         }
 
         m_selectedIndex = static_cast<i32>(index);
@@ -213,7 +213,7 @@ void DiagnosticsPanel::clearSelection()
     if (m_selectedIndex >= 0 &&
         m_selectedIndex < static_cast<i32>(m_filteredIndices.size()))
     {
-        m_diagnostics[m_filteredIndices[m_selectedIndex]].isSelected = false;
+        m_diagnostics[m_filteredIndices[static_cast<size_t>(m_selectedIndex)]].isSelected = false;
     }
     m_selectedIndex = -1;
 }
@@ -261,7 +261,7 @@ void DiagnosticsPanel::prevError()
 
     for (i32 i = start; i >= 0; --i)
     {
-        const auto& entry = m_diagnostics[m_filteredIndices[i]];
+        const auto& entry = m_diagnostics[m_filteredIndices[static_cast<size_t>(i)]];
         if (entry.error.severity == scripting::Severity::Error)
         {
             selectDiagnostic(static_cast<size_t>(i));
@@ -272,7 +272,7 @@ void DiagnosticsPanel::prevError()
     // Wrap around
     for (i32 i = static_cast<i32>(m_filteredIndices.size()) - 1; i > start; --i)
     {
-        const auto& entry = m_diagnostics[m_filteredIndices[i]];
+        const auto& entry = m_diagnostics[m_filteredIndices[static_cast<size_t>(i)]];
         if (entry.error.severity == scripting::Severity::Error)
         {
             selectDiagnostic(static_cast<size_t>(i));
