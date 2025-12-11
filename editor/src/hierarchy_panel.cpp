@@ -505,8 +505,8 @@ std::vector<MenuItem> HierarchyPanel::getMenuItems() const
     MenuItem viewMenu;
     viewMenu.label = "View";
     viewMenu.subItems = {
-        {"Reveal Selected", "", [this]() { const_cast<HierarchyPanel*>(this)->revealSelected(); }},
-        {"Show All", "", [this]() { const_cast<HierarchyPanel*>(this)->showAll(); }},
+        {"Reveal Selected", "", [this]() { const_cast<HierarchyPanel*>(this)->revealSelected(); }, nullptr, {}},
+        {"Show All", "", [this]() { const_cast<HierarchyPanel*>(this)->showAll(); }, nullptr, {}},
     };
     items.push_back(viewMenu);
 
@@ -528,34 +528,34 @@ std::vector<MenuItem> HierarchyPanel::getContextMenuItems() const
     MenuItem createMenu;
     createMenu.label = "Create";
     createMenu.subItems = {
-        {"Empty Object", "", [this]() { const_cast<HierarchyPanel*>(this)->createEmpty(); }},
-        {"Character", "", []() { /* Create character */ }},
-        {"Background", "", []() { /* Create background */ }},
-        {"UI Element", "", []() { /* Create UI */ }},
+        {"Empty Object", "", [this]() { const_cast<HierarchyPanel*>(this)->createEmpty(); }, nullptr, {}},
+        {"Character", "", []() { /* Create character */ }, nullptr, {}},
+        {"Background", "", []() { /* Create background */ }, nullptr, {}},
+        {"UI Element", "", []() { /* Create UI */ }, nullptr, {}},
     };
     items.push_back(createMenu);
 
     items.push_back({"Create Child", "",
         [this, selectedId]() { const_cast<HierarchyPanel*>(this)->createChild(selectedId); },
-        [hasSelection]() { return hasSelection; }});
+        [hasSelection]() { return hasSelection; }, {}});
 
     items.push_back(MenuItem::separator());
 
-    items.push_back({"Cut", "Ctrl+X", []() { /* Cut action */ }, [hasSelection]() { return hasSelection; }});
-    items.push_back({"Copy", "Ctrl+C", []() { /* Copy action */ }, [hasSelection]() { return hasSelection; }});
-    items.push_back({"Paste", "Ctrl+V", []() { /* Paste action */ }});
+    items.push_back({"Cut", "Ctrl+X", []() { /* Cut action */ }, [hasSelection]() { return hasSelection; }, {}});
+    items.push_back({"Copy", "Ctrl+C", []() { /* Copy action */ }, [hasSelection]() { return hasSelection; }, {}});
+    items.push_back({"Paste", "Ctrl+V", []() { /* Paste action */ }, nullptr, {}});
 
     items.push_back(MenuItem::separator());
 
     items.push_back({"Duplicate", "Ctrl+D",
         [this]() { const_cast<HierarchyPanel*>(this)->duplicateSelected(); },
-        [hasSelection]() { return hasSelection; }});
+        [hasSelection]() { return hasSelection; }, {}});
     items.push_back({"Delete", "Delete",
         [this]() { const_cast<HierarchyPanel*>(this)->deleteSelected(); },
-        [hasSelection]() { return hasSelection; }});
+        [hasSelection]() { return hasSelection; }, {}});
     items.push_back({"Rename", "F2",
         [this, selectedId]() { const_cast<HierarchyPanel*>(this)->startRename(selectedId); },
-        [hasSelection]() { return hasSelection; }});
+        [hasSelection]() { return hasSelection; }, {}});
 
     items.push_back(MenuItem::separator());
 
@@ -565,13 +565,13 @@ std::vector<MenuItem> HierarchyPanel::getContextMenuItems() const
     orderMenu.isEnabled = [hasSelection]() { return hasSelection; };
     orderMenu.subItems = {
         {"Bring to Front", "Ctrl+Shift+]",
-            [this, selectedId]() { const_cast<HierarchyPanel*>(this)->moveToFront(selectedId); }},
+            [this, selectedId]() { const_cast<HierarchyPanel*>(this)->moveToFront(selectedId); }, nullptr, {}},
         {"Send to Back", "Ctrl+Shift+[",
-            [this, selectedId]() { const_cast<HierarchyPanel*>(this)->moveToBack(selectedId); }},
+            [this, selectedId]() { const_cast<HierarchyPanel*>(this)->moveToBack(selectedId); }, nullptr, {}},
         {"Move Up", "Ctrl+]",
-            [this, selectedId]() { const_cast<HierarchyPanel*>(this)->moveNodeUp(selectedId); }},
+            [this, selectedId]() { const_cast<HierarchyPanel*>(this)->moveNodeUp(selectedId); }, nullptr, {}},
         {"Move Down", "Ctrl+[",
-            [this, selectedId]() { const_cast<HierarchyPanel*>(this)->moveNodeDown(selectedId); }},
+            [this, selectedId]() { const_cast<HierarchyPanel*>(this)->moveNodeDown(selectedId); }, nullptr, {}},
     };
     items.push_back(orderMenu);
 
@@ -579,9 +579,9 @@ std::vector<MenuItem> HierarchyPanel::getContextMenuItems() const
 
     items.push_back({"Isolate", "",
         [this, selectedId]() { const_cast<HierarchyPanel*>(this)->isolateObject(selectedId); },
-        [hasSelection]() { return hasSelection; }});
+        [hasSelection]() { return hasSelection; }, {}});
     items.push_back({"Show All", "",
-        [this]() { const_cast<HierarchyPanel*>(this)->showAll(); }});
+        [this]() { const_cast<HierarchyPanel*>(this)->showAll(); }, nullptr, {}});
 
     return items;
 }
@@ -858,7 +858,7 @@ void HierarchyPanel::renderNode(const HierarchyNode& node, int depth)
     if (node.locked) displayName = "[L] " + displayName;
 
     bool isExpanded = widgets::TreeNode(displayName.c_str(), isLeaf, isSelected,
-                                        "HIERARCHY_NODE", (void*)node.id.c_str());
+                                        "HIERARCHY_NODE", const_cast<void*>(static_cast<const void*>(node.id.c_str())));
 
     renderNodeContextMenu(node);
 
