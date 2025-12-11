@@ -95,7 +95,7 @@ void HierarchyPanel::createEmpty(const std::string& parentId)
         }
     }
 
-    SceneObjectEvent event(EditorEventType::SceneObjectCreated);
+    SceneObjectEvent event(EditorEventType::SceneObjectAdded);
     event.objectId = newNode.id;
     publishEvent(event);
 
@@ -134,7 +134,7 @@ void HierarchyPanel::duplicateSelected()
 
             duplicatedIds.push_back(duplicate.id);
 
-            SceneObjectEvent event(EditorEventType::SceneObjectCreated);
+            SceneObjectEvent event(EditorEventType::SceneObjectAdded);
             event.objectId = duplicate.id;
             publishEvent(event);
         }
@@ -173,7 +173,7 @@ void HierarchyPanel::deleteSelected()
                 m_rootNodes.end());
         }
 
-        SceneObjectEvent event(EditorEventType::SceneObjectDeleted);
+        SceneObjectEvent event(EditorEventType::SceneObjectRemoved);
         event.objectId = id;
         publishEvent(event);
     }
