@@ -9,6 +9,10 @@
 #include <cmath>
 #include <cstring>
 
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+#include <imgui.h>
+#endif
+
 namespace NovelMind::editor {
 
 StoryGraphPanel::StoryGraphPanel()
@@ -633,7 +637,89 @@ void StoryGraphPanel::onUpdate(f64 /*deltaTime*/)
 
 void StoryGraphPanel::onRender()
 {
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    // Get content region for rendering
+    ImVec2 contentMin = ImGui::GetCursorScreenPos();
+    ImVec2 contentMax = ImVec2(contentMin.x + m_contentWidth, contentMin.y + m_contentHeight);
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+    // Draw graph background
+    drawList->AddRectFilled(contentMin, contentMax, IM_COL32(25, 25, 25, 255));
+
+    // Render grid
+    if (m_showGrid)
+    {
+        f32 scaledGridSize = m_gridSize * m_zoom;
+        if (scaledGridSize >= 5.0f && scaledGridSize <= 500.0f)
+        {
+            f32 offsetX = std::fmod(m_viewOffsetX * m_zoom + m_contentWidth / 2.0f, scaledGridSize);
+            f32 offsetY = std::fmod(m_viewOffsetY * m_zoom + m_contentHeight / 2.0f, scaledGridSize);
+
+            for (f32 x = offsetX; x < m_contentWidth; x += scaledGridSize)
+            {
+                drawList->AddLine(
+                    ImVec2(contentMin.x + x, contentMin.y),
+                    ImVec2(contentMin.x + x, contentMax.y),
+                    IM_COL32(40, 40, 40, 255));
+            }
+            for (f32 y = offsetY; y < m_contentHeight; y += scaledGridSize)
+            {
+                drawList->AddLine(
+                    ImVec2(contentMin.x, contentMin.y + y),
+                    ImVec2(contentMax.x, contentMin.y + y),
+                    IM_COL32(40, 40, 40, 255));
+            }
+        }
+    }
+
+    // Render graph canvas
     renderGraphCanvas();
+
+    // Placeholder text when no graph is loaded
+    if (!m_activeGraph || m_activeGraph->getNodes().empty())
+    {
+        ImGui::SetCursorPos(ImVec2(m_contentWidth / 2 - 120, m_contentHeight / 2));
+        ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "Story Graph - No story loaded");
+        ImGui::SetCursorPos(ImVec2(m_contentWidth / 2 - 130, m_contentHeight / 2 + 20));
+        ImGui::TextColored(ImVec4(0.4f, 0.4f, 0.4f, 1.0f), "Right-click to add nodes");
+    }
+
+    // Show context menu
+    if (ImGui::BeginPopupContextWindow("StoryGraphContext"))
+    {
+        if (ImGui::BeginMenu("Add Node"))
+        {
+            if (ImGui::MenuItem("Dialogue")) createNode(scripting::IRNodeType::Dialogue, m_lastContextMenuX, m_lastContextMenuY);
+            if (ImGui::MenuItem("Choice")) createNode(scripting::IRNodeType::Choice, m_lastContextMenuX, m_lastContextMenuY);
+            if (ImGui::MenuItem("Branch")) createNode(scripting::IRNodeType::Branch, m_lastContextMenuX, m_lastContextMenuY);
+            ImGui::Separator();
+            if (ImGui::MenuItem("Show Character")) createNode(scripting::IRNodeType::ShowCharacter, m_lastContextMenuX, m_lastContextMenuY);
+            if (ImGui::MenuItem("Hide Character")) createNode(scripting::IRNodeType::HideCharacter, m_lastContextMenuX, m_lastContextMenuY);
+            if (ImGui::MenuItem("Show Background")) createNode(scripting::IRNodeType::ShowBackground, m_lastContextMenuX, m_lastContextMenuY);
+            ImGui::Separator();
+            if (ImGui::MenuItem("Play Music")) createNode(scripting::IRNodeType::PlayMusic, m_lastContextMenuX, m_lastContextMenuY);
+            if (ImGui::MenuItem("Play Sound")) createNode(scripting::IRNodeType::PlaySound, m_lastContextMenuX, m_lastContextMenuY);
+            ImGui::Separator();
+            if (ImGui::MenuItem("Set Variable")) createNode(scripting::IRNodeType::SetVariable, m_lastContextMenuX, m_lastContextMenuY);
+            if (ImGui::MenuItem("Get Variable")) createNode(scripting::IRNodeType::GetVariable, m_lastContextMenuX, m_lastContextMenuY);
+            if (ImGui::MenuItem("Comment")) createNode(scripting::IRNodeType::Comment, m_lastContextMenuX, m_lastContextMenuY);
+            ImGui::EndMenu();
+        }
+        ImGui::Separator();
+        if (ImGui::MenuItem("Frame All", "F")) frameAll();
+        if (ImGui::MenuItem("Frame Selection", "Shift+F", false, getSelection().hasSelectionOfType(SelectionType::StoryGraphNode))) frameSelection();
+        ImGui::EndPopup();
+    }
+    else if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && m_isHovered)
+    {
+        auto [gx, gy] = screenToGraph(ImGui::GetMousePos().x - contentMin.x, ImGui::GetMousePos().y - contentMin.y);
+        m_lastContextMenuX = gx;
+        m_lastContextMenuY = gy;
+        ImGui::OpenPopup("StoryGraphContext");
+    }
+#else
+    renderGraphCanvas();
+#endif
 }
 
 void StoryGraphPanel::onResize(f32 /*width*/, f32 /*height*/)

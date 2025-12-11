@@ -8,6 +8,10 @@
 #include <algorithm>
 #include <cmath>
 
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+#include <imgui.h>
+#endif
+
 namespace NovelMind::editor {
 
 SceneViewPanel::SceneViewPanel()
@@ -214,7 +218,37 @@ void SceneViewPanel::onUpdate(f64 /*deltaTime*/)
 
 void SceneViewPanel::onRender()
 {
-    // Render scene content area
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    // Get content region for rendering
+    ImVec2 contentMin = ImGui::GetCursorScreenPos();
+    ImVec2 contentMax = ImVec2(contentMin.x + m_contentWidth, contentMin.y + m_contentHeight);
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+    // Draw scene background
+    drawList->AddRectFilled(contentMin, contentMax, IM_COL32(30, 30, 30, 255));
+
+    // Draw scene bounds indicator (visual novel canvas area)
+    f32 sceneLeft, sceneTop, sceneRight, sceneBottom;
+    std::tie(sceneLeft, sceneTop) = sceneToScreen(0, 0);
+    std::tie(sceneRight, sceneBottom) = sceneToScreen(m_sceneWidth, m_sceneHeight);
+
+    // Offset by content area position
+    sceneLeft += contentMin.x;
+    sceneTop += contentMin.y;
+    sceneRight += contentMin.x;
+    sceneBottom += contentMin.y;
+
+    // Draw canvas area
+    drawList->AddRectFilled(
+        ImVec2(sceneLeft, sceneTop),
+        ImVec2(sceneRight, sceneBottom),
+        IM_COL32(45, 45, 45, 255));
+    drawList->AddRect(
+        ImVec2(sceneLeft, sceneTop),
+        ImVec2(sceneRight, sceneBottom),
+        IM_COL32(100, 100, 100, 255), 0.0f, 0, 2.0f);
+
+    // Render scene content
     renderSceneContent();
 
     // Render overlays on top
@@ -224,11 +258,23 @@ void SceneViewPanel::onRender()
     handleDragDrop();
 
     // Show context menu
-    // if (ImGui::BeginPopupContextWindow())
-    // {
-    //     renderMenuItems(getContextMenuItems());
-    //     ImGui::EndPopup();
-    // }
+    if (ImGui::BeginPopupContextWindow())
+    {
+        renderMenuItems(getContextMenuItems());
+        ImGui::EndPopup();
+    }
+
+    // Placeholder text when no scene is loaded
+    ImGui::SetCursorPos(ImVec2(m_contentWidth / 2 - 100, m_contentHeight / 2));
+    ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "Scene View - No scene loaded");
+    ImGui::SetCursorPos(ImVec2(m_contentWidth / 2 - 80, m_contentHeight / 2 + 20));
+    ImGui::TextColored(ImVec4(0.4f, 0.4f, 0.4f, 1.0f), "Create or open a scene");
+#else
+    // Stub rendering
+    renderSceneContent();
+    renderOverlays();
+    handleDragDrop();
+#endif
 }
 
 void SceneViewPanel::onResize(f32 /*width*/, f32 /*height*/)

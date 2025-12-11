@@ -19,6 +19,7 @@
 #include "NovelMind/scene/scene_graph.hpp"
 #include "NovelMind/scene/scene_inspector.hpp"
 #include "NovelMind/scripting/ir.hpp"
+#include "NovelMind/editor/sdl_imgui_backend.hpp"
 #include <string>
 #include <memory>
 #include <vector>
@@ -542,6 +543,7 @@ private:
     void handleFileDropped(const std::string& path);
     void showWelcomeScreen();
     void showAboutDialog();
+    void renderMainMenuBar();
 
     EditorConfig m_config;
     bool m_initialized = false;
@@ -555,6 +557,7 @@ private:
     std::string m_currentScriptPath;
 
     // Core systems
+    std::unique_ptr<SDLImGuiBackend> m_backend;
     std::unique_ptr<scene::SceneGraph> m_sceneGraph;
     std::unique_ptr<scene::SceneInspectorAPI> m_inspectorAPI;
     std::unique_ptr<scripting::RoundTripConverter> m_converter;

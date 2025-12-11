@@ -8,6 +8,10 @@
 #include <algorithm>
 #include <cmath>
 
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+#include <imgui.h>
+#endif
+
 namespace NovelMind::editor {
 
 TimelinePanel::TimelinePanel()

@@ -7,6 +7,10 @@
 #include "NovelMind/editor/imgui_integration.hpp"
 #include <algorithm>
 
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+#include <imgui.h>
+#endif
+
 namespace NovelMind::editor {
 
 // ============================================================================
@@ -122,75 +126,99 @@ void GUIPanelBase::onPrimarySelectionChanged(const SelectionItem& /*item*/)
 
 bool GUIPanelBase::beginPanel()
 {
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     // Convert panel flags to ImGui flags
-    // int imguiFlags = 0;
-    // if (hasFlag(m_flags, PanelFlags::NoTitleBar)) imguiFlags |= ImGuiWindowFlags_NoTitleBar;
-    // if (hasFlag(m_flags, PanelFlags::NoResize)) imguiFlags |= ImGuiWindowFlags_NoResize;
-    // ... etc
+    ImGuiWindowFlags imguiFlags = 0;
+    if (hasFlag(m_flags, PanelFlags::NoTitleBar)) imguiFlags |= ImGuiWindowFlags_NoTitleBar;
+    if (hasFlag(m_flags, PanelFlags::NoResize)) imguiFlags |= ImGuiWindowFlags_NoResize;
+    if (hasFlag(m_flags, PanelFlags::NoMove)) imguiFlags |= ImGuiWindowFlags_NoMove;
+    if (hasFlag(m_flags, PanelFlags::NoScrollbar)) imguiFlags |= ImGuiWindowFlags_NoScrollbar;
+    if (hasFlag(m_flags, PanelFlags::NoScrollWithMouse)) imguiFlags |= ImGuiWindowFlags_NoScrollWithMouse;
+    if (hasFlag(m_flags, PanelFlags::NoCollapse)) imguiFlags |= ImGuiWindowFlags_NoCollapse;
+    if (hasFlag(m_flags, PanelFlags::AlwaysAutoResize)) imguiFlags |= ImGuiWindowFlags_AlwaysAutoResize;
+    if (hasFlag(m_flags, PanelFlags::NoBackground)) imguiFlags |= ImGuiWindowFlags_NoBackground;
+    if (hasFlag(m_flags, PanelFlags::NoSavedSettings)) imguiFlags |= ImGuiWindowFlags_NoSavedSettings;
+    if (hasFlag(m_flags, PanelFlags::MenuBar)) imguiFlags |= ImGuiWindowFlags_MenuBar;
+    if (hasFlag(m_flags, PanelFlags::HorizontalScrollbar)) imguiFlags |= ImGuiWindowFlags_HorizontalScrollbar;
+    if (hasFlag(m_flags, PanelFlags::NoFocusOnAppearing)) imguiFlags |= ImGuiWindowFlags_NoFocusOnAppearing;
+    if (hasFlag(m_flags, PanelFlags::NoBringToFrontOnFocus)) imguiFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
+    if (hasFlag(m_flags, PanelFlags::AlwaysVerticalScrollbar)) imguiFlags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
+    if (hasFlag(m_flags, PanelFlags::AlwaysHorizontalScrollbar)) imguiFlags |= ImGuiWindowFlags_AlwaysHorizontalScrollbar;
+    if (hasFlag(m_flags, PanelFlags::UnsavedDocument)) imguiFlags |= ImGuiWindowFlags_UnsavedDocument;
+    if (hasFlag(m_flags, PanelFlags::NoDocking)) imguiFlags |= ImGuiWindowFlags_NoDocking;
 
-    // bool visible = ImGui::Begin(getTitle().c_str(), &m_isOpen, imguiFlags);
+    bool visible = ImGui::Begin(getTitle().c_str(), &m_isOpen, imguiFlags);
 
     // Track focus and hover state
-    // m_isFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
-    // m_isHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows);
+    m_isFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+    m_isHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows);
 
     // Track size
-    // ImVec2 size = ImGui::GetWindowSize();
-    // ImVec2 contentSize = ImGui::GetContentRegionAvail();
-    // if (size.x != m_width || size.y != m_height)
-    // {
-    //     m_width = size.x;
-    //     m_height = size.y;
-    //     m_contentWidth = contentSize.x;
-    //     m_contentHeight = contentSize.y;
-    //     onResize(m_width, m_height);
-    // }
+    ImVec2 size = ImGui::GetWindowSize();
+    ImVec2 contentSize = ImGui::GetContentRegionAvail();
+    if (size.x != m_width || size.y != m_height)
+    {
+        m_width = size.x;
+        m_height = size.y;
+        m_contentWidth = contentSize.x;
+        m_contentHeight = contentSize.y;
+        onResize(m_width, m_height);
+    }
 
+    return visible;
+#else
     // Stub returns true to allow content rendering
     return true;
+#endif
 }
 
 void GUIPanelBase::endPanel()
 {
-    // ImGui::End();
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    ImGui::End();
+#endif
 }
 
 void GUIPanelBase::renderMenuItems(const std::vector<MenuItem>& items)
 {
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
     for (const auto& item : items)
     {
         if (item.isSeparator)
         {
-            // ImGui::Separator();
+            ImGui::Separator();
             continue;
         }
 
         if (!item.subItems.empty())
         {
-            // if (ImGui::BeginMenu(item.label.c_str()))
-            // {
-            //     renderMenuItems(item.subItems);
-            //     ImGui::EndMenu();
-            // }
+            if (ImGui::BeginMenu(item.label.c_str()))
+            {
+                renderMenuItems(item.subItems);
+                ImGui::EndMenu();
+            }
         }
         else if (item.isChecked)
         {
-            // bool checked = item.isChecked();
-            // if (ImGui::MenuItem(item.label.c_str(), item.shortcut.c_str(),
-            //                     checked, item.isEnabled()))
-            // {
-            //     item.action();
-            // }
+            bool checked = item.isChecked();
+            if (ImGui::MenuItem(item.label.c_str(), item.shortcut.c_str(),
+                                checked, item.isEnabled()))
+            {
+                if (item.action) item.action();
+            }
         }
         else
         {
-            // if (ImGui::MenuItem(item.label.c_str(), item.shortcut.c_str(),
-            //                     false, item.isEnabled()))
-            // {
-            //     item.action();
-            // }
+            if (ImGui::MenuItem(item.label.c_str(), item.shortcut.c_str(),
+                                false, item.isEnabled()))
+            {
+                if (item.action) item.action();
+            }
         }
     }
+#else
+    (void)items;
+#endif
 }
 
 void GUIPanelBase::renderToolbarItems(const std::vector<ToolbarItem>& items)

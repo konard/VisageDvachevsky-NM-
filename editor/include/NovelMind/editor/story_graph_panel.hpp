@@ -364,11 +364,16 @@ private:
     f32 m_nodeCreationMenuX = 0.0f;
     f32 m_nodeCreationMenuY = 0.0f;
 
+    // Context menu position
+    f32 m_lastContextMenuX = 0.0f;
+    f32 m_lastContextMenuY = 0.0f;
+
     // Visual styles
     NodeVisualStyle m_nodeStyle;
     ConnectionStyle m_connectionStyle;
 
     // Grid
+    bool m_showGrid = true;
     f32 m_gridSize = 20.0f;
     renderer::Color m_gridColor{40, 40, 40, 255};
     renderer::Color m_gridMajorColor{50, 50, 50, 255};

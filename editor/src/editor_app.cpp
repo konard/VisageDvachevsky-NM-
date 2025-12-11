@@ -8,6 +8,11 @@
 #include <chrono>
 #include <filesystem>
 
+// Include ImGui for menu rendering
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+#include <imgui.h>
+#endif
+
 namespace NovelMind::editor
 {
 
@@ -1353,6 +1358,27 @@ Result<void> EditorApp::initialize(const EditorConfig& config)
 {
     m_config = config;
 
+    // Initialize SDL2/ImGui backend
+    m_backend = std::make_unique<SDLImGuiBackend>();
+    EditorWindowConfig windowConfig;
+    windowConfig.title = config.windowTitle;
+    windowConfig.width = config.windowWidth;
+    windowConfig.height = config.windowHeight;
+    windowConfig.maximized = config.maximized;
+    windowConfig.uiScale = config.uiScale;
+    windowConfig.darkTheme = (config.theme == "dark");
+
+    auto backendResult = m_backend->initialize(windowConfig);
+    if (!backendResult.isOk())
+    {
+        return Result<void>::error("Failed to initialize GUI backend: " + backendResult.error());
+    }
+
+    // Set up file drop callback
+    m_backend->setFileDropCallback([this](const std::string& path) {
+        handleFileDropped(path);
+    });
+
     // Create core systems
     m_sceneGraph = std::make_unique<scene::SceneGraph>();
     // SceneGraph is ready to use after construction
@@ -1387,15 +1413,38 @@ void EditorApp::run()
 
     auto lastTime = std::chrono::high_resolution_clock::now();
 
-    while (m_running)
+    while (m_running && !m_backend->shouldClose())
     {
         auto currentTime = std::chrono::high_resolution_clock::now();
         f64 deltaTime = std::chrono::duration<f64>(currentTime - lastTime).count();
         lastTime = currentTime;
 
+        // Begin new frame
+        if (!m_backend->beginFrame())
+        {
+            break;
+        }
+
+        // Begin main dockspace
+        m_backend->beginDockspace();
+
+        // Render main menu bar
+        renderMainMenuBar();
+
+        // Process input (keyboard shortcuts, etc.)
         processInput();
+
+        // Update panels
         update(deltaTime);
+
+        // Render all panels
         render();
+
+        // End dockspace
+        m_backend->endDockspace();
+
+        // End frame and swap buffers
+        m_backend->endFrame();
 
         // Auto-save check
         if (m_config.autoSave && m_projectLoaded && m_projectModified)
@@ -1427,6 +1476,13 @@ void EditorApp::shutdown()
     m_visualGraph.reset();
     m_inspectorAPI.reset();
     m_sceneGraph.reset();
+
+    // Shutdown backend last
+    if (m_backend)
+    {
+        m_backend->shutdown();
+        m_backend.reset();
+    }
 
     m_initialized = false;
 }
@@ -1878,6 +1934,162 @@ void EditorApp::showWelcomeScreen()
 void EditorApp::showAboutDialog()
 {
     // Show about dialog
+}
+
+void EditorApp::renderMainMenuBar()
+{
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+    if (ImGui::BeginMenuBar())
+    {
+        // File menu
+        if (ImGui::BeginMenu("File"))
+        {
+            if (ImGui::MenuItem("New Project", "Ctrl+Shift+N"))
+            {
+                // Show new project dialog
+            }
+            if (ImGui::MenuItem("Open Project...", "Ctrl+O"))
+            {
+                // Show open project dialog
+            }
+            if (ImGui::MenuItem("Save Project", "Ctrl+S", false, m_projectLoaded))
+            {
+                saveProject();
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("New Scene", "Ctrl+N", false, m_projectLoaded))
+            {
+                newScene();
+            }
+            if (ImGui::MenuItem("Open Scene...", nullptr, false, m_projectLoaded))
+            {
+                // Show open scene dialog
+            }
+            if (ImGui::MenuItem("Save Scene", nullptr, false, m_projectLoaded))
+            {
+                saveScene();
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Exit", "Alt+F4"))
+            {
+                m_running = false;
+            }
+            ImGui::EndMenu();
+        }
+
+        // Edit menu
+        if (ImGui::BeginMenu("Edit"))
+        {
+            if (ImGui::MenuItem("Undo", "Ctrl+Z"))
+            {
+                undo();
+            }
+            if (ImGui::MenuItem("Redo", "Ctrl+Y"))
+            {
+                redo();
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Cut", "Ctrl+X"))
+            {
+                cut();
+            }
+            if (ImGui::MenuItem("Copy", "Ctrl+C"))
+            {
+                copy();
+            }
+            if (ImGui::MenuItem("Paste", "Ctrl+V"))
+            {
+                paste();
+            }
+            if (ImGui::MenuItem("Delete", "Del"))
+            {
+                deleteSelection();
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Select All", "Ctrl+A"))
+            {
+                selectAll();
+            }
+            ImGui::EndMenu();
+        }
+
+        // View menu
+        if (ImGui::BeginMenu("View"))
+        {
+            if (ImGui::MenuItem("Scene View", nullptr, m_sceneView && m_sceneView->isVisible()))
+            {
+                togglePanel("Scene");
+            }
+            if (ImGui::MenuItem("Story Graph", nullptr, m_storyGraphView && m_storyGraphView->isVisible()))
+            {
+                togglePanel("Story");
+            }
+            if (ImGui::MenuItem("Inspector", nullptr, m_inspectorPanel && m_inspectorPanel->isVisible()))
+            {
+                togglePanel("Inspector");
+            }
+            if (ImGui::MenuItem("Asset Browser", nullptr, m_assetBrowser && m_assetBrowser->isVisible()))
+            {
+                togglePanel("Assets");
+            }
+            if (ImGui::MenuItem("Project Browser", nullptr, m_projectBrowser && m_projectBrowser->isVisible()))
+            {
+                togglePanel("Project");
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Reset Layout"))
+            {
+                resetLayout();
+            }
+            ImGui::EndMenu();
+        }
+
+        // Build menu
+        if (ImGui::BeginMenu("Build"))
+        {
+            if (ImGui::MenuItem("Quick Build", "F7", false, m_projectLoaded))
+            {
+                quickBuild();
+            }
+            if (ImGui::MenuItem("Build Settings...", nullptr, false, m_projectLoaded))
+            {
+                // Show build settings
+            }
+            ImGui::EndMenu();
+        }
+
+        // Play menu
+        if (ImGui::BeginMenu("Play"))
+        {
+            bool isPlaying = m_previewWindow && m_previewWindow->isPreviewRunning();
+            if (ImGui::MenuItem("Play", "F5", false, m_projectLoaded && !isPlaying))
+            {
+                startPreview();
+            }
+            if (ImGui::MenuItem("Stop", "Shift+F5", false, isPlaying))
+            {
+                stopPreview();
+            }
+            ImGui::EndMenu();
+        }
+
+        // Help menu
+        if (ImGui::BeginMenu("Help"))
+        {
+            if (ImGui::MenuItem("Documentation"))
+            {
+                // Open documentation
+            }
+            if (ImGui::MenuItem("About NovelMind"))
+            {
+                showAboutDialog();
+            }
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMenuBar();
+    }
+#endif
 }
 
 } // namespace NovelMind::editor

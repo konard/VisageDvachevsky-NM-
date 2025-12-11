@@ -12,6 +12,7 @@ add_library(novelmind_editor STATIC
     src/curve_editor.cpp
 
     # v0.2.0 backend systems
+    src/sdl_imgui_backend.cpp
     src/selection_system.cpp
     src/event_bus.cpp
     src/project_manager.cpp
@@ -51,12 +52,48 @@ target_include_directories(novelmind_editor
         $<INSTALL_INTERFACE:include>
 )
 
+# Optional dependencies for GUI
+find_package(SDL2 QUIET)
+find_package(OpenGL QUIET)
+
+# Check for ImGui (can be provided via FetchContent or system install)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../external/imgui/imgui.h")
+    set(IMGUI_FOUND TRUE)
+    set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../external/imgui")
+endif()
+
 target_link_libraries(novelmind_editor
     PUBLIC
         engine_core
     PRIVATE
         novelmind_compiler_options
 )
+
+# Configure SDL2 and ImGui if available
+if(SDL2_FOUND AND IMGUI_FOUND AND OPENGL_FOUND)
+    target_compile_definitions(novelmind_editor PRIVATE
+        NOVELMIND_HAS_SDL2
+        NOVELMIND_HAS_IMGUI
+    )
+    target_include_directories(novelmind_editor PRIVATE
+        ${SDL2_INCLUDE_DIRS}
+        ${IMGUI_DIR}
+        ${IMGUI_DIR}/backends
+        ${OPENGL_INCLUDE_DIR}
+    )
+    target_link_libraries(novelmind_editor PRIVATE
+        ${SDL2_LIBRARIES}
+        ${OPENGL_LIBRARIES}
+    )
+    message(STATUS "NovelMind Editor: SDL2 + ImGui GUI enabled")
+elseif(SDL2_FOUND)
+    target_compile_definitions(novelmind_editor PRIVATE NOVELMIND_HAS_SDL2)
+    target_include_directories(novelmind_editor PRIVATE ${SDL2_INCLUDE_DIRS})
+    target_link_libraries(novelmind_editor PRIVATE ${SDL2_LIBRARIES})
+    message(STATUS "NovelMind Editor: SDL2 available but ImGui not found - limited GUI")
+else()
+    message(STATUS "NovelMind Editor: Building without GUI (SDL2/ImGui not found)")
+endif()
 
 # Editor executable (optional, only build if main.cpp exists)
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")

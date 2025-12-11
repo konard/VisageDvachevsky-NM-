@@ -7,6 +7,10 @@
 #include "NovelMind/editor/imgui_integration.hpp"
 #include <cstring>
 
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+#include <imgui.h>
+#endif
+
 namespace NovelMind::editor {
 
 InspectorPanel::InspectorPanel()
@@ -76,7 +80,12 @@ void InspectorPanel::onRender()
 
     if (!itemToInspect.isValid())
     {
-        // ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "No selection");
+#if defined(NOVELMIND_HAS_SDL2) && defined(NOVELMIND_HAS_IMGUI)
+        ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), "No selection");
+        ImGui::Spacing();
+        ImGui::TextColored(ImVec4(0.4f, 0.4f, 0.4f, 1.0f), "Select an object in the Scene View");
+        ImGui::TextColored(ImVec4(0.4f, 0.4f, 0.4f, 1.0f), "or Story Graph to inspect it.");
+#endif
         return;
     }
 
