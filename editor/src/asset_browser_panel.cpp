@@ -217,7 +217,7 @@ void AssetBrowserPanel::showInExplorer()
     // Windows: use explorer
     std::string cmd = "explorer /select,\"" + m_selectedAssets[0] + "\"";
     std::system(cmd.c_str());
-#elif __APPLE__
+#elif defined(__APPLE__)
     // macOS: use open -R
     std::string cmd = "open -R \"" + m_selectedAssets[0] + "\"";
     std::system(cmd.c_str());
