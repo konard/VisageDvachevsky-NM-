@@ -24,6 +24,8 @@ namespace NovelMind::editor::qt {
  *
  * This class wraps QDockWidget and provides additional functionality
  * specific to the NovelMind Editor.
+ *
+ * NOTE: This class uses Qt's MOC (Meta-Object Compiler) for signal/slot support
  */
 class NMDockPanel : public QDockWidget {
   Q_OBJECT
