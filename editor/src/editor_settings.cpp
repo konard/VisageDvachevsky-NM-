@@ -4,7 +4,6 @@
  */
 
 #include "NovelMind/editor/editor_settings.hpp"
-#include "NovelMind/editor/editor_app.hpp"
 #include <fstream>
 #include <sstream>
 #include <algorithm>

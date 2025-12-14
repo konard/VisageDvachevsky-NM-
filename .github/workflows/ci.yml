@@ -47,6 +47,47 @@ jobs:
         cd build
         ctest --output-on-failure
 
+  build-linux-gui:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        compiler: [gcc, clang]
+        build_type: [Debug, Release]
+        include:
+          - compiler: gcc
+            cc: gcc
+            cxx: g++
+          - compiler: clang
+            cc: clang
+            cxx: clang++
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build libsdl2-dev qt6-base-dev qt6-svg-dev
+
+    - name: Configure CMake
+      env:
+        CC: ${{ matrix.cc }}
+        CXX: ${{ matrix.cxx }}
+      run: |
+        cmake -B build -G Ninja \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+          -DNM_BUILD_TESTS=ON \
+          -DNOVELMIND_BUILD_EDITOR=ON
+
+    - name: Build
+      run: cmake --build build
+
+    - name: Run tests
+      run: |
+        cd build
+        ctest --output-on-failure
+
   build-windows:
     runs-on: windows-latest
 
