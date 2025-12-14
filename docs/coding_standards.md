@@ -1,58 +1,58 @@
-# Coding Standards
+# Стандарты кодирования
 
-This document defines the coding standards and conventions for the NovelMind project.
+Данный документ определяет стандарты кодирования и соглашения для проекта NovelMind.
 
-## Language Standard
+## Языковой стандарт
 
-- **C++ Standard**: C++20 (with C++23 features where beneficial)
-- **Compiler Support**: GCC 11+, Clang 14+, MSVC 2022+
+- **Стандарт C++**: C++20 (с возможностями C++23, где это полезно)
+- **Поддержка компиляторов**: GCC 11+, Clang 14+, MSVC 2022+
 
-## Naming Conventions
+## Соглашения об именовании
 
-### General Rules
+### Общие правила
 
-| Element | Style | Example |
+| Элемент | Стиль | Пример |
 |---------|-------|---------|
-| Classes/Structs | PascalCase | `SceneManager`, `DialogueNode` |
-| Functions/Methods | camelCase | `loadTexture()`, `getCurrentScene()` |
-| Variables | camelCase | `playerName`, `currentFrame` |
-| Member Variables | m_ prefix + camelCase | `m_windowHandle`, `m_isRunning` |
-| Constants | ALL_CAPS | `MAX_SPRITES`, `DEFAULT_WIDTH` |
-| Enums | PascalCase | `enum class RenderMode` |
-| Enum Values | PascalCase | `RenderMode::Immediate` |
-| Namespaces | PascalCase | `NovelMind::Core`, `NovelMind::VFS` |
-| Macros | ALL_CAPS with NOVELMIND_ prefix | `NOVELMIND_ASSERT`, `NOVELMIND_DEBUG` |
-| Template Parameters | PascalCase | `template<typename ValueType>` |
-| File Names | snake_case | `scene_manager.hpp`, `vfs_interface.cpp` |
+| Классы/Структуры | PascalCase | `SceneManager`, `DialogueNode` |
+| Функции/Методы | camelCase | `loadTexture()`, `getCurrentScene()` |
+| Переменные | camelCase | `playerName`, `currentFrame` |
+| Переменные-члены | префикс m_ + camelCase | `m_windowHandle`, `m_isRunning` |
+| Константы | ALL_CAPS | `MAX_SPRITES`, `DEFAULT_WIDTH` |
+| Перечисления | PascalCase | `enum class RenderMode` |
+| Значения перечислений | PascalCase | `RenderMode::Immediate` |
+| Пространства имен | PascalCase | `NovelMind::Core`, `NovelMind::VFS` |
+| Макросы | ALL_CAPS с префиксом NOVELMIND_ | `NOVELMIND_ASSERT`, `NOVELMIND_DEBUG` |
+| Параметры шаблонов | PascalCase | `template<typename ValueType>` |
+| Имена файлов | snake_case | `scene_manager.hpp`, `vfs_interface.cpp` |
 
-### Namespace Structure
+### Структура пространств имен
 
 ```cpp
 namespace NovelMind {
-    namespace Core { }      // Core utilities, types, result
-    namespace Platform { }  // Platform abstraction
-    namespace VFS { }       // Virtual file system
-    namespace Renderer { }  // 2D rendering
-    namespace Scripting { } // Script engine
-    namespace Scene { }     // Scene management
-    namespace Audio { }     // Audio system
-    namespace Input { }     // Input handling
-    namespace Save { }      // Save/load system
+    namespace Core { }      // Базовые утилиты, типы, result
+    namespace Platform { }  // Абстракция платформы
+    namespace VFS { }       // Виртуальная файловая система
+    namespace Renderer { }  // 2D рендеринг
+    namespace Scripting { } // Движок скриптов
+    namespace Scene { }     // Управление сценами
+    namespace Audio { }     // Аудиосистема
+    namespace Input { }     // Обработка ввода
+    namespace Save { }      // Система сохранения/загрузки
 }
 ```
 
-**Note**: The top-level namespace is `NovelMind`, not `nm`. This provides:
-- Clear, self-documenting namespace that is recognizable in any codebase
-- No conflicts with other libraries
-- Professional, polished appearance
+**Примечание**: Пространство имен верхнего уровня — `NovelMind`, а не `nm`. Это обеспечивает:
+- Четкое, самодокументирующееся пространство имен, которое узнаваемо в любой кодовой базе
+- Отсутствие конфликтов с другими библиотеками
+- Профессиональный, отполированный вид
 
-## Code Formatting
+## Форматирование кода
 
-### Indentation and Spacing
+### Отступы и пробелы
 
-- **Indentation**: 4 spaces (no tabs)
-- **Line Length**: Maximum 100 characters
-- **Braces**: Allman style (opening brace on new line)
+- **Отступы**: 4 пробела (без табуляции)
+- **Длина строки**: Максимум 100 символов
+- **Фигурные скобки**: Стиль Allman (открывающая скобка на новой строке)
 
 ```cpp
 namespace NovelMind::Core
@@ -78,7 +78,7 @@ private:
 } // namespace NovelMind::Core
 ```
 
-### Function Definitions
+### Определения функций
 
 ```cpp
 ReturnType ClassName::functionName(ParamType1 param1, ParamType2 param2)
@@ -96,16 +96,16 @@ ReturnType ClassName::functionName(ParamType1 param1, ParamType2 param2)
 }
 ```
 
-### Control Structures
+### Управляющие структуры
 
 ```cpp
-// If statements
+// Операторы if
 if (condition)
 {
     action();
 }
 
-// Switch statements
+// Операторы switch
 switch (value)
 {
     case Value::First:
@@ -121,7 +121,7 @@ switch (value)
         break;
 }
 
-// Loops
+// Циклы
 for (size_t i = 0; i < count; ++i)
 {
     process(items[i]);
@@ -138,11 +138,11 @@ while (condition)
 }
 ```
 
-## Header Files
+## Заголовочные файлы
 
-### Header Guards
+### Защита заголовков
 
-Use `#pragma once` for header guards:
+Используйте `#pragma once` для защиты заголовков:
 
 ```cpp
 #pragma once
@@ -156,12 +156,12 @@ namespace NovelMind::VFS
 }
 ```
 
-### Include Order
+### Порядок включений
 
-1. Corresponding header (for .cpp files)
-2. C++ standard library headers
-3. Third-party library headers
-4. Project headers (sorted alphabetically)
+1. Соответствующий заголовок (для .cpp файлов)
+2. Заголовки стандартной библиотеки C++
+3. Заголовки сторонних библиотек
+4. Заголовки проекта (отсортированы по алфавиту)
 
 ```cpp
 #include "scene_manager.hpp"
@@ -177,12 +177,12 @@ namespace NovelMind::VFS
 #include "NovelMind/vfs/resource.hpp"
 ```
 
-### Forward Declarations
+### Прямые объявления
 
-Prefer forward declarations in headers when possible:
+Предпочитайте прямые объявления в заголовках, где это возможно:
 
 ```cpp
-// In header
+// В заголовке
 namespace NovelMind::Renderer
 {
     class Texture;
@@ -195,63 +195,63 @@ class SceneManager
 };
 ```
 
-## Classes and Structs
+## Классы и структуры
 
-### Class Layout
+### Структура класса
 
 ```cpp
 class ClassName
 {
 public:
-    // Types and aliases
+    // Типы и псевдонимы
     using Ptr = std::unique_ptr<ClassName>;
 
-    // Static constants
+    // Статические константы
     static constexpr int MAX_COUNT = 100;
 
-    // Constructors and destructor
+    // Конструкторы и деструктор
     ClassName();
     explicit ClassName(int value);
     ~ClassName();
 
-    // Copy/move operations
+    // Операции копирования/перемещения
     ClassName(const ClassName&) = delete;
     ClassName& operator=(const ClassName&) = delete;
     ClassName(ClassName&&) noexcept;
     ClassName& operator=(ClassName&&) noexcept;
 
-    // Public interface
+    // Публичный интерфейс
     void publicMethod();
     [[nodiscard]] int getValue() const;
 
 protected:
-    // Protected interface
+    // Защищенный интерфейс
     void protectedMethod();
 
 private:
-    // Private methods
+    // Приватные методы
     void privateHelper();
 
-    // Member variables (always last)
+    // Переменные-члены (всегда последними)
     int m_value;
     std::string m_name;
 };
 ```
 
-### Struct vs Class
+### Struct против Class
 
-- Use `struct` for plain data aggregates (POD-like types)
-- Use `class` for types with invariants and behavior
+- Используйте `struct` для простых агрегатов данных (POD-подобные типы)
+- Используйте `class` для типов с инвариантами и поведением
 
 ```cpp
-// Data aggregate
+// Агрегат данных
 struct Vec2
 {
     float x;
     float y;
 };
 
-// Type with behavior
+// Тип с поведением
 class Transform
 {
 public:
@@ -265,34 +265,34 @@ private:
 };
 ```
 
-## Modern C++ Features
+## Возможности современного C++
 
-### Use Smart Pointers
+### Используйте умные указатели
 
 ```cpp
-// Unique ownership
+// Уникальное владение
 std::unique_ptr<Texture> texture = std::make_unique<Texture>(path);
 
-// Shared ownership (use sparingly)
+// Совместное владение (использовать осторожно)
 std::shared_ptr<Resource> resource = std::make_shared<Resource>(id);
 
-// Non-owning reference
+// Не владеющая ссылка
 Texture* rawPtr = texture.get();
 ```
 
-### Use `auto` Judiciously
+### Используйте `auto` разумно
 
 ```cpp
-// Good: obvious from context or long type names
+// Хорошо: очевидно из контекста или длинные имена типов
 auto it = container.begin();
 auto texture = resourceManager.loadTexture("sprite.png");
 
-// Avoid: hides important type information
-auto value = calculateValue();  // What type is this?
-int value = calculateValue();   // Better
+// Избегайте: скрывает важную информацию о типе
+auto value = calculateValue();  // Какой это тип?
+int value = calculateValue();   // Лучше
 ```
 
-### Use `constexpr` and `const`
+### Используйте `constexpr` и `const`
 
 ```cpp
 constexpr int BUFFER_SIZE = 1024;
@@ -302,14 +302,14 @@ const std::string& getName() const { return m_name; }
 void process(const std::vector<int>& data);
 ```
 
-### Use `[[nodiscard]]`
+### Используйте `[[nodiscard]]`
 
 ```cpp
 [[nodiscard]] bool initialize();
 [[nodiscard]] std::optional<Resource> loadResource(const std::string& id);
 ```
 
-### Use Enum Classes
+### Используйте классы перечислений
 
 ```cpp
 enum class TextAlignment
@@ -319,18 +319,18 @@ enum class TextAlignment
     Right
 };
 
-// Usage
+// Использование
 TextAlignment align = TextAlignment::Center;
 ```
 
-## Error Handling
+## Обработка ошибок
 
-### No Exceptions
+### Без исключений
 
-Exceptions are disabled in the project. Use explicit error handling:
+Исключения отключены в проекте. Используйте явную обработку ошибок:
 
 ```cpp
-// Result type for operations that can fail
+// Тип Result для операций, которые могут завершиться с ошибкой
 template<typename T, typename E = std::string>
 class Result
 {
@@ -344,7 +344,7 @@ public:
     [[nodiscard]] E& error();
 };
 
-// Usage
+// Использование
 Result<Texture> result = loadTexture("image.png");
 if (result.isOk())
 {
@@ -352,13 +352,13 @@ if (result.isOk())
 }
 else
 {
-    log::error("Failed to load texture: {}", result.error());
+    log::error("Не удалось загрузить текстуру: {}", result.error());
 }
 ```
 
-### Assertions
+### Утверждения
 
-Use assertions for programmer errors:
+Используйте утверждения для ошибок программиста:
 
 ```cpp
 #define NOVELMIND_ASSERT(condition, message) \
@@ -366,88 +366,88 @@ Use assertions for programmer errors:
 
 void processItem(Item* item)
 {
-    NOVELMIND_ASSERT(item != nullptr, "Item must not be null");
+    NOVELMIND_ASSERT(item != nullptr, "Item не должен быть null");
     // ...
 }
 ```
 
-## Documentation
+## Документация
 
-### File Headers
+### Заголовки файлов
 
-Every source file should have a header comment:
+Каждый исходный файл должен иметь заголовочный комментарий:
 
 ```cpp
 /**
  * @file scene_manager.hpp
- * @brief Scene management and lifecycle handling
+ * @brief Управление сценами и их жизненным циклом
  *
- * This module provides the SceneManager class which handles
- * scene loading, transitions, and object management.
+ * Данный модуль предоставляет класс SceneManager, который обрабатывает
+ * загрузку сцен, переходы и управление объектами.
  */
 ```
 
-### Class Documentation
+### Документация классов
 
 ```cpp
 /**
- * @brief Manages scene lifecycle and transitions
+ * @brief Управляет жизненным циклом сцен и переходами
  *
- * The SceneManager is responsible for loading scenes, managing
- * scene objects, and handling transitions between scenes.
+ * SceneManager отвечает за загрузку сцен, управление
+ * объектами сцен и обработку переходов между сценами.
  */
 class SceneManager
 {
 public:
     /**
-     * @brief Load a scene by identifier
-     * @param sceneId Unique scene identifier
-     * @return Result indicating success or error
+     * @brief Загрузить сцену по идентификатору
+     * @param sceneId Уникальный идентификатор сцены
+     * @return Result, указывающий на успех или ошибку
      */
     [[nodiscard]] Result<void> loadScene(const std::string& sceneId);
 };
 ```
 
-### Inline Comments
+### Встроенные комментарии
 
-- Write comments for non-obvious logic
-- Avoid commenting obvious code
-- Keep comments up-to-date with code changes
+- Пишите комментарии для неочевидной логики
+- Избегайте комментирования очевидного кода
+- Поддерживайте комментарии актуальными при изменении кода
 
 ```cpp
-// Good: explains why
-// Use power-of-two size for texture atlas to ensure GPU compatibility
+// Хорошо: объясняет почему
+// Используем размер степени двойки для атласа текстур для обеспечения совместимости с GPU
 constexpr int ATLAS_SIZE = 2048;
 
-// Bad: states the obvious
-// Increment counter
+// Плохо: констатирует очевидное
+// Увеличиваем счетчик
 ++counter;
 ```
 
-## Testing
+## Тестирование
 
-### Test File Naming
+### Именование тестовых файлов
 
-- Unit tests: `test_<module_name>.cpp`
-- Integration tests: `integration_<feature>.cpp`
+- Юнит-тесты: `test_<имя_модуля>.cpp`
+- Интеграционные тесты: `integration_<функция>.cpp`
 
-### Test Structure
+### Структура теста
 
 ```cpp
 #include <catch2/catch_test_macros.hpp>
 #include "NovelMind/vfs/virtual_fs.hpp"
 
-TEST_CASE("VirtualFS loads resources correctly", "[vfs]")
+TEST_CASE("VirtualFS загружает ресурсы корректно", "[vfs]")
 {
     NovelMind::VFS::VirtualFS vfs;
 
-    SECTION("can load existing resource")
+    SECTION("может загрузить существующий ресурс")
     {
         auto result = vfs.readFile("test_resource");
         REQUIRE(result.isOk());
     }
 
-    SECTION("returns error for missing resource")
+    SECTION("возвращает ошибку для отсутствующего ресурса")
     {
         auto result = vfs.readFile("nonexistent");
         REQUIRE(result.isError());
@@ -455,13 +455,13 @@ TEST_CASE("VirtualFS loads resources correctly", "[vfs]")
 }
 ```
 
-## Build Configuration
+## Конфигурация сборки
 
-### CMake Standards
+### Стандарты CMake
 
-- Minimum CMake version: 3.20
-- Use modern CMake targets
-- Avoid global settings
+- Минимальная версия CMake: 3.20
+- Используйте современные цели CMake
+- Избегайте глобальных настроек
 
 ```cmake
 target_compile_features(engine_core PUBLIC cxx_std_20)
@@ -471,21 +471,21 @@ target_compile_options(engine_core PRIVATE
 )
 ```
 
-### Warning Levels
+### Уровни предупреждений
 
-- Enable maximum warnings in development
-- Treat warnings as errors in CI
-- Document any suppressed warnings
+- Включайте максимальные предупреждения при разработке
+- Рассматривайте предупреждения как ошибки в CI
+- Документируйте любые подавленные предупреждения
 
-## Code Review Checklist
+## Чек-лист для ревью кода
 
-Before submitting code for review:
+Перед отправкой кода на ревью:
 
-- [ ] Code follows naming conventions
-- [ ] No magic numbers (use named constants)
-- [ ] Public API is documented
-- [ ] Error cases are handled
-- [ ] No memory leaks (RAII used)
-- [ ] Tests written for new functionality
-- [ ] No compiler warnings
-- [ ] Code compiles on all target platforms
+- [ ] Код следует соглашениям об именовании
+- [ ] Нет магических чисел (используйте именованные константы)
+- [ ] Публичный API документирован
+- [ ] Обработаны случаи ошибок
+- [ ] Нет утечек памяти (используется RAII)
+- [ ] Написаны тесты для новой функциональности
+- [ ] Нет предупреждений компилятора
+- [ ] Код компилируется на всех целевых платформах

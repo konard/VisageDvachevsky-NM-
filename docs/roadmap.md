@@ -1,325 +1,325 @@
-# NovelMind Development Roadmap
+# Дорожная карта разработки NovelMind
 
-This document outlines the development phases for the NovelMind engine and editor.
+Данный документ описывает фазы разработки движка и редактора NovelMind.
 
-## Phase 1: Foundation
+## Фаза 1: Фундамент
 
-**Goal**: Establish the core runtime skeleton and development infrastructure.
+**Цель**: Создание базового каркаса runtime и инфраструктуры разработки.
 
-### 1.1 Project Setup
-- Repository structure and build system
-- Coding standards and documentation templates
-- CI/CD pipeline configuration
-- Development environment setup
+### 1.1 Настройка проекта
+- Структура репозитория и система сборки
+- Стандарты кодирования и шаблоны документации
+- Настройка конвейера CI/CD
+- Настройка среды разработки
 
-### 1.2 Platform Abstraction
-- Window management interface
-- Input handling abstraction
-- Timer and timing utilities
-- File system abstraction
-- Logging system
+### 1.2 Абстракция платформы
+- Интерфейс управления окнами
+- Абстракция обработки ввода
+- Таймер и утилиты времени
+- Абстракция файловой системы
+- Система логирования
 
-### 1.3 Core Infrastructure
-- Result/Error types for error handling
-- Memory management utilities
-- String utilities and encoding
-- Configuration system
+### 1.3 Базовая инфраструктура
+- Типы Result/Error для обработки ошибок
+- Утилиты управления памятью
+- Утилиты строк и кодирования
+- Система конфигурации
 
-## Phase 2: Virtual File System
+## Фаза 2: Виртуальная файловая система
 
-**Goal**: Implement the secure resource loading infrastructure.
+**Цель**: Реализация безопасной инфраструктуры загрузки ресурсов.
 
-### 2.1 VFS Core
-- Virtual file system interface
-- Resource identifier mapping
-- In-memory file system (for testing)
-- Resource caching layer
+### 2.1 Ядро VFS
+- Интерфейс виртуальной файловой системы
+- Отображение идентификаторов ресурсов
+- Файловая система в памяти (для тестирования)
+- Слой кеширования ресурсов
 
-### 2.2 Pack File Support
-- Pack file reader
-- Resource table parsing
-- Streaming support for large resources
+### 2.2 Поддержка Pack-файлов
+- Чтение pack-файлов
+- Парсинг таблицы ресурсов
+- Поддержка потоковой передачи для больших ресурсов
 
-### 2.3 Security Layer
-- AES-256-GCM encryption
-- Key derivation and storage
-- Integrity verification
+### 2.3 Уровень безопасности
+- Шифрование AES-256-GCM
+- Формирование и хранение ключей
+- Проверка целостности
 
-## Phase 3: Rendering System
+## Фаза 3: Система рендеринга
 
-**Goal**: Build the 2D rendering pipeline.
+**Цель**: Построение конвейера 2D-рендеринга.
 
-### 3.1 Renderer Core
-- SDL2/OpenGL backend setup
-- Render context management
-- Frame buffer handling
+### 3.1 Ядро рендерера
+- Настройка бэкенда SDL2/OpenGL
+- Управление контекстом рендеринга
+- Обработка буфера кадров
 
-### 3.2 Sprite Rendering
-- Texture loading and management
-- Sprite batching
-- Texture atlases
-- Blend modes and effects
+### 3.2 Рендеринг спрайтов
+- Загрузка и управление текстурами
+- Батчинг спрайтов
+- Атласы текстур
+- Режимы смешивания и эффекты
 
-### 3.3 Text Rendering
-- FreeType integration
-- Font loading and caching
-- Text layout engine
-- Unicode support
+### 3.3 Рендеринг текста
+- Интеграция FreeType
+- Загрузка и кеширование шрифтов
+- Движок компоновки текста
+- Поддержка Unicode
 
-### 3.4 Visual Effects
-- Fade transitions
-- Screen shake
-- Color grading
-- Custom shader support
+### 3.4 Визуальные эффекты
+- Переходы затухания
+- Сотрясение экрана
+- Цветокоррекция
+- Поддержка пользовательских шейдеров
 
-## Phase 4: Scripting Engine
+## Фаза 4: Движок скриптов
 
-**Goal**: Implement the NM Script language and interpreter.
+**Цель**: Реализация языка NM Script и интерпретатора.
 
-### 4.1 Language Design
-- Finalize NM Script grammar
-- Design bytecode format
-- Define standard library
+### 4.1 Дизайн языка
+- Финализация грамматики NM Script
+- Дизайн формата байт-кода
+- Определение стандартной библиотеки
 
-### 4.2 Compiler
-- Lexer and tokenizer
-- Parser and AST generation
-- Semantic analysis
-- Bytecode generation
+### 4.2 Компилятор
+- Лексер и токенизатор
+- Парсер и генерация AST
+- Семантический анализ
+- Генерация байт-кода
 
 ### 4.3 Runtime
-- Virtual machine implementation
-- Instruction execution
-- Variable management
-- Native function bindings
+- Реализация виртуальной машины
+- Выполнение инструкций
+- Управление переменными
+- Привязки нативных функций
 
-### 4.4 Integration
-- Engine command callbacks
-- Coroutine-style execution
-- Error handling and debugging
+### 4.4 Интеграция
+- Коллбэки команд движка
+- Выполнение в стиле корутин
+- Обработка ошибок и отладка
 
-## Phase 5: Scene System
+## Фаза 5: Система сцен
 
-**Goal**: Build the scene graph and object management.
+**Цель**: Построение графа сцен и управления объектами.
 
-### 5.1 Scene Graph
-- Layer system (background, characters, UI, effects)
-- Object hierarchy
-- Visibility and culling
+### 5.1 Граф сцен
+- Система слоев (фон, персонажи, UI, эффекты)
+- Иерархия объектов
+- Видимость и отсечение
 
-### 5.2 Scene Objects
-- Sprite objects
-- Text labels
-- UI panels
-- Animated objects
+### 5.2 Объекты сцены
+- Объекты спрайтов
+- Текстовые метки
+- UI панели
+- Анимированные объекты
 
-### 5.3 Transitions
-- Scene loading/unloading
-- Transition effects
-- Cross-fade support
+### 5.3 Переходы
+- Загрузка/выгрузка сцен
+- Эффекты переходов
+- Поддержка кросс-фейда
 
-## Phase 6: Story Engine
+## Фаза 6: Движок истории
 
-**Goal**: Implement visual novel gameplay systems.
+**Цель**: Реализация систем геймплея визуальной новеллы.
 
-### 6.1 Dialogue System
-- Text display with typewriter effect
-- Character name plates
-- Multiple dialogue styles
+### 6.1 Система диалогов
+- Отображение текста с эффектом печатной машинки
+- Таблички с именами персонажей
+- Множественные стили диалогов
 
-### 6.2 Choice System
-- Choice menu rendering
-- Branch handling
-- Conditional choices
+### 6.2 Система выбора
+- Рендеринг меню выбора
+- Обработка ветвления
+- Условные выборы
 
-### 6.3 State Management
-- Flag and variable tracking
-- Condition evaluation
-- State persistence
+### 6.3 Управление состоянием
+- Отслеживание флагов и переменных
+- Оценка условий
+- Сохранение состояния
 
-## Phase 7: Audio System
+## Фаза 7: Аудиосистема
 
-**Goal**: Add sound and music support.
+**Цель**: Добавление поддержки звука и музыки.
 
-### 7.1 Audio Backend
-- SDL_mixer or similar integration
-- Audio format decoding
-- Volume control
+### 7.1 Аудио бэкенд
+- Интеграция SDL_mixer или аналога
+- Декодирование аудиоформатов
+- Управление громкостью
 
-### 7.2 Sound Effects
-- Sound playback
-- Positional audio (optional)
-- Sound pools
+### 7.2 Звуковые эффекты
+- Воспроизведение звука
+- Позиционный звук (опционально)
+- Пулы звуков
 
-### 7.3 Music System
-- Background music playback
-- Crossfading
-- Loop points
+### 7.3 Музыкальная система
+- Воспроизведение фоновой музыки
+- Кросс-фейдинг
+- Точки зацикливания
 
-## Phase 8: Save/Load System
+## Фаза 8: Система сохранения/загрузки
 
-**Goal**: Implement game state persistence.
+**Цель**: Реализация сохранения состояния игры.
 
-### 8.1 Serialization
-- State snapshot creation
-- Binary serialization format
-- Compression
+### 8.1 Сериализация
+- Создание снимков состояния
+- Бинарный формат сериализации
+- Сжатие
 
-### 8.2 Save Slots
-- Save file management
-- Slot metadata (timestamp, thumbnail)
-- Auto-save support
+### 8.2 Слоты сохранения
+- Управление файлами сохранений
+- Метаданные слотов (временная метка, миниатюра)
+- Поддержка автосохранения
 
-### 8.3 Security
-- Save file integrity
-- Optional encryption
-- Tamper detection
+### 8.3 Безопасность
+- Целостность файлов сохранений
+- Опциональное шифрование
+- Обнаружение подмены
 
-## Phase 9: Localization
+## Фаза 9: Локализация
 
-**Goal**: Add multi-language support.
+**Цель**: Добавление поддержки нескольких языков.
 
-### 9.1 String Management
-- String table loading
-- Language switching
-- Fallback handling
+### 9.1 Управление строками
+- Загрузка таблиц строк
+- Переключение языка
+- Обработка откатов
 
-### 9.2 Text Formatting
-- Variable interpolation
-- Plural forms
-- RTL text support
+### 9.2 Форматирование текста
+- Интерполяция переменных
+- Формы множественного числа
+- Поддержка текста справа налево
 
-## Phase 10: Visual Editor ✅ (Phases 0-5.0 Complete)
+## Фаза 10: Визуальный редактор ✅ (Фазы 0-5.0 выполнены)
 
-**Goal**: Build the visual authoring tool.
+**Цель**: Построение визуального инструмента авторинга.
 
-**Status**: Qt 6 Widgets-based GUI implemented with professional UX/DX.
-See `docs/gui_architecture.md` and `docs/gui-assessment.md` for details.
+**Статус**: Реализован GUI на основе Qt 6 Widgets с профессиональным UX/DX.
+См. `docs/gui_architecture.md` и `docs/gui-assessment.md` для деталей.
 
-### 10.1 Editor Framework ✅ **COMPLETE**
-- ✅ Qt 6 Widgets-based UI (dark theme, Unreal-like)
-- ✅ Project management (welcome screen, recent projects)
-- ✅ Asset browser (tree/list view, search, filters)
-- ✅ 12 fully functional panels
+### 10.1 Фреймворк редактора ✅ **ВЫПОЛНЕНО**
+- ✅ UI на основе Qt 6 Widgets (темная тема, в стиле Unreal)
+- ✅ Управление проектами (экран приветствия, недавние проекты)
+- ✅ Браузер ресурсов (просмотр дерева/списка, поиск, фильтры)
+- ✅ 12 полнофункциональных панелей
 - ✅ Event Bus, Selection System, Undo/Redo
-- ✅ Play-In-Editor with debugging (Phase 5.0)
+- ✅ Play-In-Editor с отладкой (Фаза 5.0)
 
-### 10.2 Scene Editor ⚠️ **PARTIAL**
-- ✅ SceneView panel with QGraphicsView
-- ✅ Pan (middle-mouse) and zoom (scroll wheel)
-- ✅ Grid overlay
-- ✅ Inspector with full property editing (Phase 2.2 complete - String, Int, Float, Bool, Color, Enum)
-- ⏳ WYSIWYG preview (pending real renderer integration)
-- ⏳ Object placement (pending real scene objects)
-- ⏳ Layer management (pending scene architecture)
-- ⏳ Preview playback (pending Phase 5.1 runtime)
+### 10.2 Редактор сцен ⚠️ **ЧАСТИЧНО**
+- ✅ Панель SceneView с QGraphicsView
+- ✅ Панорамирование (средняя кнопка мыши) и зум (колесо прокрутки)
+- ✅ Наложение сетки
+- ✅ Inspector с полным редактированием свойств (Фаза 2.2 завершена - String, Int, Float, Bool, Color, Enum)
+- ⏳ WYSIWYG превью (ожидает интеграции настоящего рендерера)
+- ⏳ Размещение объектов (ожидает настоящие объекты сцены)
+- ⏳ Управление слоями (ожидает архитектуру сцены)
+- ⏳ Превью воспроизведения (ожидает runtime Фазы 5.1)
 
-### 10.3 Story Flow Editor ✅ **COMPLETE** (Phase 3.3)
-- ✅ Node graph visualization (QGraphicsView/Scene)
-- ✅ Pan and zoom
-- ✅ Breakpoint indicators (red circles)
-- ✅ Execution highlighting (green glow)
-- ✅ Context menu (breakpoint toggle, edit, delete)
-- ✅ Node creation/deletion (Phase 3.3 complete)
-- ✅ Node palette with 6 node types (Entry, Dialogue, Choice, Scene, Label, Script)
-- ✅ Connection drawing (Ctrl+Click drag)
-- ✅ Connection deletion (Delete/Backspace)
-- ✅ Variable inspector (Debug Overlay panel)
+### 10.3 Редактор потока истории ✅ **ВЫПОЛНЕНО** (Фаза 3.3)
+- ✅ Визуализация графа узлов (QGraphicsView/Scene)
+- ✅ Панорамирование и зум
+- ✅ Индикаторы точек останова (красные круги)
+- ✅ Подсветка выполнения (зеленое свечение)
+- ✅ Контекстное меню (переключение точки останова, редактирование, удаление)
+- ✅ Создание/удаление узлов (Фаза 3.3 завершена)
+- ✅ Палитра узлов с 6 типами узлов (Entry, Dialogue, Choice, Scene, Label, Script)
+- ✅ Рисование соединений (Ctrl+Click и перетаскивание)
+- ✅ Удаление соединений (Delete/Backspace)
+- ✅ Инспектор переменных (панель Debug Overlay)
 
-### 10.4 Script Editor ⏳ **PENDING** (Phase 6+)
-- ⏳ NM Script code editing
-- ⏳ Syntax highlighting
-- ⏳ Auto-completion
-- ⏳ Error checking
+### 10.4 Редактор скриптов ⏳ **В ОЖИДАНИИ** (Фаза 6+)
+- ⏳ Редактирование кода NM Script
+- ⏳ Подсветка синтаксиса
+- ⏳ Автодополнение
+- ⏳ Проверка ошибок
 
-### 10.5 Localization Editor ⚠️ **PARTIAL**
-- ✅ Translation table editor (ID/Source/Translation)
-- ✅ Language selector
-- ⚠️ Import/export (buttons exist, I/O pending)
-- ⏳ Translation preview (pending Phase 4+)
+### 10.5 Редактор локализации ⚠️ **ЧАСТИЧНО**
+- ✅ Редактор таблицы переводов (ID/Источник/Перевод)
+- ✅ Селектор языка
+- ⚠️ Импорт/экспорт (кнопки существуют, I/O в ожидании)
+- ⏳ Превью перевода (ожидает Фазу 4+)
 
-## Phase 11: Build System
+## Фаза 11: Система сборки
 
-**Goal**: Create the project compilation pipeline.
+**Цель**: Создание конвейера компиляции проектов.
 
-### 11.1 Asset Compiler
-- Image processing
-- Audio conversion
-- Font rasterization
-- Script compilation
+### 11.1 Компилятор ресурсов
+- Обработка изображений
+- Конвертация аудио
+- Растеризация шрифтов
+- Компиляция скриптов
 
-### 11.2 Pack Builder
-- Resource packing
-- Encryption
-- Compression
+### 11.2 Сборщик пакетов
+- Упаковка ресурсов
+- Шифрование
+- Сжатие
 
-### 11.3 Executable Builder
-- Platform-specific packaging
-- Code signing support
-- Installer generation
+### 11.3 Сборщик исполняемых файлов
+- Упаковка под конкретную платформу
+- Поддержка подписи кода
+- Генерация инсталлятора
 
-## Phase 12: Polish and Optimization
+## Фаза 12: Полировка и оптимизация
 
-**Goal**: Prepare for production use.
+**Цель**: Подготовка к промышленному использованию.
 
-### 12.1 Performance
-- Profiling and optimization
-- Memory usage reduction
-- Load time improvements
+### 12.1 Производительность
+- Профилирование и оптимизация
+- Уменьшение использования памяти
+- Улучшение времени загрузки
 
-### 12.2 Quality
-- Bug fixing
-- Edge case handling
-- Error messages
+### 12.2 Качество
+- Исправление ошибок
+- Обработка крайних случаев
+- Сообщения об ошибках
 
-### 12.3 Documentation
-- User documentation
-- API reference
-- Tutorials and examples
+### 12.3 Документация
+- Пользовательская документация
+- Справочник по API
+- Учебники и примеры
 
-## Future Considerations
+## Будущие соображения
 
-Features for potential future development:
+Функции для потенциальной будущей разработки:
 
-- **Plugin System**: Extensible architecture for custom nodes and commands
-- **Mobile Support**: iOS and Android ports
-- **Web Export**: WebAssembly-based browser runtime
-- **Cloud Saves**: Online save synchronization
-- **Achievements**: Achievement system integration
-- **Analytics**: Optional telemetry for game analytics
-- **Live2D Integration**: Support for Live2D character animations
-- **Video Playback**: Cutscene video support
-- **Mini-games**: Framework for embedded mini-games
-- **Mod Support**: Official modding API and tools
+- **Система плагинов**: Расширяемая архитектура для пользовательских узлов и команд
+- **Поддержка мобильных платформ**: Порты для iOS и Android
+- **Веб-экспорт**: Runtime на основе WebAssembly для браузера
+- **Облачные сохранения**: Онлайн-синхронизация сохранений
+- **Достижения**: Интеграция системы достижений
+- **Аналитика**: Опциональная телеметрия для игровой аналитики
+- **Интеграция Live2D**: Поддержка анимаций персонажей Live2D
+- **Воспроизведение видео**: Поддержка видео для катсцен
+- **Мини-игры**: Фреймворк для встроенных мини-игр
+- **Поддержка модов**: Официальный API для модов и инструменты
 
-## Dependencies
+## Зависимости
 
-External libraries planned for use:
+Планируемые к использованию внешние библиотеки:
 
-| Library | Purpose | License |
+| Библиотека | Назначение | Лицензия |
 |---------|---------|---------|
-| SDL2 | Platform abstraction | zlib |
-| OpenGL | Rendering | Khronos |
-| FreeType | Font rendering | FreeType License |
-| stb_image | Image loading | Public Domain |
-| stb_vorbis | OGG decoding | Public Domain |
-| zlib | Compression | zlib |
-| OpenSSL/mbedTLS | Encryption | Apache 2.0/Apache 2.0 |
-| Catch2 | Testing | BSL-1.0 |
-| fmt | String formatting | MIT |
-| nlohmann/json | JSON parsing | MIT |
+| SDL2 | Абстракция платформы | zlib |
+| OpenGL | Рендеринг | Khronos |
+| FreeType | Рендеринг шрифтов | FreeType License |
+| stb_image | Загрузка изображений | Public Domain |
+| stb_vorbis | Декодирование OGG | Public Domain |
+| zlib | Сжатие | zlib |
+| OpenSSL/mbedTLS | Шифрование | Apache 2.0/Apache 2.0 |
+| Catch2 | Тестирование | BSL-1.0 |
+| fmt | Форматирование строк | MIT |
+| nlohmann/json | Парсинг JSON | MIT |
 
-## Version Planning
+## Планирование версий
 
-| Version | Milestone |
+| Версия | Веха |
 |---------|-----------|
-| 0.1.0 | Core runtime with basic rendering |
-| 0.2.0 | VFS and resource management |
-| 0.3.0 | Scripting engine |
-| 0.4.0 | Complete story engine |
-| 0.5.0 | Editor alpha |
-| 0.6.0 | Build system |
-| 0.7.0 | Audio and save/load |
-| 0.8.0 | Editor beta |
-| 0.9.0 | Feature complete |
-| 1.0.0 | Production release |
+| 0.1.0 | Базовый runtime с простым рендерингом |
+| 0.2.0 | VFS и управление ресурсами |
+| 0.3.0 | Движок скриптов |
+| 0.4.0 | Полный движок истории |
+| 0.5.0 | Альфа-версия редактора |
+| 0.6.0 | Система сборки |
+| 0.7.0 | Аудио и сохранение/загрузка |
+| 0.8.0 | Бета-версия редактора |
+| 0.9.0 | Функционально завершено |
+| 1.0.0 | Промышленный релиз |

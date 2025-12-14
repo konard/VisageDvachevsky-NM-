@@ -1,220 +1,220 @@
-# Pack File Format Specification
+# Спецификация формата Pack-файла
 
-This document specifies the binary format for NovelMind resource pack files (`.nmres`).
+Данный документ определяет бинарный формат для файлов пакетов ресурсов NovelMind (`.nmres`).
 
-## Overview
+## Обзор
 
-NovelMind uses a custom pack file format to store encrypted game resources. The format is designed to:
+NovelMind использует пользовательский формат pack-файла для хранения зашифрованных игровых ресурсов. Формат разработан для:
 
-- Protect assets from casual extraction
-- Support fast random access to individual resources
-- Allow streaming of large resources
-- Enable integrity verification
+- Защиты ресурсов от простого извлечения
+- Поддержки быстрого произвольного доступа к отдельным ресурсам
+- Возможности потоковой передачи больших ресурсов
+- Обеспечения проверки целостности
 
-## File Structure
+## Структура файла
 
 ```
 +------------------+
-|     Header       |  (64 bytes)
+|     Header       |  (64 байта)
 +------------------+
-|   Resource Table |  (variable)
+|   Resource Table |  (переменный)
 +------------------+
-|   String Table   |  (variable)
+|   String Table   |  (переменный)
 +------------------+
-|   Resource Data  |  (variable)
+|   Resource Data  |  (переменный)
 +------------------+
-|     Footer       |  (32 bytes)
+|     Footer       |  (32 байта)
 +------------------+
 ```
 
-## Header Format (64 bytes)
+## Формат заголовка (64 байта)
 
-| Offset | Size | Type | Description |
+| Смещение | Размер | Тип | Описание |
 |--------|------|------|-------------|
-| 0x00 | 4 | char[4] | Magic number: "NMRS" |
-| 0x04 | 2 | uint16 | Format version (major) |
-| 0x06 | 2 | uint16 | Format version (minor) |
-| 0x08 | 4 | uint32 | Flags |
-| 0x0C | 4 | uint32 | Resource count |
-| 0x10 | 8 | uint64 | Resource table offset |
-| 0x18 | 8 | uint64 | String table offset |
-| 0x20 | 8 | uint64 | Data section offset |
-| 0x28 | 8 | uint64 | Total file size |
-| 0x30 | 16 | uint8[16] | Content hash (first 128 bits of SHA-256) |
+| 0x00 | 4 | char[4] | Магическое число: "NMRS" |
+| 0x04 | 2 | uint16 | Версия формата (мажорная) |
+| 0x06 | 2 | uint16 | Версия формата (минорная) |
+| 0x08 | 4 | uint32 | Флаги |
+| 0x0C | 4 | uint32 | Количество ресурсов |
+| 0x10 | 8 | uint64 | Смещение таблицы ресурсов |
+| 0x18 | 8 | uint64 | Смещение таблицы строк |
+| 0x20 | 8 | uint64 | Смещение секции данных |
+| 0x28 | 8 | uint64 | Общий размер файла |
+| 0x30 | 16 | uint8[16] | Хеш содержимого (первые 128 бит SHA-256) |
 
-### Flags (bit field)
+### Флаги (битовое поле)
 
-| Bit | Name | Description |
+| Бит | Название | Описание |
 |-----|------|-------------|
-| 0 | ENCRYPTED | Resources are encrypted |
-| 1 | COMPRESSED | Resources are compressed |
-| 2 | SIGNED | Pack includes digital signature |
-| 3-31 | Reserved | Must be zero |
+| 0 | ENCRYPTED | Ресурсы зашифрованы |
+| 1 | COMPRESSED | Ресурсы сжаты |
+| 2 | SIGNED | Пакет содержит цифровую подпись |
+| 3-31 | Зарезервировано | Должно быть равно нулю |
 
-## Resource Table Entry (48 bytes each)
+## Запись таблицы ресурсов (48 байт каждая)
 
-| Offset | Size | Type | Description |
+| Смещение | Размер | Тип | Описание |
 |--------|------|------|-------------|
-| 0x00 | 4 | uint32 | Resource ID string offset |
-| 0x04 | 4 | uint32 | Resource type |
-| 0x08 | 8 | uint64 | Data offset (from data section start) |
-| 0x10 | 8 | uint64 | Compressed size |
-| 0x18 | 8 | uint64 | Uncompressed size |
-| 0x20 | 4 | uint32 | Flags |
-| 0x24 | 4 | uint32 | Checksum (CRC32) |
-| 0x28 | 8 | uint8[8] | Initialization vector (for encryption) |
+| 0x00 | 4 | uint32 | Смещение строки ID ресурса |
+| 0x04 | 4 | uint32 | Тип ресурса |
+| 0x08 | 8 | uint64 | Смещение данных (от начала секции данных) |
+| 0x10 | 8 | uint64 | Сжатый размер |
+| 0x18 | 8 | uint64 | Несжатый размер |
+| 0x20 | 4 | uint32 | Флаги |
+| 0x24 | 4 | uint32 | Контрольная сумма (CRC32) |
+| 0x28 | 8 | uint8[8] | Вектор инициализации (для шифрования) |
 
-### Resource Types
+### Типы ресурсов
 
-| Value | Type | Description |
+| Значение | Тип | Описание |
 |-------|------|-------------|
-| 0x00 | Unknown | Unspecified type |
-| 0x01 | Texture | Image data (PNG, etc.) |
-| 0x02 | Audio | Sound effect |
-| 0x03 | Music | Background music (streaming) |
-| 0x04 | Font | Font file |
-| 0x05 | Script | Compiled NM Script bytecode |
-| 0x06 | Scene | Scene definition |
-| 0x07 | Localization | Translation strings |
-| 0x08 | Data | Generic data blob |
+| 0x00 | Unknown | Неопределенный тип |
+| 0x01 | Texture | Данные изображения (PNG и т.д.) |
+| 0x02 | Audio | Звуковой эффект |
+| 0x03 | Music | Фоновая музыка (потоковая) |
+| 0x04 | Font | Файл шрифта |
+| 0x05 | Script | Скомпилированный байт-код NM Script |
+| 0x06 | Scene | Определение сцены |
+| 0x07 | Localization | Строки перевода |
+| 0x08 | Data | Обобщенный блок данных |
 
-### Resource Flags
+### Флаги ресурса
 
-| Bit | Name | Description |
+| Бит | Название | Описание |
 |-----|------|-------------|
-| 0 | STREAMABLE | Resource should be streamed |
-| 1 | PRELOAD | Resource should be preloaded |
-| 2-31 | Reserved | Must be zero |
+| 0 | STREAMABLE | Ресурс должен передаваться потоком |
+| 1 | PRELOAD | Ресурс должен быть предварительно загружен |
+| 2-31 | Зарезервировано | Должно быть равно нулю |
 
-## String Table
+## Таблица строк
 
-The string table stores all resource ID strings in a contiguous block.
+Таблица строк хранит все строки ID ресурсов в непрерывном блоке.
 
 ```
 +------------------+
-|  String Count    |  (4 bytes, uint32)
+|  String Count    |  (4 байта, uint32)
 +------------------+
-|  Offset Table    |  (4 bytes * count)
+|  Offset Table    |  (4 байта * количество)
 +------------------+
-|   String Data    |  (null-terminated UTF-8 strings)
+|   String Data    |  (строки UTF-8 с нулевым терминатором)
 +------------------+
 ```
 
-Resource IDs are stored as null-terminated UTF-8 strings. The offset table contains offsets from the start of the string data section.
+ID ресурсов хранятся как строки UTF-8 с нулевым терминатором. Таблица смещений содержит смещения от начала секции строковых данных.
 
-## Resource Data Section
+## Секция данных ресурсов
 
-Resources are stored sequentially with optional alignment padding. Each resource's data is:
+Ресурсы хранятся последовательно с опциональным выравниванием. Данные каждого ресурса:
 
-1. Optionally compressed (zlib/LZ4)
-2. Encrypted (AES-256-GCM)
-3. Stored at the offset specified in the resource table
+1. Опционально сжимаются (zlib/LZ4)
+2. Шифруются (AES-256-GCM)
+3. Хранятся по смещению, указанному в таблице ресурсов
 
-### Alignment
+### Выравнивание
 
-- Resources larger than 4KB are aligned to 4KB boundaries
-- Smaller resources are aligned to 16-byte boundaries
-- Alignment enables memory-mapped access and streaming
+- Ресурсы размером более 4KB выравниваются по границам 4KB
+- Меньшие ресурсы выравниваются по границам 16 байт
+- Выравнивание обеспечивает доступ через отображение в память и потоковую передачу
 
-## Footer (32 bytes)
+## Footer (32 байта)
 
-| Offset | Size | Type | Description |
+| Смещение | Размер | Тип | Описание |
 |--------|------|------|-------------|
-| 0x00 | 4 | uint32 | Footer magic: "NMRF" |
-| 0x04 | 4 | uint32 | CRC32 of header + resource table + string table |
-| 0x08 | 8 | uint64 | Pack creation timestamp (Unix epoch) |
-| 0x10 | 4 | uint32 | Build number |
-| 0x14 | 12 | uint8[12] | Reserved (must be zero) |
+| 0x00 | 4 | uint32 | Магическое число footer: "NMRF" |
+| 0x04 | 4 | uint32 | CRC32 заголовка + таблицы ресурсов + таблицы строк |
+| 0x08 | 8 | uint64 | Временная метка создания пакета (Unix epoch) |
+| 0x10 | 4 | uint32 | Номер сборки |
+| 0x14 | 12 | uint8[12] | Зарезервировано (должно быть нулем) |
 
-## Encryption
+## Шифрование
 
-### Key Derivation
+### Формирование ключа
 
-The encryption key is derived from a project-specific master key:
+Ключ шифрования формируется из главного ключа проекта:
 
 ```
 salt = SHA256(project_id + build_timestamp)
 key = PBKDF2-SHA256(master_key, salt, iterations=100000, key_length=32)
 ```
 
-### Resource Encryption
+### Шифрование ресурсов
 
-Each resource is encrypted individually using AES-256-GCM:
+Каждый ресурс шифруется индивидуально с использованием AES-256-GCM:
 
-- Unique IV per resource (stored in resource table)
-- Authentication tag appended to encrypted data (16 bytes)
-- Associated data: resource ID + type + size
+- Уникальный IV для каждого ресурса (хранится в таблице ресурсов)
+- Тег аутентификации добавляется к зашифрованным данным (16 байт)
+- Ассоциированные данные: ID ресурса + тип + размер
 
-### Key Storage
+### Хранение ключа
 
-The derived key is obfuscated and embedded in the executable:
+Производный ключ обфусцируется и встраивается в исполняемый файл:
 
-1. Split key into multiple fragments
-2. XOR with code section hashes
-3. Store fragments in different locations
-4. Reconstruct at runtime
+1. Разделение ключа на несколько фрагментов
+2. XOR с хешами секции кода
+3. Хранение фрагментов в разных местах
+4. Восстановление во время выполнения
 
-Note: This provides protection against casual extraction but is not cryptographically secure against determined reverse engineering.
+Примечание: Это обеспечивает защиту от простого извлечения, но не является криптографически безопасным от целенаправленной обратной разработки.
 
-## Compression
+## Сжатие
 
-Resources can be compressed before encryption using:
+Ресурсы могут быть сжаты перед шифрованием с использованием:
 
-- **LZ4** (default): Fast decompression, moderate compression
-- **zlib**: Better compression, slower decompression
+- **LZ4** (по умолчанию): Быстрая декомпрессия, умеренное сжатие
+- **zlib**: Лучшее сжатие, более медленная декомпрессия
 
-The compression algorithm is indicated in the pack flags. Individual resources may be stored uncompressed if compression provides no benefit (e.g., already compressed images).
+Алгоритм сжатия указывается во флагах пакета. Отдельные ресурсы могут храниться несжатыми, если сжатие не дает преимущества (например, уже сжатые изображения).
 
-## Pack Building Process
-
-```
-1. Collect all resources
-2. For each resource:
-   a. Read source file
-   b. Generate resource ID (hash of original path)
-   c. Compress if beneficial
-   d. Generate unique IV
-   e. Encrypt with AES-256-GCM
-   f. Calculate CRC32
-3. Build resource table
-4. Build string table
-5. Write header (placeholder hashes)
-6. Write resource table
-7. Write string table
-8. Write resource data
-9. Calculate content hash
-10. Write footer
-11. Update header with final hash
-```
-
-## Runtime Loading Process
+## Процесс сборки пакета
 
 ```
-1. Read and validate header
-2. Read footer and verify table CRC
-3. Load resource table into memory
-4. Load string table into memory
-5. Build resource ID -> entry map
-6. On resource request:
-   a. Look up entry by ID
-   b. Read encrypted data from offset
-   c. Decrypt with resource IV
-   d. Decompress if needed
-   e. Verify CRC32
-   f. Return decrypted data
+1. Сбор всех ресурсов
+2. Для каждого ресурса:
+   a. Чтение исходного файла
+   b. Генерация ID ресурса (хеш исходного пути)
+   c. Сжатие, если выгодно
+   d. Генерация уникального IV
+   e. Шифрование с помощью AES-256-GCM
+   f. Вычисление CRC32
+3. Построение таблицы ресурсов
+4. Построение таблицы строк
+5. Запись заголовка (временные хеши)
+6. Запись таблицы ресурсов
+7. Запись таблицы строк
+8. Запись данных ресурсов
+9. Вычисление хеша содержимого
+10. Запись footer
+11. Обновление заголовка с финальным хешем
 ```
 
-## Example Resource Layout
+## Процесс загрузки во время выполнения
 
 ```
-Header (64 bytes)
+1. Чтение и валидация заголовка
+2. Чтение footer и проверка CRC таблицы
+3. Загрузка таблицы ресурсов в память
+4. Загрузка таблицы строк в память
+5. Построение карты ID ресурса -> запись
+6. При запросе ресурса:
+   a. Поиск записи по ID
+   b. Чтение зашифрованных данных из смещения
+   c. Расшифровка с использованием IV ресурса
+   d. Декомпрессия при необходимости
+   e. Проверка CRC32
+   f. Возврат расшифрованных данных
+```
+
+## Пример структуры ресурсов
+
+```
+Header (64 байта)
   Magic: "NMRS"
   Version: 1.0
   Flags: ENCRYPTED | COMPRESSED
   Resource Count: 3
   ...
 
-Resource Table (144 bytes = 3 * 48)
+Resource Table (144 байта = 3 * 48)
   [0] ID: "bg_city" | Type: Texture | Offset: 0 | Size: 245760
   [1] ID: "bgm_main" | Type: Music | Offset: 249856 | Size: 1048576
   [2] ID: "scene_intro" | Type: Script | Offset: 1298432 | Size: 4096
@@ -225,34 +225,34 @@ String Table
   Data: "bg_city\0bgm_main\0scene_intro\0"
 
 Resource Data
-  [0x000000] bg_city texture data (encrypted, 245760 bytes)
-  [0x03D000] bgm_main music data (encrypted, 1048576 bytes)
-  [0x13D000] scene_intro script data (encrypted, 4096 bytes)
+  [0x000000] bg_city данные текстуры (зашифрованы, 245760 байт)
+  [0x03D000] bgm_main данные музыки (зашифрованы, 1048576 байт)
+  [0x13D000] scene_intro данные скрипта (зашифрованы, 4096 байт)
 
-Footer (32 bytes)
+Footer (32 байта)
   ...
 ```
 
-## Versioning
+## Версионность
 
-| Version | Changes |
+| Версия | Изменения |
 |---------|---------|
-| 1.0 | Initial format |
+| 1.0 | Начальный формат |
 
-Future versions will maintain backward compatibility where possible. The runtime will refuse to load packs with incompatible major versions.
+Будущие версии будут сохранять обратную совместимость, где это возможно. Runtime будет отказываться загружать пакеты с несовместимыми мажорными версиями.
 
-## Security Considerations
+## Соображения безопасности
 
-The pack file format provides protection against:
+Формат pack-файла обеспечивает защиту от:
 
-- Direct file extraction from game directory
-- Casual modification of game resources
-- Tampering detection via checksums
+- Прямого извлечения файлов из игровой директории
+- Простого изменения игровых ресурсов
+- Обнаружения подмены через контрольные суммы
 
-The format does NOT provide protection against:
+Формат НЕ обеспечивает защиту от:
 
-- Determined reverse engineering
-- Memory dumping during runtime
-- Executable patching
+- Целенаправленной обратной разработки
+- Дампа памяти во время выполнения
+- Патчинга исполняемого файла
 
-For sensitive content, consider additional legal protections (DMCA, etc.) alongside technical measures.
+Для конфиденциального контента рассмотрите дополнительные юридические меры защиты (DMCA и т.д.) наряду с техническими мерами.
