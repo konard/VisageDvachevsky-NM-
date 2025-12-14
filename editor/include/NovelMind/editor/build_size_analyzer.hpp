@@ -331,15 +331,15 @@ private:
 /**
  * @brief Build Size Analyzer Panel
  */
-class BuildSizeAnalyzerPanel : public EditorPanel
+class BuildSizeAnalyzerPanel
 {
 public:
     BuildSizeAnalyzerPanel();
-    ~BuildSizeAnalyzerPanel() override;
+    ~BuildSizeAnalyzerPanel();
 
-    void update(f64 deltaTime) override;
-    void render() override;
-    void onResize(i32 width, i32 height) override;
+    void update(f64 deltaTime);
+    void render();
+    void onResize(i32 width, i32 height);
 
     void setAnalyzer(BuildSizeAnalyzer* analyzer);
 

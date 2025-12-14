@@ -15,7 +15,6 @@
 
 #include "NovelMind/core/types.hpp"
 #include "NovelMind/core/result.hpp"
-#include "NovelMind/editor/editor_app.hpp"
 #include "NovelMind/scene/animation.hpp"
 #include "NovelMind/renderer/renderer.hpp"
 #include <string>
@@ -473,15 +472,15 @@ private:
 /**
  * @brief Timeline Editor Panel
  */
-class TimelineEditor : public EditorPanel
+class TimelineEditor
 {
 public:
     TimelineEditor();
-    ~TimelineEditor() override;
+    ~TimelineEditor();
 
-    void update(f64 deltaTime) override;
-    void render() override;
-    void onResize(i32 width, i32 height) override;
+    void update(f64 deltaTime);
+    void render();
+    void onResize(i32 width, i32 height);
 
     // Timeline management
     void setTimeline(Timeline* timeline);
@@ -558,6 +557,13 @@ private:
     // Curve editor state
     bool m_showCurveEditor = false;
     std::string m_curveEditorPropertyName;
+
+    // Panel state (would come from EditorPanel base class)
+    i32 m_width = 800;
+    i32 m_height = 600;
+    bool m_visible = true;
+
+    bool isVisible() const { return m_visible; }
 
     // Callbacks
     std::function<void(TimelineClip*)> m_onClipSelected;

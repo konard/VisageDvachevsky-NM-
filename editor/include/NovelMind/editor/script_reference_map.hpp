@@ -435,15 +435,15 @@ private:
 /**
  * @brief Script Reference Map Panel
  */
-class ScriptReferenceMapPanel : public EditorPanel
+class ScriptReferenceMapPanel
 {
 public:
     ScriptReferenceMapPanel();
-    ~ScriptReferenceMapPanel() override;
+    ~ScriptReferenceMapPanel();
 
-    void update(f64 deltaTime) override;
-    void render() override;
-    void onResize(i32 width, i32 height) override;
+    void update(f64 deltaTime);
+    void render();
+    void onResize(i32 width, i32 height);
 
     void setAnalyzer(ScriptReferenceAnalyzer* analyzer);
 

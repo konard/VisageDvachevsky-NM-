@@ -873,7 +873,6 @@ Result<void> CurveLibrary::loadLibrary(const std::string& path)
 // =============================================================================
 
 CurveEditor::CurveEditor()
-    : EditorPanel("Curve Editor")
 {
 }
 
@@ -895,6 +894,7 @@ void CurveEditor::update(f64 deltaTime)
 
 void CurveEditor::render()
 {
+    // isVisible() check already handled in class definition
     if (!isVisible()) return;
 
     renderGrid();

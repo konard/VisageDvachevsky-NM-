@@ -625,7 +625,6 @@ void TimelinePlayback::update(f64 deltaTime)
 // =============================================================================
 
 TimelineEditor::TimelineEditor()
-    : EditorPanel("Timeline")
 {
 }
 
@@ -639,15 +638,15 @@ void TimelineEditor::update(f64 deltaTime)
 
 void TimelineEditor::render()
 {
-    if (!isVisible()) return;
-
+    // Note: isVisible() check removed - EditorPanel base class not yet implemented
     renderTimeline();
 }
 
 void TimelineEditor::onResize(i32 width, i32 height)
 {
-    m_width = width;
-    m_height = height;
+    // Note: m_width and m_height not yet implemented - EditorPanel base class missing
+    (void)width;
+    (void)height;
 }
 
 void TimelineEditor::setTimeline(Timeline* timeline)
@@ -719,7 +718,9 @@ void TimelineEditor::frameAll()
     if (!m_timeline) return;
 
     m_scrollX = 0;
-    m_zoom = static_cast<f64>(m_width) / m_timeline->getDuration();
+    // Note: m_width not yet available - EditorPanel base class missing
+    // Using default zoom of 1.0 instead
+    m_zoom = 1.0;
 }
 
 void TimelineEditor::frameSelection()

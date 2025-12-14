@@ -15,7 +15,6 @@
 #include "NovelMind/core/result.hpp"
 #include "NovelMind/scene/animation.hpp"
 #include "NovelMind/renderer/renderer.hpp"
-#include "editor_app.hpp"
 #include <string>
 #include <vector>
 #include <memory>
@@ -207,15 +206,15 @@ struct CurveEditorConfig
  * - Select from preset curves
  * - Save custom curves to library
  */
-class CurveEditor : public EditorPanel
+class CurveEditor
 {
 public:
     CurveEditor();
-    ~CurveEditor() override;
+    ~CurveEditor();
 
-    void update(f64 deltaTime) override;
-    void render() override;
-    void onResize(i32 width, i32 height) override;
+    void update(f64 deltaTime);
+    void render();
+    void onResize(i32 width, i32 height);
 
     // Curve management
     void setCurve(AnimationCurve* curve);
@@ -323,6 +322,13 @@ private:
     // Preview animation
     f32 m_previewTime = 0.0f;
     bool m_previewPlaying = false;
+
+    // Panel state (would come from EditorPanel base class)
+    i32 m_width = 800;
+    i32 m_height = 600;
+    bool m_visible = true;
+
+    bool isVisible() const { return m_visible; }
 
     // Callbacks
     std::function<void(const AnimationCurve&)> m_onCurveModified;
