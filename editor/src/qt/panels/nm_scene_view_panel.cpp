@@ -6,6 +6,7 @@
 #include <QHBoxLayout>
 #include <QToolBar>
 #include <QAction>
+#include <QAbstractButton>
 #include <QPainter>
 #include <QWheelEvent>
 #include <QMouseEvent>
