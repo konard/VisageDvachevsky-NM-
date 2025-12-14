@@ -15,7 +15,6 @@
 #include "NovelMind/core/result.hpp"
 #include "NovelMind/scene/animation.hpp"
 #include "NovelMind/renderer/renderer.hpp"
-#include "editor_app.hpp"
 #include <string>
 #include <vector>
 #include <memory>

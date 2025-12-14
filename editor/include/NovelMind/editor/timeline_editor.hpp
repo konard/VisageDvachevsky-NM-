@@ -15,7 +15,6 @@
 
 #include "NovelMind/core/types.hpp"
 #include "NovelMind/core/result.hpp"
-#include "NovelMind/editor/editor_app.hpp"
 #include "NovelMind/scene/animation.hpp"
 #include "NovelMind/renderer/renderer.hpp"
 #include <string>

@@ -372,54 +372,10 @@ EditorLayout LayoutManager::captureCurrentLayout()
     EditorLayout layout;
     layout.name = "Current";
 
-    if (m_editor)
-    {
-        // Capture panel states
-        auto* projectBrowser = m_editor->getProjectBrowser();
-        if (projectBrowser)
-        {
-            PanelState state;
-            state.name = "Project";
-            state.visible = projectBrowser->isVisible();
-            layout.panels.push_back(state);
-        }
-
-        auto* sceneView = m_editor->getSceneView();
-        if (sceneView)
-        {
-            PanelState state;
-            state.name = "Scene";
-            state.visible = sceneView->isVisible();
-            layout.panels.push_back(state);
-        }
-
-        auto* storyGraph = m_editor->getStoryGraphView();
-        if (storyGraph)
-        {
-            PanelState state;
-            state.name = "Story";
-            state.visible = storyGraph->isVisible();
-            layout.panels.push_back(state);
-        }
-
-        auto* inspector = m_editor->getInspectorPanel();
-        if (inspector)
-        {
-            PanelState state;
-            state.name = "Inspector";
-            state.visible = inspector->isVisible();
-            layout.panels.push_back(state);
-        }
-
-        auto* assets = m_editor->getAssetBrowser();
-        if (assets)
-        {
-            PanelState state;
-            state.name = "Assets";
-            state.visible = assets->isVisible();
-            layout.panels.push_back(state);
-        }
-    }
+    // TODO: Implement panel state capture when EditorApp interface is defined
+    // For now, return empty layout as this functionality requires a complete
+    // EditorApp class definition which is pending the Qt6 GUI refactoring
+    (void)m_editor;  // Suppress unused warning
 
     return layout;
 }
