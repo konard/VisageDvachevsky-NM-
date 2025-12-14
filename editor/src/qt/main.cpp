@@ -14,11 +14,13 @@
 
 #include "NovelMind/editor/qt/nm_main_window.hpp"
 #include "NovelMind/editor/qt/nm_style_manager.hpp"
+#include "NovelMind/editor/qt/nm_welcome_dialog.hpp"
 #include "NovelMind/core/logger.hpp"
 
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QCommandLineOption>
+#include <QSettings>
 #include <iostream>
 
 using namespace NovelMind;
@@ -127,13 +129,53 @@ int main(int argc, char* argv[])
 
     // Handle project opening
     QString projectPath;
+    bool skipWelcome = parser.isSet(noWelcomeOption);
+
     if (parser.isSet(openProjectOption))
     {
         projectPath = parser.value(openProjectOption);
+        skipWelcome = true;
     }
     else if (!parser.positionalArguments().isEmpty())
     {
         projectPath = parser.positionalArguments().first();
+        skipWelcome = true;
+    }
+
+    // Show welcome dialog if needed
+    if (!skipWelcome)
+    {
+        QSettings settings("NovelMind", "Editor");
+        bool skipWelcomeInFuture = settings.value("skipWelcomeScreen", false).toBool();
+
+        if (!skipWelcomeInFuture)
+        {
+            NMWelcomeDialog welcomeDialog;
+            if (welcomeDialog.exec() == QDialog::Accepted)
+            {
+                if (welcomeDialog.shouldCreateNewProject())
+                {
+                    core::Logger::instance().info("User requested new project with template: " +
+                        welcomeDialog.selectedTemplate().toStdString());
+                    // TODO: Open new project dialog
+                }
+                else if (!welcomeDialog.selectedProjectPath().isEmpty())
+                {
+                    projectPath = welcomeDialog.selectedProjectPath();
+                }
+
+                if (welcomeDialog.shouldSkipInFuture())
+                {
+                    settings.setValue("skipWelcomeScreen", true);
+                }
+            }
+            else
+            {
+                // User closed welcome dialog - exit application
+                core::Logger::instance().info("User closed welcome dialog");
+                return 0;
+            }
+        }
     }
 
     if (!projectPath.isEmpty())

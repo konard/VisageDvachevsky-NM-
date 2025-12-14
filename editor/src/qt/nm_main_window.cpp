@@ -1,6 +1,7 @@
 #include "NovelMind/editor/qt/nm_main_window.hpp"
 #include "NovelMind/editor/qt/nm_style_manager.hpp"
 #include "NovelMind/editor/qt/nm_dock_panel.hpp"
+#include "NovelMind/editor/qt/nm_undo_manager.hpp"
 #include "NovelMind/editor/qt/panels/nm_scene_view_panel.hpp"
 #include "NovelMind/editor/qt/panels/nm_story_graph_panel.hpp"
 #include "NovelMind/editor/qt/panels/nm_inspector_panel.hpp"
@@ -41,6 +42,9 @@ NMMainWindow::~NMMainWindow()
 bool NMMainWindow::initialize()
 {
     if (m_initialized) return true;
+
+    // Initialize undo/redo system
+    NMUndoManager::instance().initialize();
 
     setupMenuBar();
     setupToolBar();
@@ -299,9 +303,23 @@ void NMMainWindow::setupConnections()
     connect(m_actionSaveProject, &QAction::triggered, this, &NMMainWindow::saveProjectRequested);
     connect(m_actionExit, &QAction::triggered, this, &QMainWindow::close);
 
-    // Edit menu
-    connect(m_actionUndo, &QAction::triggered, this, &NMMainWindow::undoRequested);
-    connect(m_actionRedo, &QAction::triggered, this, &NMMainWindow::redoRequested);
+    // Edit menu - connect to undo manager
+    connect(m_actionUndo, &QAction::triggered, &NMUndoManager::instance(), &NMUndoManager::undo);
+    connect(m_actionRedo, &QAction::triggered, &NMUndoManager::instance(), &NMUndoManager::redo);
+
+    // Update undo/redo action states based on undo manager
+    connect(&NMUndoManager::instance(), &NMUndoManager::canUndoChanged, m_actionUndo, &QAction::setEnabled);
+    connect(&NMUndoManager::instance(), &NMUndoManager::canRedoChanged, m_actionRedo, &QAction::setEnabled);
+    connect(&NMUndoManager::instance(), &NMUndoManager::undoTextChanged, [this](const QString& text) {
+        m_actionUndo->setText(text.isEmpty() ? tr("&Undo") : tr("&Undo %1").arg(text));
+    });
+    connect(&NMUndoManager::instance(), &NMUndoManager::redoTextChanged, [this](const QString& text) {
+        m_actionRedo->setText(text.isEmpty() ? tr("&Redo") : tr("&Redo %1").arg(text));
+    });
+
+    // Initialize undo/redo states
+    m_actionUndo->setEnabled(NMUndoManager::instance().canUndo());
+    m_actionRedo->setEnabled(NMUndoManager::instance().canRedo());
 
     // View menu - panel toggles
     connect(m_actionToggleSceneView, &QAction::toggled, m_sceneViewPanel, &QDockWidget::setVisible);

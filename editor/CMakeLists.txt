@@ -51,6 +51,8 @@ add_library(novelmind_editor STATIC
     src/qt/nm_style_manager.cpp
     src/qt/nm_main_window.cpp
     src/qt/nm_dock_panel.cpp
+    src/qt/nm_welcome_dialog.cpp
+    src/qt/nm_undo_manager.cpp
     src/qt/panels/nm_scene_view_panel.cpp
     src/qt/panels/nm_story_graph_panel.cpp
     src/qt/panels/nm_inspector_panel.cpp
