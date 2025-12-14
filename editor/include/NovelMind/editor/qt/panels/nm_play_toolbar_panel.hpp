@@ -22,9 +22,9 @@ public:
     explicit NMPlayToolbarPanel(QWidget* parent = nullptr);
     ~NMPlayToolbarPanel() override = default;
 
-    void initialize() override;
-    void shutdown() override;
-    void onUpdate(float deltaTime) override;
+    void onInitialize() override;
+    void onShutdown() override;
+    void onUpdate(double deltaTime) override;
 
 private slots:
     void onPlayModeChanged(NMPlayModeController::PlayMode mode);

@@ -14,6 +14,8 @@
 #include <QObject>
 #include <QUndoStack>
 #include <QUndoCommand>
+#include <QVariant>
+#include <QPointF>
 #include <memory>
 
 namespace NovelMind::editor::qt {

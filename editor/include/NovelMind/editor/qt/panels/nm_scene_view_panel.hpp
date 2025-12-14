@@ -17,6 +17,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsItem>
 #include <QLabel>
+#include <QToolBar>
 
 namespace NovelMind::editor::qt {
 

@@ -11,8 +11,8 @@ NMPlayToolbarPanel::NMPlayToolbarPanel(QWidget* parent)
     setupUI();
 }
 
-void NMPlayToolbarPanel::initialize() {
-    NMDockPanel::initialize();
+void NMPlayToolbarPanel::onInitialize() {
+    NMDockPanel::onInitialize();
 
     auto& controller = NMPlayModeController::instance();
 
@@ -27,8 +27,8 @@ void NMPlayToolbarPanel::initialize() {
     updateButtonStates();
 }
 
-void NMPlayToolbarPanel::shutdown() {
-    NMDockPanel::shutdown();
+void NMPlayToolbarPanel::onShutdown() {
+    NMDockPanel::onShutdown();
 
     // Stop playback on shutdown
     if (m_currentMode != NMPlayModeController::Stopped) {
@@ -36,7 +36,7 @@ void NMPlayToolbarPanel::shutdown() {
     }
 }
 
-void NMPlayToolbarPanel::onUpdate(float deltaTime) {
+void NMPlayToolbarPanel::onUpdate(double deltaTime) {
     NMDockPanel::onUpdate(deltaTime);
     // Real-time updates if needed
 }

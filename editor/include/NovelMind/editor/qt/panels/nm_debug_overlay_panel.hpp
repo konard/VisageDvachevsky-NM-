@@ -38,9 +38,9 @@ public:
     explicit NMDebugOverlayPanel(QWidget* parent = nullptr);
     ~NMDebugOverlayPanel() override = default;
 
-    void initialize() override;
-    void shutdown() override;
-    void onUpdate(float deltaTime) override;
+    void onInitialize() override;
+    void onShutdown() override;
+    void onUpdate(double deltaTime) override;
 
     void setDisplayMode(DebugDisplayMode mode);
     DebugDisplayMode displayMode() const { return m_displayMode; }

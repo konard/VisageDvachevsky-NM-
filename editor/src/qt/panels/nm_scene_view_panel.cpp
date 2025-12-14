@@ -320,21 +320,8 @@ void NMSceneGraphicsScene::addSceneObject(NMSceneObject* object)
     m_sceneObjects.append(object);
     addItem(object);
 
-    // Connect signals for position tracking
-    connect(object, &QGraphicsItem::xChanged, this, [this, object]() {
-        if (object == m_selectedObject)
-        {
-            updateGizmo();
-            emit objectPositionChanged(object->id(), object->pos());
-        }
-    });
-    connect(object, &QGraphicsItem::yChanged, this, [this, object]() {
-        if (object == m_selectedObject)
-        {
-            updateGizmo();
-            emit objectPositionChanged(object->id(), object->pos());
-        }
-    });
+    // Note: Position tracking should be implemented through NMSceneObject::itemChange()
+    // or via a custom signal/slot mechanism in NMSceneObject if it inherits from QObject
 }
 
 void NMSceneGraphicsScene::removeSceneObject(const QString& objectId)
@@ -792,15 +779,15 @@ void NMSceneViewPanel::setupToolBar()
     auto& iconMgr = NMIconManager::instance();
 
     // Zoom controls
-    QAction* actionZoomIn = m_toolBar->addAction(iconMgr.icon("zoom-in"), tr("Zoom In"));
+    QAction* actionZoomIn = m_toolBar->addAction(iconMgr.getIcon("zoom-in"), tr("Zoom In"));
     actionZoomIn->setToolTip(tr("Zoom In (Scroll Up)"));
     connect(actionZoomIn, &QAction::triggered, this, &NMSceneViewPanel::onZoomIn);
 
-    QAction* actionZoomOut = m_toolBar->addAction(iconMgr.icon("zoom-out"), tr("Zoom Out"));
+    QAction* actionZoomOut = m_toolBar->addAction(iconMgr.getIcon("zoom-out"), tr("Zoom Out"));
     actionZoomOut->setToolTip(tr("Zoom Out (Scroll Down)"));
     connect(actionZoomOut, &QAction::triggered, this, &NMSceneViewPanel::onZoomOut);
 
-    QAction* actionZoomReset = m_toolBar->addAction(iconMgr.icon("zoom-fit"), tr("Reset"));
+    QAction* actionZoomReset = m_toolBar->addAction(iconMgr.getIcon("zoom-fit"), tr("Reset"));
     actionZoomReset->setToolTip(tr("Reset Zoom (1:1)"));
     connect(actionZoomReset, &QAction::triggered, this, &NMSceneViewPanel::onZoomReset);
 

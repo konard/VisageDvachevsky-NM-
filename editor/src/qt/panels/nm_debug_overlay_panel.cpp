@@ -18,8 +18,8 @@ NMDebugOverlayPanel::NMDebugOverlayPanel(QWidget* parent)
     setupUI();
 }
 
-void NMDebugOverlayPanel::initialize() {
-    NMDockPanel::initialize();
+void NMDebugOverlayPanel::onInitialize() {
+    NMDockPanel::onInitialize();
 
     auto& controller = NMPlayModeController::instance();
 
@@ -34,11 +34,11 @@ void NMDebugOverlayPanel::initialize() {
     updateCallStackTab(controller.callStack());
 }
 
-void NMDebugOverlayPanel::shutdown() {
-    NMDockPanel::shutdown();
+void NMDebugOverlayPanel::onShutdown() {
+    NMDockPanel::onShutdown();
 }
 
-void NMDebugOverlayPanel::onUpdate(float deltaTime) {
+void NMDebugOverlayPanel::onUpdate(double deltaTime) {
     NMDockPanel::onUpdate(deltaTime);
 }
 
