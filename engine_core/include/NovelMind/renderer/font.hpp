@@ -1,34 +1,32 @@
 #pragma once
 
-#include "NovelMind/core/types.hpp"
 #include "NovelMind/core/result.hpp"
-#include <vector>
+#include "NovelMind/core/types.hpp"
 #include <string>
+#include <vector>
 
-namespace NovelMind::renderer
-{
+namespace NovelMind::renderer {
 
-class Font
-{
+class Font {
 public:
-    Font();
-    ~Font();
+  Font();
+  ~Font();
 
-    Font(const Font&) = delete;
-    Font& operator=(const Font&) = delete;
-    Font(Font&& other) noexcept;
-    Font& operator=(Font&& other) noexcept;
+  Font(const Font &) = delete;
+  Font &operator=(const Font &) = delete;
+  Font(Font &&other) noexcept;
+  Font &operator=(Font &&other) noexcept;
 
-    Result<void> loadFromMemory(const std::vector<u8>& data, i32 size);
-    void destroy();
+  Result<void> loadFromMemory(const std::vector<u8> &data, i32 size);
+  void destroy();
 
-    [[nodiscard]] bool isValid() const;
-    [[nodiscard]] i32 getSize() const;
-    [[nodiscard]] void* getNativeHandle() const;
+  [[nodiscard]] bool isValid() const;
+  [[nodiscard]] i32 getSize() const;
+  [[nodiscard]] void *getNativeHandle() const;
 
 private:
-    void* m_handle;
-    i32 m_size;
+  void *m_handle;
+  i32 m_size;
 };
 
 } // namespace NovelMind::renderer

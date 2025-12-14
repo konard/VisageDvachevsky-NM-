@@ -1,122 +1,78 @@
 #pragma once
 
-#include <string>
 #include <optional>
+#include <string>
 #include <utility>
 
-namespace NovelMind
-{
+namespace NovelMind {
 
-template<typename T, typename E = std::string>
-class Result
-{
+template <typename T, typename E = std::string> class Result {
 public:
-    static Result ok(T value)
-    {
-        Result r;
-        r.m_value = std::move(value);
-        r.m_hasValue = true;
-        return r;
-    }
+  static Result ok(T value) {
+    Result r;
+    r.m_value = std::move(value);
+    r.m_hasValue = true;
+    return r;
+  }
 
-    static Result error(E err)
-    {
-        Result r;
-        r.m_error = std::move(err);
-        r.m_hasValue = false;
-        return r;
-    }
+  static Result error(E err) {
+    Result r;
+    r.m_error = std::move(err);
+    r.m_hasValue = false;
+    return r;
+  }
 
-    [[nodiscard]] bool isOk() const
-    {
-        return m_hasValue;
-    }
+  [[nodiscard]] bool isOk() const { return m_hasValue; }
 
-    [[nodiscard]] bool isError() const
-    {
-        return !m_hasValue;
-    }
+  [[nodiscard]] bool isError() const { return !m_hasValue; }
 
-    [[nodiscard]] T& value() &
-    {
-        return m_value.value();
-    }
+  [[nodiscard]] T &value() & { return m_value.value(); }
 
-    [[nodiscard]] const T& value() const&
-    {
-        return m_value.value();
-    }
+  [[nodiscard]] const T &value() const & { return m_value.value(); }
 
-    [[nodiscard]] T&& value() &&
-    {
-        return std::move(m_value.value());
-    }
+  [[nodiscard]] T &&value() && { return std::move(m_value.value()); }
 
-    [[nodiscard]] E& error() &
-    {
-        return m_error.value();
-    }
+  [[nodiscard]] E &error() & { return m_error.value(); }
 
-    [[nodiscard]] const E& error() const&
-    {
-        return m_error.value();
-    }
+  [[nodiscard]] const E &error() const & { return m_error.value(); }
 
-    [[nodiscard]] T valueOr(T defaultValue) const
-    {
-        if (m_hasValue)
-        {
-            return m_value.value();
-        }
-        return defaultValue;
+  [[nodiscard]] T valueOr(T defaultValue) const {
+    if (m_hasValue) {
+      return m_value.value();
     }
+    return defaultValue;
+  }
 
 private:
-    std::optional<T> m_value;
-    std::optional<E> m_error;
-    bool m_hasValue = false;
+  std::optional<T> m_value;
+  std::optional<E> m_error;
+  bool m_hasValue = false;
 };
 
-template<typename E>
-class Result<void, E>
-{
+template <typename E> class Result<void, E> {
 public:
-    static Result ok()
-    {
-        Result r;
-        r.m_error = std::nullopt;
-        return r;
-    }
+  static Result ok() {
+    Result r;
+    r.m_error = std::nullopt;
+    return r;
+  }
 
-    static Result error(E err)
-    {
-        Result r;
-        r.m_error = std::move(err);
-        return r;
-    }
+  static Result error(E err) {
+    Result r;
+    r.m_error = std::move(err);
+    return r;
+  }
 
-    [[nodiscard]] bool isOk() const
-    {
-        return !m_error.has_value();
-    }
+  [[nodiscard]] bool isOk() const { return !m_error.has_value(); }
 
-    [[nodiscard]] bool isError() const
-    {
-        return m_error.has_value();
-    }
+  [[nodiscard]] bool isError() const { return m_error.has_value(); }
 
-    [[nodiscard]] E& error() &
-    {
-        return m_error.value();
-    }
+  [[nodiscard]] E &error() & { return m_error.value(); }
 
-    [[nodiscard]] const E& error() const&
-    {
-        return m_error.value();
-    }
+  [[nodiscard]] const E &error() const & { return m_error.value(); }
 
 private:
-    std::optional<E> m_error;
+  std::optional<E> m_error;
 };
 
 } // namespace NovelMind

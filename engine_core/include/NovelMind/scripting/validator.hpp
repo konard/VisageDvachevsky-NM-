@@ -16,43 +16,34 @@
 #include "NovelMind/core/types.hpp"
 #include "NovelMind/scripting/ast.hpp"
 #include "NovelMind/scripting/script_error.hpp"
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include <string>
 #include <vector>
 
-namespace NovelMind::scripting
-{
+namespace NovelMind::scripting {
 
 /**
  * @brief Symbol information for tracking definitions and usages
  */
-struct SymbolInfo
-{
-    std::string name;
-    SourceLocation definitionLocation;
-    std::vector<SourceLocation> usageLocations;
-    bool isDefined = false;
-    bool isUsed = false;
+struct SymbolInfo {
+  std::string name;
+  SourceLocation definitionLocation;
+  std::vector<SourceLocation> usageLocations;
+  bool isDefined = false;
+  bool isUsed = false;
 };
 
 /**
  * @brief Result of validation analysis
  */
-struct ValidationResult
-{
-    ErrorList errors;
-    bool isValid;
+struct ValidationResult {
+  ErrorList errors;
+  bool isValid;
 
-    [[nodiscard]] bool hasErrors() const
-    {
-        return errors.hasErrors();
-    }
+  [[nodiscard]] bool hasErrors() const { return errors.hasErrors(); }
 
-    [[nodiscard]] bool hasWarnings() const
-    {
-        return errors.hasWarnings();
-    }
+  [[nodiscard]] bool hasWarnings() const { return errors.hasWarnings(); }
 };
 
 /**
@@ -75,107 +66,106 @@ struct ValidationResult
  * }
  * @endcode
  */
-class Validator
-{
+class Validator {
 public:
-    Validator();
-    ~Validator();
+  Validator();
+  ~Validator();
 
-    /**
-     * @brief Validate a parsed AST program
-     * @param program The program to validate
-     * @return ValidationResult containing all errors and warnings
-     */
-    [[nodiscard]] ValidationResult validate(const Program& program);
+  /**
+   * @brief Validate a parsed AST program
+   * @param program The program to validate
+   * @return ValidationResult containing all errors and warnings
+   */
+  [[nodiscard]] ValidationResult validate(const Program &program);
 
-    /**
-     * @brief Configure whether to report unused symbols as warnings
-     */
-    void setReportUnused(bool report);
+  /**
+   * @brief Configure whether to report unused symbols as warnings
+   */
+  void setReportUnused(bool report);
 
-    /**
-     * @brief Configure whether to report dead code as warnings
-     */
-    void setReportDeadCode(bool report);
+  /**
+   * @brief Configure whether to report dead code as warnings
+   */
+  void setReportDeadCode(bool report);
 
 private:
-    // Reset state for new validation
-    void reset();
+  // Reset state for new validation
+  void reset();
 
-    // First pass: collect all definitions
-    void collectDefinitions(const Program& program);
-    void collectCharacterDefinition(const CharacterDecl& decl);
-    void collectSceneDefinition(const SceneDecl& decl);
+  // First pass: collect all definitions
+  void collectDefinitions(const Program &program);
+  void collectCharacterDefinition(const CharacterDecl &decl);
+  void collectSceneDefinition(const SceneDecl &decl);
 
-    // Second pass: validate references and usage
-    void validateProgram(const Program& program);
-    void validateScene(const SceneDecl& decl);
-    void validateStatement(const Statement& stmt, bool& reachable);
-    void validateExpression(const Expression& expr);
+  // Second pass: validate references and usage
+  void validateProgram(const Program &program);
+  void validateScene(const SceneDecl &decl);
+  void validateStatement(const Statement &stmt, bool &reachable);
+  void validateExpression(const Expression &expr);
 
-    // Statement validators
-    void validateShowStmt(const ShowStmt& stmt);
-    void validateHideStmt(const HideStmt& stmt);
-    void validateSayStmt(const SayStmt& stmt);
-    void validateChoiceStmt(const ChoiceStmt& stmt, bool& reachable);
-    void validateIfStmt(const IfStmt& stmt, bool& reachable);
-    void validateGotoStmt(const GotoStmt& stmt, bool& reachable);
-    void validateWaitStmt(const WaitStmt& stmt);
-    void validatePlayStmt(const PlayStmt& stmt);
-    void validateStopStmt(const StopStmt& stmt);
-    void validateSetStmt(const SetStmt& stmt);
-    void validateTransitionStmt(const TransitionStmt& stmt);
-    void validateBlockStmt(const BlockStmt& stmt, bool& reachable);
+  // Statement validators
+  void validateShowStmt(const ShowStmt &stmt);
+  void validateHideStmt(const HideStmt &stmt);
+  void validateSayStmt(const SayStmt &stmt);
+  void validateChoiceStmt(const ChoiceStmt &stmt, bool &reachable);
+  void validateIfStmt(const IfStmt &stmt, bool &reachable);
+  void validateGotoStmt(const GotoStmt &stmt, bool &reachable);
+  void validateWaitStmt(const WaitStmt &stmt);
+  void validatePlayStmt(const PlayStmt &stmt);
+  void validateStopStmt(const StopStmt &stmt);
+  void validateSetStmt(const SetStmt &stmt);
+  void validateTransitionStmt(const TransitionStmt &stmt);
+  void validateBlockStmt(const BlockStmt &stmt, bool &reachable);
 
-    // Expression validators
-    void validateLiteral(const LiteralExpr& expr);
-    void validateIdentifier(const IdentifierExpr& expr, SourceLocation loc);
-    void validateBinary(const BinaryExpr& expr);
-    void validateUnary(const UnaryExpr& expr);
-    void validateCall(const CallExpr& expr, SourceLocation loc);
-    void validateProperty(const PropertyExpr& expr);
+  // Expression validators
+  void validateLiteral(const LiteralExpr &expr);
+  void validateIdentifier(const IdentifierExpr &expr, SourceLocation loc);
+  void validateBinary(const BinaryExpr &expr);
+  void validateUnary(const UnaryExpr &expr);
+  void validateCall(const CallExpr &expr, SourceLocation loc);
+  void validateProperty(const PropertyExpr &expr);
 
-    // Control flow analysis
-    void analyzeControlFlow(const Program& program);
-    void findReachableScenes(const std::string& startScene,
-                            std::unordered_set<std::string>& visited);
+  // Control flow analysis
+  void analyzeControlFlow(const Program &program);
+  void findReachableScenes(const std::string &startScene,
+                           std::unordered_set<std::string> &visited);
 
-    // Unused symbol detection
-    void reportUnusedSymbols();
+  // Unused symbol detection
+  void reportUnusedSymbols();
 
-    // Helper methods
-    void markCharacterUsed(const std::string& name, SourceLocation loc);
-    void markSceneUsed(const std::string& name, SourceLocation loc);
-    void markVariableUsed(const std::string& name, SourceLocation loc);
-    void markVariableDefined(const std::string& name, SourceLocation loc);
+  // Helper methods
+  void markCharacterUsed(const std::string &name, SourceLocation loc);
+  void markSceneUsed(const std::string &name, SourceLocation loc);
+  void markVariableUsed(const std::string &name, SourceLocation loc);
+  void markVariableDefined(const std::string &name, SourceLocation loc);
 
-    bool isCharacterDefined(const std::string& name) const;
-    bool isSceneDefined(const std::string& name) const;
-    bool isVariableDefined(const std::string& name) const;
+  bool isCharacterDefined(const std::string &name) const;
+  bool isSceneDefined(const std::string &name) const;
+  bool isVariableDefined(const std::string &name) const;
 
-    // Error reporting
-    void error(ErrorCode code, const std::string& message, SourceLocation loc);
-    void warning(ErrorCode code, const std::string& message, SourceLocation loc);
-    void info(ErrorCode code, const std::string& message, SourceLocation loc);
+  // Error reporting
+  void error(ErrorCode code, const std::string &message, SourceLocation loc);
+  void warning(ErrorCode code, const std::string &message, SourceLocation loc);
+  void info(ErrorCode code, const std::string &message, SourceLocation loc);
 
-    // Symbol tables
-    std::unordered_map<std::string, SymbolInfo> m_characters;
-    std::unordered_map<std::string, SymbolInfo> m_scenes;
-    std::unordered_map<std::string, SymbolInfo> m_variables;
+  // Symbol tables
+  std::unordered_map<std::string, SymbolInfo> m_characters;
+  std::unordered_map<std::string, SymbolInfo> m_scenes;
+  std::unordered_map<std::string, SymbolInfo> m_variables;
 
-    // Scene control flow graph (scene -> scenes it can goto)
-    std::unordered_map<std::string, std::unordered_set<std::string>> m_sceneGraph;
+  // Scene control flow graph (scene -> scenes it can goto)
+  std::unordered_map<std::string, std::unordered_set<std::string>> m_sceneGraph;
 
-    // Current context
-    std::string m_currentScene;
-    SourceLocation m_currentLocation;
+  // Current context
+  std::string m_currentScene;
+  SourceLocation m_currentLocation;
 
-    // Configuration
-    bool m_reportUnused = true;
-    bool m_reportDeadCode = true;
+  // Configuration
+  bool m_reportUnused = true;
+  bool m_reportDeadCode = true;
 
-    // Results
-    ErrorList m_errors;
+  // Results
+  ErrorList m_errors;
 };
 
 } // namespace NovelMind::scripting

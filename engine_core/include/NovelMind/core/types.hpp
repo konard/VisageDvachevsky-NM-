@@ -1,14 +1,13 @@
 #pragma once
 
-#include <cstdint>
 #include <cstddef>
-#include <string>
-#include <optional>
-#include <variant>
+#include <cstdint>
 #include <memory>
+#include <optional>
+#include <string>
+#include <variant>
 
-namespace NovelMind
-{
+namespace NovelMind {
 
 using i8 = std::int8_t;
 using i16 = std::int16_t;

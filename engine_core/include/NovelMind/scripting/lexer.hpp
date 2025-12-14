@@ -8,30 +8,26 @@
  * source code into a stream of tokens for parsing.
  */
 
-#include "NovelMind/core/types.hpp"
 #include "NovelMind/core/result.hpp"
+#include "NovelMind/core/types.hpp"
 #include "NovelMind/scripting/token.hpp"
 #include <string>
 #include <string_view>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
-namespace NovelMind::scripting
-{
+namespace NovelMind::scripting {
 
 /**
  * @brief Lexer error information
  */
-struct LexerError
-{
-    std::string message;
-    SourceLocation location;
+struct LexerError {
+  std::string message;
+  SourceLocation location;
 
-    LexerError() = default;
-    LexerError(std::string msg, SourceLocation loc)
-        : message(std::move(msg))
-        , location(loc)
-    {}
+  LexerError() = default;
+  LexerError(std::string msg, SourceLocation loc)
+      : message(std::move(msg)), location(loc) {}
 };
 
 /**
@@ -52,63 +48,62 @@ struct LexerError
  * }
  * @endcode
  */
-class Lexer
-{
+class Lexer {
 public:
-    Lexer();
-    ~Lexer();
+  Lexer();
+  ~Lexer();
 
-    /**
-     * @brief Tokenize source code into a vector of tokens
-     * @param source The source code string to tokenize
-     * @return Result containing tokens or an error
-     */
-    [[nodiscard]] Result<std::vector<Token>> tokenize(std::string_view source);
+  /**
+   * @brief Tokenize source code into a vector of tokens
+   * @param source The source code string to tokenize
+   * @return Result containing tokens or an error
+   */
+  [[nodiscard]] Result<std::vector<Token>> tokenize(std::string_view source);
 
-    /**
-     * @brief Reset lexer state for reuse
-     */
-    void reset();
+  /**
+   * @brief Reset lexer state for reuse
+   */
+  void reset();
 
-    /**
-     * @brief Get all errors encountered during tokenization
-     */
-    [[nodiscard]] const std::vector<LexerError>& getErrors() const;
+  /**
+   * @brief Get all errors encountered during tokenization
+   */
+  [[nodiscard]] const std::vector<LexerError> &getErrors() const;
 
 private:
-    void initKeywords();
+  void initKeywords();
 
-    [[nodiscard]] bool isAtEnd() const;
-    [[nodiscard]] char peek() const;
-    [[nodiscard]] char peekNext() const;
-    char advance();
-    bool match(char expected);
+  [[nodiscard]] bool isAtEnd() const;
+  [[nodiscard]] char peek() const;
+  [[nodiscard]] char peekNext() const;
+  char advance();
+  bool match(char expected);
 
-    void skipWhitespace();
-    void skipLineComment();
-    void skipBlockComment();
+  void skipWhitespace();
+  void skipLineComment();
+  void skipBlockComment();
 
-    Token scanToken();
-    Token makeToken(TokenType type);
-    Token makeToken(TokenType type, const std::string& lexeme);
-    Token errorToken(const std::string& message);
+  Token scanToken();
+  Token makeToken(TokenType type);
+  Token makeToken(TokenType type, const std::string &lexeme);
+  Token errorToken(const std::string &message);
 
-    Token scanString();
-    Token scanNumber();
-    Token scanIdentifier();
-    Token scanColorLiteral();
+  Token scanString();
+  Token scanNumber();
+  Token scanIdentifier();
+  Token scanColorLiteral();
 
-    [[nodiscard]] TokenType identifierType(const std::string& lexeme) const;
+  [[nodiscard]] TokenType identifierType(const std::string &lexeme) const;
 
-    std::string_view m_source;
-    size_t m_start;
-    size_t m_current;
-    u32 m_line;
-    u32 m_column;
-    u32 m_startColumn;
+  std::string_view m_source;
+  size_t m_start;
+  size_t m_current;
+  u32 m_line;
+  u32 m_column;
+  u32 m_startColumn;
 
-    std::vector<LexerError> m_errors;
-    std::unordered_map<std::string, TokenType> m_keywords;
+  std::vector<LexerError> m_errors;
+  std::unordered_map<std::string, TokenType> m_keywords;
 };
 
 } // namespace NovelMind::scripting
