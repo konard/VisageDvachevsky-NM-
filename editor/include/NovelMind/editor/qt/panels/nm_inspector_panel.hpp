@@ -12,8 +12,8 @@
  */
 
 #include "NovelMind/editor/qt/nm_dock_panel.hpp"
-#include <QScrollArea>
 #include <QLabel>
+#include <QScrollArea>
 #include <QVBoxLayout>
 
 namespace NovelMind::editor::qt {
@@ -21,115 +21,118 @@ namespace NovelMind::editor::qt {
 /**
  * @brief Property editor widget types
  */
-enum class NMPropertyType
-{
-    String,
-    Integer,
-    Float,
-    Boolean,
-    Color,
-    Enum,
-    Asset
+enum class NMPropertyType {
+  String,
+  Integer,
+  Float,
+  Boolean,
+  Color,
+  Enum,
+  Asset
 };
 
 /**
  * @brief A collapsible group box for property categories
  */
-class NMPropertyGroup : public QWidget
-{
-    Q_OBJECT
+class NMPropertyGroup : public QWidget {
+  Q_OBJECT
 
 public:
-    explicit NMPropertyGroup(const QString& title, QWidget* parent = nullptr);
+  explicit NMPropertyGroup(const QString &title, QWidget *parent = nullptr);
 
-    void setExpanded(bool expanded);
-    [[nodiscard]] bool isExpanded() const { return m_expanded; }
+  void setExpanded(bool expanded);
+  [[nodiscard]] bool isExpanded() const { return m_expanded; }
 
-    void addProperty(const QString& name, const QString& value);
-    void addProperty(const QString& name, QWidget* widget);
+  void addProperty(const QString &name, const QString &value);
+  void addProperty(const QString &name, QWidget *widget);
 
-    /**
-     * @brief Add an editable property
-     */
-    void addEditableProperty(const QString& name, NMPropertyType type, const QString& currentValue, const QStringList& enumValues = {});
+  /**
+   * @brief Add an editable property
+   */
+  void addEditableProperty(const QString &name, NMPropertyType type,
+                           const QString &currentValue,
+                           const QStringList &enumValues = {});
 
-    void clearProperties();
+  void clearProperties();
 
 signals:
-    void propertyValueChanged(const QString& propertyName, const QString& newValue);
+  void propertyValueChanged(const QString &propertyName,
+                            const QString &newValue);
 
 private slots:
-    void onHeaderClicked();
-    void onPropertyEdited();
+  void onHeaderClicked();
+  void onPropertyEdited();
 
 private:
-    QWidget* m_header = nullptr;
-    QWidget* m_content = nullptr;
-    QVBoxLayout* m_contentLayout = nullptr;
-    QLabel* m_expandIcon = nullptr;
-    bool m_expanded = true;
+  QWidget *m_header = nullptr;
+  QWidget *m_content = nullptr;
+  QVBoxLayout *m_contentLayout = nullptr;
+  QLabel *m_expandIcon = nullptr;
+  bool m_expanded = true;
 };
 
 /**
  * @brief Inspector panel for property editing
  */
-class NMInspectorPanel : public NMDockPanel
-{
-    Q_OBJECT
+class NMInspectorPanel : public NMDockPanel {
+  Q_OBJECT
 
 public:
-    explicit NMInspectorPanel(QWidget* parent = nullptr);
-    ~NMInspectorPanel() override;
+  explicit NMInspectorPanel(QWidget *parent = nullptr);
+  ~NMInspectorPanel() override;
 
-    void onInitialize() override;
-    void onUpdate(double deltaTime) override;
+  void onInitialize() override;
+  void onUpdate(double deltaTime) override;
 
-    /**
-     * @brief Clear all properties
-     */
-    void clear();
+  /**
+   * @brief Clear all properties
+   */
+  void clear();
 
-    /**
-     * @brief Show properties for an object
-     * @param objectType Type of the object (for header display)
-     * @param objectId ID of the object
-     * @param editable Whether properties should be editable
-     */
-    void inspectObject(const QString& objectType, const QString& objectId, bool editable = true);
+  /**
+   * @brief Show properties for an object
+   * @param objectType Type of the object (for header display)
+   * @param objectId ID of the object
+   * @param editable Whether properties should be editable
+   */
+  void inspectObject(const QString &objectType, const QString &objectId,
+                     bool editable = true);
 
-    /**
-     * @brief Add a property group
-     */
-    NMPropertyGroup* addGroup(const QString& title);
+  /**
+   * @brief Add a property group
+   */
+  NMPropertyGroup *addGroup(const QString &title);
 
-    /**
-     * @brief Show "nothing selected" message
-     */
-    void showNoSelection();
+  /**
+   * @brief Show "nothing selected" message
+   */
+  void showNoSelection();
 
-    /**
-     * @brief Enable or disable edit mode
-     */
-    void setEditMode(bool enabled) { m_editMode = enabled; }
-    [[nodiscard]] bool editMode() const { return m_editMode; }
+  /**
+   * @brief Enable or disable edit mode
+   */
+  void setEditMode(bool enabled) { m_editMode = enabled; }
+  [[nodiscard]] bool editMode() const { return m_editMode; }
 
 signals:
-    void propertyChanged(const QString& objectId, const QString& propertyName, const QString& newValue);
+  void propertyChanged(const QString &objectId, const QString &propertyName,
+                       const QString &newValue);
 
 private slots:
-    void onGroupPropertyChanged(const QString& propertyName, const QString& newValue);
+  void onGroupPropertyChanged(const QString &propertyName,
+                              const QString &newValue);
 
 private:
-    void setupContent();
+  void setupContent();
 
-    QScrollArea* m_scrollArea = nullptr;
-    QWidget* m_scrollContent = nullptr;
-    QVBoxLayout* m_mainLayout = nullptr;
-    QLabel* m_headerLabel = nullptr;
-    QLabel* m_noSelectionLabel = nullptr;
-    QList<NMPropertyGroup*> m_groups;
-    QString m_currentObjectId;
-    bool m_editMode = true;
+  QScrollArea *m_scrollArea = nullptr;
+  QWidget *m_scrollContent = nullptr;
+  QVBoxLayout *m_mainLayout = nullptr;
+  QLabel *m_headerLabel = nullptr;
+  QLabel *m_noSelectionLabel = nullptr;
+  QList<NMPropertyGroup *> m_groups;
+  QString m_currentObjectId;
+  bool m_editMode = true;
 };
 
 } // namespace NovelMind::editor::qt

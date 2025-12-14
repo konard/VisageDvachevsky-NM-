@@ -3,9 +3,9 @@
 
 #include <NovelMind/editor/qt/nm_dock_panel.hpp>
 #include <NovelMind/editor/qt/nm_play_mode_controller.hpp>
-#include <QPushButton>
-#include <QLabel>
 #include <QHBoxLayout>
+#include <QLabel>
+#include <QPushButton>
 
 namespace NovelMind::editor::qt {
 
@@ -16,36 +16,36 @@ namespace NovelMind::editor::qt {
  * Typically docked in the main toolbar or as a floating panel.
  */
 class NMPlayToolbarPanel : public NMDockPanel {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    explicit NMPlayToolbarPanel(QWidget* parent = nullptr);
-    ~NMPlayToolbarPanel() override = default;
+  explicit NMPlayToolbarPanel(QWidget *parent = nullptr);
+  ~NMPlayToolbarPanel() override = default;
 
-    void onInitialize() override;
-    void onShutdown() override;
-    void onUpdate(double deltaTime) override;
+  void onInitialize() override;
+  void onShutdown() override;
+  void onUpdate(double deltaTime) override;
 
 private slots:
-    void onPlayModeChanged(NMPlayModeController::PlayMode mode);
-    void onCurrentNodeChanged(const QString& nodeId);
-    void onBreakpointHit(const QString& nodeId);
+  void onPlayModeChanged(NMPlayModeController::PlayMode mode);
+  void onCurrentNodeChanged(const QString &nodeId);
+  void onBreakpointHit(const QString &nodeId);
 
 private:
-    void setupUI();
-    void updateButtonStates();
-    void updateStatusLabel();
+  void setupUI();
+  void updateButtonStates();
+  void updateStatusLabel();
 
-    // UI Elements
-    QPushButton* m_playButton = nullptr;
-    QPushButton* m_pauseButton = nullptr;
-    QPushButton* m_stopButton = nullptr;
-    QPushButton* m_stepButton = nullptr;
-    QLabel* m_statusLabel = nullptr;
+  // UI Elements
+  QPushButton *m_playButton = nullptr;
+  QPushButton *m_pauseButton = nullptr;
+  QPushButton *m_stopButton = nullptr;
+  QPushButton *m_stepButton = nullptr;
+  QLabel *m_statusLabel = nullptr;
 
-    // State
-    NMPlayModeController::PlayMode m_currentMode = NMPlayModeController::Stopped;
-    QString m_currentNodeId;
+  // State
+  NMPlayModeController::PlayMode m_currentMode = NMPlayModeController::Stopped;
+  QString m_currentNodeId;
 };
 
 } // namespace NovelMind::editor::qt

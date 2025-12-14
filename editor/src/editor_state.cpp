@@ -360,7 +360,8 @@ void EditorStateManager::addRecentProject(const std::string &path) {
   // Trim to max
   if (m_state.recentProjects.size() >
       static_cast<size_t>(m_state.preferences.maxRecentProjects)) {
-    m_state.recentProjects.resize(static_cast<size_t>(m_state.preferences.maxRecentProjects));
+    m_state.recentProjects.resize(
+        static_cast<size_t>(m_state.preferences.maxRecentProjects));
   }
 
   m_dirty = true;

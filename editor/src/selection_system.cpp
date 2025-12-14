@@ -56,13 +56,13 @@ std::vector<std::string> SceneObjectSelection::getPropertyNames() const {
 }
 
 std::string
-SceneObjectSelection::getPropertyValue(const std::string &/*name*/) const {
+SceneObjectSelection::getPropertyValue(const std::string & /*name*/) const {
   // This would fetch from the actual scene object
   return "";
 }
 
-void SceneObjectSelection::setPropertyValue(const std::string &/*name*/,
-                                            const std::string &/*value*/) {
+void SceneObjectSelection::setPropertyValue(const std::string & /*name*/,
+                                            const std::string & /*value*/) {
   // This would set on the actual scene object
 }
 
@@ -168,13 +168,13 @@ std::vector<std::string> TimelineItemSelection::getPropertyNames() const {
 }
 
 std::string
-TimelineItemSelection::getPropertyValue(const std::string &/*name*/) const {
+TimelineItemSelection::getPropertyValue(const std::string & /*name*/) const {
   // This would fetch from the actual timeline system
   return "";
 }
 
-void TimelineItemSelection::setPropertyValue(const std::string &/*name*/,
-                                             const std::string &/*value*/) {
+void TimelineItemSelection::setPropertyValue(const std::string & /*name*/,
+                                             const std::string & /*value*/) {
   // This would set on the actual timeline system
 }
 

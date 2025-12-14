@@ -7,8 +7,8 @@
 
 #include "NovelMind/editor/qt/nm_dock_panel.hpp"
 
-#include <QWidget>
 #include <QToolBar>
+#include <QWidget>
 
 class QTreeWidget;
 class QToolBar;
@@ -16,23 +16,22 @@ class QPushButton;
 
 namespace NovelMind::editor::qt {
 
-class NMDiagnosticsPanel : public NMDockPanel
-{
-    Q_OBJECT
+class NMDiagnosticsPanel : public NMDockPanel {
+  Q_OBJECT
 
 public:
-    explicit NMDiagnosticsPanel(QWidget* parent = nullptr);
-    ~NMDiagnosticsPanel() override;
+  explicit NMDiagnosticsPanel(QWidget *parent = nullptr);
+  ~NMDiagnosticsPanel() override;
 
-    void onInitialize() override;
-    void onShutdown() override;
-    void onUpdate(double deltaTime) override;
+  void onInitialize() override;
+  void onShutdown() override;
+  void onUpdate(double deltaTime) override;
 
 private:
-    void setupUI();
+  void setupUI();
 
-    QTreeWidget* m_diagnosticsTree = nullptr;
-    QToolBar* m_toolbar = nullptr;
+  QTreeWidget *m_diagnosticsTree = nullptr;
+  QToolBar *m_toolbar = nullptr;
 };
 
 } // namespace NovelMind::editor::qt

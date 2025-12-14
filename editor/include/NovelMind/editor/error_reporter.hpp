@@ -142,11 +142,11 @@ class IDiagnosticListener {
 public:
   virtual ~IDiagnosticListener() = default;
 
-  virtual void onDiagnosticAdded(const Diagnostic &/*diagnostic*/) {}
+  virtual void onDiagnosticAdded(const Diagnostic & /*diagnostic*/) {}
   virtual void onDiagnosticRemoved(u64 /*id*/) {}
   virtual void onDiagnosticsCleared(DiagnosticCategory /*category*/) {}
   virtual void onAllDiagnosticsCleared() {}
-  virtual void onSummaryChanged(const DiagnosticSummary &/*summary*/) {}
+  virtual void onSummaryChanged(const DiagnosticSummary & /*summary*/) {}
 };
 
 /**

@@ -3,143 +3,130 @@
 
 namespace NovelMind::editor::qt {
 
-QtSelectionManager& QtSelectionManager::instance()
-{
-    static QtSelectionManager instance;
-    return instance;
+QtSelectionManager &QtSelectionManager::instance() {
+  static QtSelectionManager instance;
+  return instance;
 }
 
-QtSelectionManager::QtSelectionManager()
-    : QObject(nullptr)
-{
+QtSelectionManager::QtSelectionManager() : QObject(nullptr) {}
+
+void QtSelectionManager::select(const QString &id, SelectionType type) {
+  if (m_selectedIds.size() == 1 && m_selectedIds.first() == id &&
+      m_currentType == type) {
+    return; // Already selected
+  }
+
+  m_selectedIds.clear();
+  m_selectedIds.append(id);
+  m_currentType = type;
+
+  notifySelectionChanged();
 }
 
-void QtSelectionManager::select(const QString& id, SelectionType type)
-{
-    if (m_selectedIds.size() == 1 && m_selectedIds.first() == id && m_currentType == type)
-    {
-        return;  // Already selected
-    }
+void QtSelectionManager::selectMultiple(const QStringList &ids,
+                                        SelectionType type) {
+  m_selectedIds = ids;
+  m_currentType = ids.isEmpty() ? SelectionType::None : type;
 
+  notifySelectionChanged();
+}
+
+void QtSelectionManager::addToSelection(const QString &id, SelectionType type) {
+  // Can only add items of the same type
+  if (!m_selectedIds.isEmpty() && m_currentType != type) {
+    // Clear and start new selection of this type
     m_selectedIds.clear();
+  }
+
+  if (!m_selectedIds.contains(id)) {
     m_selectedIds.append(id);
     m_currentType = type;
-
     notifySelectionChanged();
+  }
 }
 
-void QtSelectionManager::selectMultiple(const QStringList& ids, SelectionType type)
-{
-    m_selectedIds = ids;
-    m_currentType = ids.isEmpty() ? SelectionType::None : type;
-
+void QtSelectionManager::removeFromSelection(const QString &id) {
+  if (m_selectedIds.removeOne(id)) {
+    if (m_selectedIds.isEmpty()) {
+      m_currentType = SelectionType::None;
+    }
     notifySelectionChanged();
+  }
 }
 
-void QtSelectionManager::addToSelection(const QString& id, SelectionType type)
-{
-    // Can only add items of the same type
-    if (!m_selectedIds.isEmpty() && m_currentType != type)
-    {
-        // Clear and start new selection of this type
-        m_selectedIds.clear();
-    }
-
-    if (!m_selectedIds.contains(id))
-    {
-        m_selectedIds.append(id);
-        m_currentType = type;
-        notifySelectionChanged();
-    }
+void QtSelectionManager::toggleSelection(const QString &id,
+                                         SelectionType type) {
+  if (m_selectedIds.contains(id)) {
+    removeFromSelection(id);
+  } else {
+    addToSelection(id, type);
+  }
 }
 
-void QtSelectionManager::removeFromSelection(const QString& id)
-{
-    if (m_selectedIds.removeOne(id))
-    {
-        if (m_selectedIds.isEmpty())
-        {
-            m_currentType = SelectionType::None;
-        }
-        notifySelectionChanged();
-    }
+void QtSelectionManager::clearSelection() {
+  if (m_selectedIds.isEmpty())
+    return;
+
+  m_selectedIds.clear();
+  m_currentType = SelectionType::None;
+
+  emit selectionCleared();
+  notifySelectionChanged();
 }
 
-void QtSelectionManager::toggleSelection(const QString& id, SelectionType type)
-{
-    if (m_selectedIds.contains(id))
-    {
-        removeFromSelection(id);
-    }
-    else
-    {
-        addToSelection(id, type);
-    }
+bool QtSelectionManager::hasSelection() const {
+  return !m_selectedIds.isEmpty();
 }
 
-void QtSelectionManager::clearSelection()
-{
-    if (m_selectedIds.isEmpty()) return;
-
-    m_selectedIds.clear();
-    m_currentType = SelectionType::None;
-
-    emit selectionCleared();
-    notifySelectionChanged();
+SelectionType QtSelectionManager::currentSelectionType() const {
+  return m_currentType;
 }
 
-bool QtSelectionManager::hasSelection() const
-{
-    return !m_selectedIds.isEmpty();
+QStringList QtSelectionManager::selectedIds() const { return m_selectedIds; }
+
+QString QtSelectionManager::primarySelection() const {
+  return m_selectedIds.isEmpty() ? QString() : m_selectedIds.first();
 }
 
-SelectionType QtSelectionManager::currentSelectionType() const
-{
-    return m_currentType;
+int QtSelectionManager::selectionCount() const {
+  return static_cast<int>(m_selectedIds.size());
 }
 
-QStringList QtSelectionManager::selectedIds() const
-{
-    return m_selectedIds;
+bool QtSelectionManager::isSelected(const QString &id) const {
+  return m_selectedIds.contains(id);
 }
 
-QString QtSelectionManager::primarySelection() const
-{
-    return m_selectedIds.isEmpty() ? QString() : m_selectedIds.first();
-}
+void QtSelectionManager::notifySelectionChanged() {
+  emit selectionChanged(m_selectedIds, m_currentType);
 
-int QtSelectionManager::selectionCount() const
-{
-    return static_cast<int>(m_selectedIds.size());
-}
+  if (!m_selectedIds.isEmpty()) {
+    emit primarySelectionChanged(m_selectedIds.first(), m_currentType);
+  }
 
-bool QtSelectionManager::isSelected(const QString& id) const
-{
-    return m_selectedIds.contains(id);
-}
+  // Also notify via event bus for non-Qt subscribers
+  QString typeStr;
+  switch (m_currentType) {
+  case SelectionType::SceneObject:
+    typeStr = "SceneObject";
+    break;
+  case SelectionType::GraphNode:
+    typeStr = "GraphNode";
+    break;
+  case SelectionType::TimelineItem:
+    typeStr = "TimelineItem";
+    break;
+  case SelectionType::Asset:
+    typeStr = "Asset";
+    break;
+  case SelectionType::HierarchyItem:
+    typeStr = "HierarchyItem";
+    break;
+  default:
+    typeStr = "None";
+    break;
+  }
 
-void QtSelectionManager::notifySelectionChanged()
-{
-    emit selectionChanged(m_selectedIds, m_currentType);
-
-    if (!m_selectedIds.isEmpty())
-    {
-        emit primarySelectionChanged(m_selectedIds.first(), m_currentType);
-    }
-
-    // Also notify via event bus for non-Qt subscribers
-    QString typeStr;
-    switch (m_currentType)
-    {
-        case SelectionType::SceneObject: typeStr = "SceneObject"; break;
-        case SelectionType::GraphNode: typeStr = "GraphNode"; break;
-        case SelectionType::TimelineItem: typeStr = "TimelineItem"; break;
-        case SelectionType::Asset: typeStr = "Asset"; break;
-        case SelectionType::HierarchyItem: typeStr = "HierarchyItem"; break;
-        default: typeStr = "None"; break;
-    }
-
-    QtEventBus::instance().publishSelectionChanged(m_selectedIds, typeStr);
+  QtEventBus::instance().publishSelectionChanged(m_selectedIds, typeStr);
 }
 
 } // namespace NovelMind::editor::qt

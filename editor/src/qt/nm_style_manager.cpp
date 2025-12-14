@@ -1,137 +1,128 @@
 #include "NovelMind/editor/qt/nm_style_manager.hpp"
 
-#include <QStyleFactory>
 #include <QFontDatabase>
-#include <QScreen>
 #include <QGuiApplication>
+#include <QScreen>
+#include <QStyleFactory>
 
 namespace NovelMind::editor::qt {
 
-NMStyleManager& NMStyleManager::instance()
-{
-    static NMStyleManager instance;
-    return instance;
+NMStyleManager &NMStyleManager::instance() {
+  static NMStyleManager instance;
+  return instance;
 }
 
-NMStyleManager::NMStyleManager()
-    : QObject(nullptr)
-{
+NMStyleManager::NMStyleManager() : QObject(nullptr) {}
+
+void NMStyleManager::initialize(QApplication *app) {
+  m_app = app;
+
+  setupHighDpi();
+  setupFonts();
+  applyDarkTheme();
 }
 
-void NMStyleManager::initialize(QApplication* app)
-{
-    m_app = app;
+void NMStyleManager::setupHighDpi() {
+  // Get the primary screen's DPI
+  if (QGuiApplication::primaryScreen()) {
+    double dpi = QGuiApplication::primaryScreen()->logicalDotsPerInch();
+    // Standard DPI is 96, calculate scale factor
+    m_uiScale = dpi / 96.0;
 
-    setupHighDpi();
-    setupFonts();
-    applyDarkTheme();
+    // Clamp to reasonable range
+    if (m_uiScale < 1.0)
+      m_uiScale = 1.0;
+    if (m_uiScale > 3.0)
+      m_uiScale = 3.0;
+  }
+
+  // Update icon sizes based on scale
+  m_toolbarIconSize = static_cast<int>(24 * m_uiScale);
+  m_menuIconSize = static_cast<int>(16 * m_uiScale);
 }
 
-void NMStyleManager::setupHighDpi()
-{
-    // Get the primary screen's DPI
-    if (QGuiApplication::primaryScreen())
-    {
-        double dpi = QGuiApplication::primaryScreen()->logicalDotsPerInch();
-        // Standard DPI is 96, calculate scale factor
-        m_uiScale = dpi / 96.0;
-
-        // Clamp to reasonable range
-        if (m_uiScale < 1.0) m_uiScale = 1.0;
-        if (m_uiScale > 3.0) m_uiScale = 3.0;
-    }
-
-    // Update icon sizes based on scale
-    m_toolbarIconSize = static_cast<int>(24 * m_uiScale);
-    m_menuIconSize = static_cast<int>(16 * m_uiScale);
-}
-
-void NMStyleManager::setupFonts()
-{
-    // Default UI font
+void NMStyleManager::setupFonts() {
+  // Default UI font
 #ifdef Q_OS_WIN
-    m_defaultFont = QFont("Segoe UI", 9);
-    m_monospaceFont = QFont("Consolas", 9);
+  m_defaultFont = QFont("Segoe UI", 9);
+  m_monospaceFont = QFont("Consolas", 9);
 #elif defined(Q_OS_LINUX)
-    m_defaultFont = QFont("Ubuntu", 10);
-    m_monospaceFont = QFont("Ubuntu Mono", 10);
+  m_defaultFont = QFont("Ubuntu", 10);
+  m_monospaceFont = QFont("Ubuntu Mono", 10);
 
-    // Fallback if Ubuntu font not available
-    if (!QFontDatabase::families().contains("Ubuntu"))
-    {
-        m_defaultFont = QFont("Sans", 10);
-    }
-    if (!QFontDatabase::families().contains("Ubuntu Mono"))
-    {
-        m_monospaceFont = QFont("Monospace", 10);
-    }
+  // Fallback if Ubuntu font not available
+  if (!QFontDatabase::families().contains("Ubuntu")) {
+    m_defaultFont = QFont("Sans", 10);
+  }
+  if (!QFontDatabase::families().contains("Ubuntu Mono")) {
+    m_monospaceFont = QFont("Monospace", 10);
+  }
 #else
-    m_defaultFont = QFont();  // System default
-    m_defaultFont.setPointSize(10);
-    m_monospaceFont = QFont("Courier", 10);
+  m_defaultFont = QFont(); // System default
+  m_defaultFont.setPointSize(10);
+  m_monospaceFont = QFont("Courier", 10);
 #endif
 
-    // Apply scale to fonts
-    m_defaultFont.setPointSizeF(m_defaultFont.pointSizeF() * m_uiScale);
-    m_monospaceFont.setPointSizeF(m_monospaceFont.pointSizeF() * m_uiScale);
+  // Apply scale to fonts
+  m_defaultFont.setPointSizeF(m_defaultFont.pointSizeF() * m_uiScale);
+  m_monospaceFont.setPointSizeF(m_monospaceFont.pointSizeF() * m_uiScale);
 }
 
-void NMStyleManager::applyDarkTheme()
-{
-    if (!m_app) return;
+void NMStyleManager::applyDarkTheme() {
+  if (!m_app)
+    return;
 
-    // Use Fusion style as base (cross-platform, customizable)
-    m_app->setStyle(QStyleFactory::create("Fusion"));
+  // Use Fusion style as base (cross-platform, customizable)
+  m_app->setStyle(QStyleFactory::create("Fusion"));
 
-    // Apply default font
-    m_app->setFont(m_defaultFont);
+  // Apply default font
+  m_app->setFont(m_defaultFont);
 
-    // Apply stylesheet
-    m_app->setStyleSheet(getStyleSheet());
+  // Apply stylesheet
+  m_app->setStyleSheet(getStyleSheet());
 
-    emit themeChanged();
+  emit themeChanged();
 }
 
-void NMStyleManager::setUiScale(double scale)
-{
-    if (scale < 0.5) scale = 0.5;
-    if (scale > 3.0) scale = 3.0;
+void NMStyleManager::setUiScale(double scale) {
+  if (scale < 0.5)
+    scale = 0.5;
+  if (scale > 3.0)
+    scale = 3.0;
 
-    if (qFuzzyCompare(m_uiScale, scale)) return;
+  if (qFuzzyCompare(m_uiScale, scale))
+    return;
 
-    m_uiScale = scale;
-    m_toolbarIconSize = static_cast<int>(24 * m_uiScale);
-    m_menuIconSize = static_cast<int>(16 * m_uiScale);
+  m_uiScale = scale;
+  m_toolbarIconSize = static_cast<int>(24 * m_uiScale);
+  m_menuIconSize = static_cast<int>(16 * m_uiScale);
 
-    setupFonts();
-    applyDarkTheme();
+  setupFonts();
+  applyDarkTheme();
 
-    emit scaleChanged(m_uiScale);
+  emit scaleChanged(m_uiScale);
 }
 
-QString NMStyleManager::colorToStyleString(const QColor& color)
-{
-    return QString("rgb(%1, %2, %3)")
-        .arg(color.red())
-        .arg(color.green())
-        .arg(color.blue());
+QString NMStyleManager::colorToStyleString(const QColor &color) {
+  return QString("rgb(%1, %2, %3)")
+      .arg(color.red())
+      .arg(color.green())
+      .arg(color.blue());
 }
 
-QString NMStyleManager::colorToRgbaString(const QColor& color, int alpha)
-{
-    return QString("rgba(%1, %2, %3, %4)")
-        .arg(color.red())
-        .arg(color.green())
-        .arg(color.blue())
-        .arg(alpha);
+QString NMStyleManager::colorToRgbaString(const QColor &color, int alpha) {
+  return QString("rgba(%1, %2, %3, %4)")
+      .arg(color.red())
+      .arg(color.green())
+      .arg(color.blue())
+      .arg(alpha);
 }
 
-QString NMStyleManager::getStyleSheet() const
-{
-    const auto& p = m_palette;
+QString NMStyleManager::getStyleSheet() const {
+  const auto &p = m_palette;
 
-    // Generate comprehensive stylesheet for Unreal-like dark theme
-    return QString(R"(
+  // Generate comprehensive stylesheet for Unreal-like dark theme
+  return QString(R"(
 /* ========================================================================== */
 /* Global Styles                                                              */
 /* ========================================================================== */
@@ -623,19 +614,19 @@ QStatusBar::item {
 }
 
 )")
-        .arg(colorToStyleString(p.textPrimary))       // %1
-        .arg(colorToStyleString(p.bgDark))            // %2
-        .arg(colorToStyleString(p.accentPrimary))     // %3
-        .arg(colorToStyleString(p.textPrimary))       // %4
-        .arg(colorToStyleString(p.bgDarkest))         // %5
-        .arg(colorToStyleString(p.borderLight))       // %6
-        .arg(colorToStyleString(p.bgLight))           // %7
-        .arg(colorToStyleString(p.textDisabled))      // %8
-        .arg(colorToStyleString(p.accentActive))      // %9
-        .arg(colorToStyleString(p.bgMedium))          // %10
-        .arg(colorToStyleString(p.textSecondary))     // %11
-        .arg(colorToStyleString(p.accentHover))       // %12
-        .arg(colorToStyleString(p.textSecondary));    // %13
+      .arg(colorToStyleString(p.textPrimary))    // %1
+      .arg(colorToStyleString(p.bgDark))         // %2
+      .arg(colorToStyleString(p.accentPrimary))  // %3
+      .arg(colorToStyleString(p.textPrimary))    // %4
+      .arg(colorToStyleString(p.bgDarkest))      // %5
+      .arg(colorToStyleString(p.borderLight))    // %6
+      .arg(colorToStyleString(p.bgLight))        // %7
+      .arg(colorToStyleString(p.textDisabled))   // %8
+      .arg(colorToStyleString(p.accentActive))   // %9
+      .arg(colorToStyleString(p.bgMedium))       // %10
+      .arg(colorToStyleString(p.textSecondary))  // %11
+      .arg(colorToStyleString(p.accentHover))    // %12
+      .arg(colorToStyleString(p.textSecondary)); // %13
 }
 
 } // namespace NovelMind::editor::qt
