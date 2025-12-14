@@ -14,6 +14,7 @@
 #include "NovelMind/editor/qt/nm_dock_panel.hpp"
 #include <QPlainTextEdit>
 #include <QDateTime>
+#include <QToolBar>
 
 namespace NovelMind::editor::qt {
 

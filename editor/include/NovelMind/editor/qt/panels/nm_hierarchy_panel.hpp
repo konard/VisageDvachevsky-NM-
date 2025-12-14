@@ -13,6 +13,7 @@
 
 #include "NovelMind/editor/qt/nm_dock_panel.hpp"
 #include <QTreeWidget>
+#include <QToolBar>
 
 namespace NovelMind::editor::qt {
 

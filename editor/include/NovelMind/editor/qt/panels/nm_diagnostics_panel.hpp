@@ -8,6 +8,7 @@
 #include "NovelMind/editor/qt/nm_dock_panel.hpp"
 
 #include <QWidget>
+#include <QToolBar>
 
 class QTreeWidget;
 class QToolBar;

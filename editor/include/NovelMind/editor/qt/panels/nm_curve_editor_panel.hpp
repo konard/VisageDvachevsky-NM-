@@ -10,6 +10,7 @@
 #include <QWidget>
 #include <QGraphicsView>
 #include <QGraphicsScene>
+#include <QToolBar>
 
 class QToolBar;
 class QPushButton;

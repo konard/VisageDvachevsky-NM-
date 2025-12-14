@@ -13,6 +13,7 @@
 
 #include <QMainWindow>
 #include <QTimer>
+#include <QToolBar>
 #include <memory>
 
 class QMenuBar;

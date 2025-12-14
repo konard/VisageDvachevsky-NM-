@@ -19,6 +19,7 @@
 #include <QGraphicsScene>
 #include <QVector>
 #include <QMap>
+#include <QToolBar>
 
 class QToolBar;
 class QPushButton;

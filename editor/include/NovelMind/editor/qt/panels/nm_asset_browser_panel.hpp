@@ -16,6 +16,7 @@
 #include <QListView>
 #include <QFileSystemModel>
 #include <QSplitter>
+#include <QToolBar>
 
 namespace NovelMind::editor::qt {
 
