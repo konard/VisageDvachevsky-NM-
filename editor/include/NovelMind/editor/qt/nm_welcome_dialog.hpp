@@ -18,12 +18,15 @@
 #include <QLabel>
 #include <QString>
 #include <QVector>
+#include <QPropertyAnimation>
+#include <QGraphicsOpacityEffect>
 
 class QVBoxLayout;
 class QHBoxLayout;
 class QGridLayout;
 class QScrollArea;
 class QLineEdit;
+class QParallelAnimationGroup;
 
 namespace NovelMind::editor::qt {
 
@@ -129,6 +132,10 @@ private slots:
     void onBrowseExamplesClicked();
     void onSearchTextChanged(const QString& text);
 
+protected:
+    void showEvent(QShowEvent* event) override;
+    bool eventFilter(QObject* watched, QEvent* event) override;
+
 private:
     void setupUI();
     void setupLeftPanel();
@@ -137,6 +144,9 @@ private:
     void loadRecentProjects();
     void loadTemplates();
     void styleDialog();
+    void setupAnimations();
+    void startEntranceAnimations();
+    void animateButtonHover(QWidget* button, bool entering);
 
     QWidget* createProjectCard(const RecentProject& project);
     QWidget* createTemplateCard(const ProjectTemplate& tmpl, int index);
@@ -178,6 +188,10 @@ private:
 
     QVector<RecentProject> m_recentProjects;
     QVector<ProjectTemplate> m_templates;
+
+    // Animations
+    QParallelAnimationGroup* m_entranceAnimGroup = nullptr;
+    bool m_animationsPlayed = false;
 
     // Constants
     static constexpr int CARD_WIDTH = 280;

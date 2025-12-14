@@ -16,6 +16,14 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QCheckBox>
+#include <QPropertyAnimation>
+#include <QParallelAnimationGroup>
+#include <QGraphicsOpacityEffect>
+#include <QSequentialAnimationGroup>
+#include <QEasingCurve>
+#include <QShowEvent>
+#include <QEvent>
+#include <QTimer>
 
 namespace NovelMind::editor::qt {
 
@@ -444,34 +452,6 @@ void NMWelcomeDialog::onSearchTextChanged(const QString& text)
     Q_UNUSED(text);
 }
 
-bool NMWelcomeDialog::eventFilter(QObject* watched, QEvent* event)
-{
-    if (event->type() == QEvent::MouseButtonPress)
-    {
-        // Handle template card clicks
-        QWidget* widget = qobject_cast<QWidget*>(watched);
-        if (widget && widget->objectName() == "TemplateCard")
-        {
-            int templateIndex = widget->property("templateIndex").toInt();
-            onTemplateClicked(templateIndex);
-            return true;
-        }
-
-        // Handle resource card clicks
-        if (widget && widget->objectName() == "ResourceCard")
-        {
-            QString url = widget->property("url").toString();
-            if (!url.isEmpty())
-            {
-                QDesktopServices::openUrl(QUrl(url));
-            }
-            return true;
-        }
-    }
-
-    return QDialog::eventFilter(watched, event);
-}
-
 void NMWelcomeDialog::styleDialog()
 {
     // Apply stylesheet for welcome dialog
@@ -621,6 +601,172 @@ void NMWelcomeDialog::styleDialog()
             background-color: #232323;
         }
     )");
+}
+
+void NMWelcomeDialog::setupAnimations()
+{
+    // Set initial opacity to 0 for entrance animation
+    if (m_leftPanel) {
+        QGraphicsOpacityEffect* leftOpacity = new QGraphicsOpacityEffect(m_leftPanel);
+        m_leftPanel->setGraphicsEffect(leftOpacity);
+        leftOpacity->setOpacity(0.0);
+    }
+
+    if (m_centerPanel) {
+        QGraphicsOpacityEffect* centerOpacity = new QGraphicsOpacityEffect(m_centerPanel);
+        m_centerPanel->setGraphicsEffect(centerOpacity);
+        centerOpacity->setOpacity(0.0);
+    }
+
+    if (m_rightPanel) {
+        QGraphicsOpacityEffect* rightOpacity = new QGraphicsOpacityEffect(m_rightPanel);
+        m_rightPanel->setGraphicsEffect(rightOpacity);
+        rightOpacity->setOpacity(0.0);
+    }
+}
+
+void NMWelcomeDialog::startEntranceAnimations()
+{
+    if (m_animationsPlayed) {
+        return;
+    }
+    m_animationsPlayed = true;
+
+    m_entranceAnimGroup = new QParallelAnimationGroup(this);
+
+    // Animate left panel
+    if (m_leftPanel && m_leftPanel->graphicsEffect()) {
+        QPropertyAnimation* leftAnim = new QPropertyAnimation(
+            m_leftPanel->graphicsEffect(), "opacity", this);
+        leftAnim->setDuration(600);
+        leftAnim->setStartValue(0.0);
+        leftAnim->setEndValue(1.0);
+        leftAnim->setEasingCurve(QEasingCurve::OutCubic);
+        m_entranceAnimGroup->addAnimation(leftAnim);
+    }
+
+    // Animate center panel (slightly delayed)
+    if (m_centerPanel && m_centerPanel->graphicsEffect()) {
+        QSequentialAnimationGroup* centerSeq = new QSequentialAnimationGroup(this);
+        QPropertyAnimation* centerDelay = new QPropertyAnimation(this, "windowOpacity", this);
+        centerDelay->setDuration(100);  // Small delay
+        centerDelay->setStartValue(1.0);
+        centerDelay->setEndValue(1.0);
+
+        QPropertyAnimation* centerAnim = new QPropertyAnimation(
+            m_centerPanel->graphicsEffect(), "opacity", this);
+        centerAnim->setDuration(600);
+        centerAnim->setStartValue(0.0);
+        centerAnim->setEndValue(1.0);
+        centerAnim->setEasingCurve(QEasingCurve::OutCubic);
+
+        centerSeq->addAnimation(centerDelay);
+        centerSeq->addAnimation(centerAnim);
+        m_entranceAnimGroup->addAnimation(centerSeq);
+    }
+
+    // Animate right panel (slightly more delayed)
+    if (m_rightPanel && m_rightPanel->graphicsEffect()) {
+        QSequentialAnimationGroup* rightSeq = new QSequentialAnimationGroup(this);
+        QPropertyAnimation* rightDelay = new QPropertyAnimation(this, "windowOpacity", this);
+        rightDelay->setDuration(200);  // Larger delay
+        rightDelay->setStartValue(1.0);
+        rightDelay->setEndValue(1.0);
+
+        QPropertyAnimation* rightAnim = new QPropertyAnimation(
+            m_rightPanel->graphicsEffect(), "opacity", this);
+        rightAnim->setDuration(600);
+        rightAnim->setStartValue(0.0);
+        rightAnim->setEndValue(1.0);
+        rightAnim->setEasingCurve(QEasingCurve::OutCubic);
+
+        rightSeq->addAnimation(rightDelay);
+        rightSeq->addAnimation(rightAnim);
+        m_entranceAnimGroup->addAnimation(rightSeq);
+    }
+
+    m_entranceAnimGroup->start();
+}
+
+void NMWelcomeDialog::animateButtonHover(QWidget* button, bool entering)
+{
+    if (!button) return;
+
+    // Create smooth scale animation for button hover
+    QPropertyAnimation* scaleAnim = new QPropertyAnimation(button, "geometry", this);
+    scaleAnim->setDuration(150);
+    scaleAnim->setEasingCurve(entering ? QEasingCurve::OutBack : QEasingCurve::InOutQuad);
+
+    QRect currentGeom = button->geometry();
+    QRect targetGeom = currentGeom;
+
+    if (entering) {
+        // Slight scale up on hover
+        targetGeom.adjust(-2, -2, 2, 2);
+    }
+
+    scaleAnim->setStartValue(button->geometry());
+    scaleAnim->setEndValue(targetGeom);
+    scaleAnim->start(QPropertyAnimation::DeleteWhenStopped);
+}
+
+void NMWelcomeDialog::showEvent(QShowEvent* event)
+{
+    QDialog::showEvent(event);
+
+    if (!m_animationsPlayed) {
+        setupAnimations();
+        // Start animations after a short delay to ensure widgets are fully laid out
+        QTimer::singleShot(50, this, &NMWelcomeDialog::startEntranceAnimations);
+    }
+}
+
+bool NMWelcomeDialog::eventFilter(QObject* watched, QEvent* event)
+{
+    if (event->type() == QEvent::MouseButtonPress)
+    {
+        // Handle template card clicks
+        QWidget* widget = qobject_cast<QWidget*>(watched);
+        if (widget && widget->objectName() == "TemplateCard")
+        {
+            int templateIndex = widget->property("templateIndex").toInt();
+            onTemplateClicked(templateIndex);
+            return true;
+        }
+
+        // Handle resource card clicks
+        if (widget && widget->objectName() == "ResourceCard")
+        {
+            QString url = widget->property("url").toString();
+            if (!url.isEmpty())
+            {
+                QDesktopServices::openUrl(QUrl(url));
+            }
+            return true;
+        }
+    }
+    else if (event->type() == QEvent::Enter)
+    {
+        // Handle hover enter on buttons and cards
+        QWidget* widget = qobject_cast<QWidget*>(watched);
+        if (widget && (widget->objectName().contains("Button") ||
+                       widget->objectName().contains("Card")))
+        {
+            animateButtonHover(widget, true);
+        }
+    }
+    else if (event->type() == QEvent::Leave)
+    {
+        // Handle hover leave on buttons and cards
+        QWidget* widget = qobject_cast<QWidget*>(watched);
+        if (widget && (widget->objectName().contains("Button") ||
+                       widget->objectName().contains("Card")))
+        {
+            animateButtonHover(widget, false);
+        }
+    }
+
+    return QDialog::eventFilter(watched, event);
 }
 
 } // namespace NovelMind::editor::qt
