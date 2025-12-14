@@ -1,17 +1,24 @@
 #include "NovelMind/editor/qt/panels/nm_story_graph_panel.hpp"
 #include "NovelMind/editor/qt/nm_style_manager.hpp"
 #include "NovelMind/editor/qt/nm_play_mode_controller.hpp"
+#include "NovelMind/editor/qt/nm_icon_manager.hpp"
+#include "NovelMind/editor/qt/nm_undo_manager.hpp"
 
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QToolBar>
 #include <QAction>
 #include <QPainter>
 #include <QWheelEvent>
 #include <QMouseEvent>
+#include <QKeyEvent>
 #include <QScrollBar>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
+#include <QPushButton>
+#include <QLabel>
+#include <QFrame>
 
 namespace NovelMind::editor::qt {
 
@@ -307,6 +314,71 @@ void NMStoryGraphScene::clearGraph()
     m_nodes.clear();
 }
 
+void NMStoryGraphScene::removeNode(NMGraphNodeItem* node)
+{
+    if (!node) return;
+
+    // Remove all connections attached to this node
+    auto connections = findConnectionsForNode(node);
+    for (auto* conn : connections)
+    {
+        removeConnection(conn);
+    }
+
+    // Remove from list and scene
+    m_nodes.removeAll(node);
+    removeItem(node);
+    emit nodeDeleted(node);
+    delete node;
+}
+
+void NMStoryGraphScene::removeConnection(NMGraphConnectionItem* connection)
+{
+    if (!connection) return;
+
+    m_connections.removeAll(connection);
+    removeItem(connection);
+    emit connectionDeleted(connection);
+    delete connection;
+}
+
+QList<NMGraphConnectionItem*> NMStoryGraphScene::findConnectionsForNode(NMGraphNodeItem* node) const
+{
+    QList<NMGraphConnectionItem*> result;
+    for (auto* conn : m_connections)
+    {
+        if (conn->startNode() == node || conn->endNode() == node)
+        {
+            result.append(conn);
+        }
+    }
+    return result;
+}
+
+void NMStoryGraphScene::keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace)
+    {
+        // Delete selected items
+        auto selected = selectedItems();
+        for (auto* item : selected)
+        {
+            if (auto* node = qgraphicsitem_cast<NMGraphNodeItem*>(item))
+            {
+                removeNode(node);
+            }
+            else if (auto* conn = qgraphicsitem_cast<NMGraphConnectionItem*>(item))
+            {
+                removeConnection(conn);
+            }
+        }
+        event->accept();
+        return;
+    }
+
+    QGraphicsScene::keyPressEvent(event);
+}
+
 void NMStoryGraphScene::drawBackground(QPainter* painter, const QRectF& rect)
 {
     const auto& palette = NMStyleManager::instance().palette();
@@ -358,6 +430,16 @@ NMStoryGraphView::NMStoryGraphView(QWidget* parent)
     setDragMode(RubberBandDrag);
 }
 
+void NMStoryGraphView::setConnectionDrawingMode(bool enabled)
+{
+    m_isDrawingConnection = enabled;
+    if (!enabled)
+    {
+        m_connectionStartNode = nullptr;
+    }
+    viewport()->update();
+}
+
 void NMStoryGraphView::setZoomLevel(qreal zoom)
 {
     zoom = qBound(0.1, zoom, 5.0);
@@ -405,6 +487,22 @@ void NMStoryGraphView::mousePressEvent(QMouseEvent* event)
         return;
     }
 
+    // Ctrl+LeftClick to start drawing a connection
+    if (event->button() == Qt::LeftButton && event->modifiers() & Qt::ControlModifier)
+    {
+        QPointF scenePos = mapToScene(event->pos());
+        auto* item = scene()->itemAt(scenePos, transform());
+        if (auto* node = qgraphicsitem_cast<NMGraphNodeItem*>(item))
+        {
+            m_isDrawingConnection = true;
+            m_connectionStartNode = node;
+            m_connectionEndPoint = scenePos;
+            setCursor(Qt::CrossCursor);
+            event->accept();
+            return;
+        }
+    }
+
     QGraphicsView::mousePressEvent(event);
 }
 
@@ -417,6 +515,15 @@ void NMStoryGraphView::mouseMoveEvent(QMouseEvent* event)
 
         horizontalScrollBar()->setValue(horizontalScrollBar()->value() - delta.x());
         verticalScrollBar()->setValue(verticalScrollBar()->value() - delta.y());
+        event->accept();
+        return;
+    }
+
+    // Update connection drawing line
+    if (m_isDrawingConnection && m_connectionStartNode)
+    {
+        m_connectionEndPoint = mapToScene(event->pos());
+        viewport()->update();
         event->accept();
         return;
     }
@@ -434,7 +541,138 @@ void NMStoryGraphView::mouseReleaseEvent(QMouseEvent* event)
         return;
     }
 
+    // Finish drawing connection
+    if (event->button() == Qt::LeftButton && m_isDrawingConnection && m_connectionStartNode)
+    {
+        QPointF scenePos = mapToScene(event->pos());
+        auto* item = scene()->itemAt(scenePos, transform());
+        if (auto* endNode = qgraphicsitem_cast<NMGraphNodeItem*>(item))
+        {
+            if (endNode != m_connectionStartNode)
+            {
+                // Emit signal to create connection
+                emit requestConnection(m_connectionStartNode, endNode);
+            }
+        }
+
+        m_isDrawingConnection = false;
+        m_connectionStartNode = nullptr;
+        setCursor(Qt::ArrowCursor);
+        viewport()->update();
+        event->accept();
+        return;
+    }
+
     QGraphicsView::mouseReleaseEvent(event);
+}
+
+void NMStoryGraphView::drawForeground(QPainter* painter, const QRectF& /*rect*/)
+{
+    // Draw connection line being created
+    if (m_isDrawingConnection && m_connectionStartNode)
+    {
+        const auto& palette = NMStyleManager::instance().palette();
+
+        QPointF start = m_connectionStartNode->sceneBoundingRect().center();
+        start.setX(m_connectionStartNode->sceneBoundingRect().right());
+        QPointF end = m_connectionEndPoint;
+
+        // Draw bezier curve
+        QPainterPath path;
+        path.moveTo(start);
+
+        qreal dx = std::abs(end.x() - start.x()) * 0.5;
+        path.cubicTo(start + QPointF(dx, 0),
+                     end + QPointF(-dx, 0),
+                     end);
+
+        painter->setRenderHint(QPainter::Antialiasing);
+        painter->setPen(QPen(palette.accentPrimary, 2, Qt::DashLine));
+        painter->setBrush(Qt::NoBrush);
+        painter->drawPath(path);
+    }
+}
+
+// ============================================================================
+// NMNodePalette
+// ============================================================================
+
+NMNodePalette::NMNodePalette(QWidget* parent)
+    : QWidget(parent)
+{
+    auto* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(4, 4, 4, 4);
+    layout->setSpacing(4);
+
+    const auto& palette = NMStyleManager::instance().palette();
+
+    // Title
+    auto* titleLabel = new QLabel(tr("Create Node"), this);
+    titleLabel->setStyleSheet(QString("color: %1; font-weight: bold; padding: 4px;")
+                                  .arg(palette.textPrimary.name()));
+    layout->addWidget(titleLabel);
+
+    // Separator
+    auto* separator = new QFrame(this);
+    separator->setFrameShape(QFrame::HLine);
+    separator->setStyleSheet(QString("background-color: %1;").arg(palette.borderDark.name()));
+    layout->addWidget(separator);
+
+    // Node type buttons
+    createNodeButton("Entry", "▶");
+    createNodeButton("Dialogue", "💬");
+    createNodeButton("Choice", "⚑");
+    createNodeButton("Scene", "🎬");
+    createNodeButton("Label", "🏷");
+    createNodeButton("Script", "⚙");
+
+    layout->addStretch();
+
+    // Style the widget
+    setStyleSheet(QString("QWidget { background-color: %1; border: 1px solid %2; border-radius: 4px; }")
+                      .arg(palette.bgDark.name())
+                      .arg(palette.borderDark.name()));
+    setMinimumWidth(120);
+    setMaximumWidth(150);
+}
+
+void NMNodePalette::createNodeButton(const QString& nodeType, const QString& icon)
+{
+    auto* layout = qobject_cast<QVBoxLayout*>(this->layout());
+    if (!layout) return;
+
+    auto* button = new QPushButton(QString("%1 %2").arg(icon, nodeType), this);
+    button->setMinimumHeight(32);
+
+    const auto& palette = NMStyleManager::instance().palette();
+    button->setStyleSheet(QString(
+        "QPushButton {"
+        "  background-color: %1;"
+        "  color: %2;"
+        "  border: 1px solid %3;"
+        "  border-radius: 4px;"
+        "  padding: 6px 12px;"
+        "  text-align: left;"
+        "}"
+        "QPushButton:hover {"
+        "  background-color: %4;"
+        "  border-color: %5;"
+        "}"
+        "QPushButton:pressed {"
+        "  background-color: %6;"
+        "}"
+    ).arg(palette.bgMedium.name())
+     .arg(palette.textPrimary.name())
+     .arg(palette.borderDark.name())
+     .arg(palette.bgLight.name())
+     .arg(palette.accentPrimary.name())
+     .arg(palette.bgDark.name()));
+
+    connect(button, &QPushButton::clicked, this, [this, nodeType]() {
+        emit nodeTypeSelected(nodeType);
+    });
+
+    layout->insertWidget(layout->count() - 1, button);
 }
 
 // ============================================================================
@@ -447,6 +685,7 @@ NMStoryGraphPanel::NMStoryGraphPanel(QWidget* parent)
     setPanelId("StoryGraph");
     setupContent();
     setupToolBar();
+    setupNodePalette();
 }
 
 NMStoryGraphPanel::~NMStoryGraphPanel() = default;
@@ -540,17 +779,54 @@ void NMStoryGraphPanel::setupToolBar()
 void NMStoryGraphPanel::setupContent()
 {
     m_contentWidget = new QWidget(this);
-    auto* layout = new QVBoxLayout(m_contentWidget);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
+    auto* mainLayout = new QVBoxLayout(m_contentWidget);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setSpacing(0);
+
+    // Create horizontal layout for node palette + graph view
+    auto* hLayout = new QHBoxLayout();
+    hLayout->setContentsMargins(0, 0, 0, 0);
+    hLayout->setSpacing(4);
 
     m_scene = new NMStoryGraphScene(this);
     m_view = new NMStoryGraphView(m_contentWidget);
     m_view->setScene(m_scene);
 
-    layout->addWidget(m_view);
+    hLayout->addWidget(m_view, 1); // Graph view takes most space
+
+    mainLayout->addLayout(hLayout);
 
     setContentWidget(m_contentWidget);
+
+    // Connect view signals
+    connect(m_view, &NMStoryGraphView::requestConnection,
+            this, &NMStoryGraphPanel::onRequestConnection);
+}
+
+void NMStoryGraphPanel::setupNodePalette()
+{
+    if (!m_contentWidget) return;
+
+    // Find the horizontal layout
+    auto* mainLayout = qobject_cast<QVBoxLayout*>(m_contentWidget->layout());
+    if (!mainLayout) return;
+
+    QHBoxLayout* hLayout = nullptr;
+    for (int i = 0; i < mainLayout->count(); ++i)
+    {
+        hLayout = qobject_cast<QHBoxLayout*>(mainLayout->itemAt(i)->layout());
+        if (hLayout) break;
+    }
+
+    if (!hLayout) return;
+
+    // Create and add node palette
+    m_nodePalette = new NMNodePalette(m_contentWidget);
+    hLayout->insertWidget(0, m_nodePalette); // Add to left side
+
+    // Connect signals
+    connect(m_nodePalette, &NMNodePalette::nodeTypeSelected,
+            this, &NMStoryGraphPanel::onNodeTypeSelected);
 }
 
 void NMStoryGraphPanel::onZoomIn()
@@ -659,6 +935,64 @@ void NMStoryGraphPanel::updateCurrentNode(const QString& nodeId)
             {
                 m_view->centerOn(currentNode);
             }
+        }
+    }
+}
+
+void NMStoryGraphPanel::createNode(const QString& nodeType)
+{
+    if (!m_scene || !m_view) return;
+
+    // Get center of visible area
+    QPointF centerPos = m_view->mapToScene(m_view->viewport()->rect().center());
+
+    // Create node with unique ID
+    QString nodeId = QString("node_%1_%2").arg(nodeType.toLower()).arg(m_nextNodeId++);
+    auto* node = m_scene->addNode(QString("New %1").arg(nodeType), nodeType, centerPos);
+    node->setNodeId(m_nextNodeId);
+    node->setNodeIdString(nodeId);
+
+    // Select the new node
+    m_scene->clearSelection();
+    node->setSelected(true);
+}
+
+void NMStoryGraphPanel::onNodeTypeSelected(const QString& nodeType)
+{
+    createNode(nodeType);
+}
+
+void NMStoryGraphPanel::onRequestConnection(NMGraphNodeItem* from, NMGraphNodeItem* to)
+{
+    if (!m_scene || !from || !to) return;
+
+    // Check if connection already exists
+    for (const auto* conn : m_scene->connections())
+    {
+        if (conn->startNode() == from && conn->endNode() == to)
+        {
+            return; // Connection already exists
+        }
+    }
+
+    // Create the connection
+    m_scene->addConnection(from, to);
+}
+
+void NMStoryGraphPanel::onDeleteSelected()
+{
+    if (!m_scene) return;
+
+    auto selected = m_scene->selectedItems();
+    for (auto* item : selected)
+    {
+        if (auto* node = qgraphicsitem_cast<NMGraphNodeItem*>(item))
+        {
+            m_scene->removeNode(node);
+        }
+        else if (auto* conn = qgraphicsitem_cast<NMGraphConnectionItem*>(item))
+        {
+            m_scene->removeConnection(conn);
         }
     }
 }
