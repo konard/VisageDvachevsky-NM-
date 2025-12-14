@@ -9,6 +9,8 @@
 #include "NovelMind/editor/qt/panels/nm_console_panel.hpp"
 #include "NovelMind/editor/qt/panels/nm_asset_browser_panel.hpp"
 #include "NovelMind/editor/qt/panels/nm_hierarchy_panel.hpp"
+#include "NovelMind/editor/qt/panels/nm_play_toolbar_panel.hpp"
+#include "NovelMind/editor/qt/panels/nm_debug_overlay_panel.hpp"
 
 #include <QMenuBar>
 #include <QToolBar>
@@ -314,11 +316,22 @@ void NMMainWindow::setupPanels()
     m_hierarchyPanel->setObjectName("HierarchyPanel");
     m_hierarchyPanel->setWindowIcon(iconMgr.getIcon("panel-hierarchy", 16));
 
+    // Phase 5 - Play-In-Editor panels
+    m_playToolbarPanel = new NMPlayToolbarPanel(this);
+    m_playToolbarPanel->setObjectName("PlayToolbarPanel");
+    m_playToolbarPanel->setWindowIcon(iconMgr.getIcon("play", 16));
+
+    m_debugOverlayPanel = new NMDebugOverlayPanel(this);
+    m_debugOverlayPanel->setObjectName("DebugOverlayPanel");
+    m_debugOverlayPanel->setWindowIcon(iconMgr.getIcon("panel-diagnostics", 16));
+
     // Add panels to the main window
     addDockWidget(Qt::LeftDockWidgetArea, m_hierarchyPanel);
     addDockWidget(Qt::RightDockWidgetArea, m_inspectorPanel);
+    addDockWidget(Qt::RightDockWidgetArea, m_debugOverlayPanel);  // Phase 5
     addDockWidget(Qt::BottomDockWidgetArea, m_consolePanel);
     addDockWidget(Qt::BottomDockWidgetArea, m_assetBrowserPanel);
+    addDockWidget(Qt::TopDockWidgetArea, m_playToolbarPanel);  // Phase 5
 
     // Central area: Scene View and Story Graph as tabs
     setCentralWidget(nullptr);
@@ -330,6 +343,10 @@ void NMMainWindow::setupPanels()
     // Tab the bottom panels
     tabifyDockWidget(m_consolePanel, m_assetBrowserPanel);
     m_consolePanel->raise();
+
+    // Tab debug overlay with inspector (Phase 5)
+    tabifyDockWidget(m_inspectorPanel, m_debugOverlayPanel);
+    m_inspectorPanel->raise();
 }
 
 void NMMainWindow::setupConnections()

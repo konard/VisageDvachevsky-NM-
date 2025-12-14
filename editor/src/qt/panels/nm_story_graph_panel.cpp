@@ -106,6 +106,57 @@ void NMGraphNodeItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* /
         painter->setBrush(Qt::NoBrush);
         painter->drawRoundedRect(boundingRect().adjusted(1, 1, -1, -1), CORNER_RADIUS, CORNER_RADIUS);
     }
+
+    // Breakpoint indicator (red circle in top-left corner)
+    if (m_hasBreakpoint)
+    {
+        const qreal radius = 8.0;
+        const QPointF center(radius + 4, radius + 4);
+
+        painter->setBrush(QColor(220, 60, 60)); // Red
+        painter->setPen(QPen(QColor(180, 40, 40), 2));
+        painter->drawEllipse(center, radius, radius);
+
+        // Inner highlight for 3D effect
+        painter->setBrush(QColor(255, 100, 100, 80));
+        painter->setPen(Qt::NoPen);
+        painter->drawEllipse(center - QPointF(2, 2), radius * 0.4, radius * 0.4);
+    }
+
+    // Currently executing indicator (pulsing green border + glow)
+    if (m_isCurrentlyExecuting)
+    {
+        // Outer glow effect
+        for (int i = 3; i >= 0; --i)
+        {
+            int alpha = 40 - (i * 10);
+            QColor glowColor(60, 220, 120, alpha);
+            painter->setPen(QPen(glowColor, 3 + i * 2));
+            painter->setBrush(Qt::NoBrush);
+            painter->drawRoundedRect(boundingRect().adjusted(-i, -i, i, i),
+                                    CORNER_RADIUS + i, CORNER_RADIUS + i);
+        }
+
+        // Solid green border
+        painter->setPen(QPen(QColor(60, 220, 120), 3));
+        painter->setBrush(Qt::NoBrush);
+        painter->drawRoundedRect(boundingRect().adjusted(1, 1, -1, -1),
+                                CORNER_RADIUS, CORNER_RADIUS);
+
+        // Execution arrow indicator in top-right corner
+        const qreal arrowSize = 16.0;
+        const QPointF arrowCenter(NODE_WIDTH - arrowSize - 4, arrowSize / 2 + 4);
+
+        QPainterPath arrowPath;
+        arrowPath.moveTo(arrowCenter + QPointF(-arrowSize/2, -arrowSize/3));
+        arrowPath.lineTo(arrowCenter + QPointF(arrowSize/2, 0));
+        arrowPath.lineTo(arrowCenter + QPointF(-arrowSize/2, arrowSize/3));
+        arrowPath.closeSubpath();
+
+        painter->setBrush(QColor(60, 220, 120));
+        painter->setPen(QPen(QColor(40, 180, 90), 2));
+        painter->drawPath(arrowPath);
+    }
 }
 
 QVariant NMGraphNodeItem::itemChange(GraphicsItemChange change, const QVariant& value)
@@ -120,6 +171,47 @@ QVariant NMGraphNodeItem::itemChange(GraphicsItemChange change, const QVariant& 
         m_isSelected = value.toBool();
     }
     return QGraphicsItem::itemChange(change, value);
+}
+
+void NMGraphNodeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
+{
+    QMenu menu;
+
+    // Toggle Breakpoint action
+    QAction* breakpointAction = menu.addAction(
+        m_hasBreakpoint ? "Remove Breakpoint" : "Add Breakpoint"
+    );
+    breakpointAction->setIcon(QIcon::fromTheme(m_hasBreakpoint ? "edit-delete" : "list-add"));
+
+    menu.addSeparator();
+
+    // Edit Node action
+    QAction* editAction = menu.addAction("Edit Node Properties");
+    editAction->setIcon(QIcon::fromTheme("document-properties"));
+
+    // Delete Node action
+    QAction* deleteAction = menu.addAction("Delete Node");
+    deleteAction->setIcon(QIcon::fromTheme("edit-delete"));
+
+    // Show menu and handle action
+    QAction* selectedAction = menu.exec(event->screenPos());
+
+    if (selectedAction == breakpointAction)
+    {
+        // Toggle breakpoint via Play Mode Controller
+        NMPlayModeController::instance().toggleBreakpoint(m_nodeIdString);
+    }
+    else if (selectedAction == deleteAction)
+    {
+        // TODO: Implement node deletion via undo system
+        // For now, just mark for deletion
+    }
+    else if (selectedAction == editAction)
+    {
+        // TODO: Open inspector with node properties
+    }
+
+    event->accept();
 }
 
 // ============================================================================
@@ -368,6 +460,13 @@ void NMStoryGraphPanel::onInitialize()
     {
         m_view->centerOnGraph();
     }
+
+    // Connect to Play Mode Controller signals
+    auto& playController = NMPlayModeController::instance();
+    connect(&playController, &NMPlayModeController::currentNodeChanged,
+            this, &NMStoryGraphPanel::onCurrentNodeChanged);
+    connect(&playController, &NMPlayModeController::breakpointsChanged,
+            this, &NMStoryGraphPanel::onBreakpointsChanged);
 }
 
 void NMStoryGraphPanel::onUpdate(double /*deltaTime*/)
@@ -385,18 +484,23 @@ void NMStoryGraphPanel::loadDemoGraph()
     // Create demo nodes
     auto* startNode = m_scene->addNode("Start", "Entry", QPointF(0, 0));
     startNode->setNodeId(1);
+    startNode->setNodeIdString("node_start");
 
     auto* dialogueNode = m_scene->addNode("Welcome to the game!", "Dialogue", QPointF(300, 0));
     dialogueNode->setNodeId(2);
+    dialogueNode->setNodeIdString("node_dialogue_1");
 
     auto* choiceNode = m_scene->addNode("What will you do?", "Choice", QPointF(600, 0));
     choiceNode->setNodeId(3);
+    choiceNode->setNodeIdString("node_choice_1");
 
     auto* branch1 = m_scene->addNode("You explore the forest", "Dialogue", QPointF(900, -100));
     branch1->setNodeId(4);
+    branch1->setNodeIdString("node_branch_forest");
 
     auto* branch2 = m_scene->addNode("You head to the village", "Dialogue", QPointF(900, 100));
     branch2->setNodeId(5);
+    branch2->setNodeIdString("node_branch_village");
 
     // Create connections
     m_scene->addConnection(startNode, dialogueNode);
@@ -479,6 +583,83 @@ void NMStoryGraphPanel::onFitToGraph()
     if (m_view && m_scene && !m_scene->items().isEmpty())
     {
         m_view->fitInView(m_scene->itemsBoundingRect().adjusted(-50, -50, 50, 50), Qt::KeepAspectRatio);
+    }
+}
+
+void NMStoryGraphPanel::onCurrentNodeChanged(const QString& nodeId)
+{
+    updateCurrentNode(nodeId);
+}
+
+void NMStoryGraphPanel::onBreakpointsChanged()
+{
+    updateNodeBreakpoints();
+}
+
+NMGraphNodeItem* NMStoryGraphPanel::findNodeByIdString(const QString& id) const
+{
+    if (!m_scene) return nullptr;
+
+    const auto items = m_scene->items();
+    for (auto* item : items)
+    {
+        if (auto* node = qgraphicsitem_cast<NMGraphNodeItem*>(item))
+        {
+            if (node->nodeIdString() == id)
+            {
+                return node;
+            }
+        }
+    }
+    return nullptr;
+}
+
+void NMStoryGraphPanel::updateNodeBreakpoints()
+{
+    if (!m_scene) return;
+
+    auto& playController = NMPlayModeController::instance();
+    const QSet<QString> breakpoints = playController.breakpoints();
+
+    // Update all nodes
+    const auto items = m_scene->items();
+    for (auto* item : items)
+    {
+        if (auto* node = qgraphicsitem_cast<NMGraphNodeItem*>(item))
+        {
+            bool hasBreakpoint = breakpoints.contains(node->nodeIdString());
+            node->setBreakpoint(hasBreakpoint);
+        }
+    }
+}
+
+void NMStoryGraphPanel::updateCurrentNode(const QString& nodeId)
+{
+    if (!m_scene) return;
+
+    // Clear previous execution state
+    if (!m_currentExecutingNode.isEmpty())
+    {
+        if (auto* prevNode = findNodeByIdString(m_currentExecutingNode))
+        {
+            prevNode->setCurrentlyExecuting(false);
+        }
+    }
+
+    // Set new execution state
+    m_currentExecutingNode = nodeId;
+    if (!nodeId.isEmpty())
+    {
+        if (auto* currentNode = findNodeByIdString(nodeId))
+        {
+            currentNode->setCurrentlyExecuting(true);
+
+            // Center view on executing node
+            if (m_view)
+            {
+                m_view->centerOn(currentNode);
+            }
+        }
     }
 }
 

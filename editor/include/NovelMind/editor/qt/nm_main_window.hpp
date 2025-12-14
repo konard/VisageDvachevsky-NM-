@@ -32,6 +32,8 @@ class NMInspectorPanel;
 class NMConsolePanel;
 class NMAssetBrowserPanel;
 class NMHierarchyPanel;
+class NMPlayToolbarPanel;
+class NMDebugOverlayPanel;
 
 /**
  * @brief Main application window for the NovelMind Editor
@@ -73,6 +75,8 @@ public:
     [[nodiscard]] NMConsolePanel* consolePanel() const { return m_consolePanel; }
     [[nodiscard]] NMAssetBrowserPanel* assetBrowserPanel() const { return m_assetBrowserPanel; }
     [[nodiscard]] NMHierarchyPanel* hierarchyPanel() const { return m_hierarchyPanel; }
+    [[nodiscard]] NMPlayToolbarPanel* playToolbarPanel() const { return m_playToolbarPanel; }
+    [[nodiscard]] NMDebugOverlayPanel* debugOverlayPanel() const { return m_debugOverlayPanel; }
 
     // =========================================================================
     // Layout Management
@@ -225,6 +229,8 @@ private:
     NMConsolePanel* m_consolePanel = nullptr;
     NMAssetBrowserPanel* m_assetBrowserPanel = nullptr;
     NMHierarchyPanel* m_hierarchyPanel = nullptr;
+    NMPlayToolbarPanel* m_playToolbarPanel = nullptr;
+    NMDebugOverlayPanel* m_debugOverlayPanel = nullptr;
 
     // =========================================================================
     // State
