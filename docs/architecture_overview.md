@@ -1,10 +1,10 @@
-# Architecture Overview
+# Обзор архитектуры
 
-This document describes the high-level architecture of the NovelMind engine and its components.
+Этот документ описывает архитектуру движка NovelMind и его компонентов на высоком уровне.
 
-## System Components
+## Компоненты системы
 
-NovelMind consists of three main components:
+NovelMind состоит из трех основных компонентов:
 
 ```
 +-------------------+     +-------------------+     +-------------------+
@@ -16,11 +16,11 @@ NovelMind consists of three main components:
    (JSON/NMScript)          + Compiled Scripts
 ```
 
-### 1. Runtime Engine (`engine_core/`)
+### 1. Движок выполнения (`engine_core/`)
 
-The runtime engine is the core component that executes visual novels at runtime. It is designed to be lightweight and fast.
+Движок выполнения является основным компонентом, который исполняет визуальные новеллы во время выполнения. Он разработан быть легковесным и быстрым.
 
-#### Module Architecture
+#### Архитектура модулей
 
 ```
 +------------------------------------------------------------------+
@@ -54,38 +54,38 @@ The runtime engine is the core component that executes visual novels at runtime.
 +------------------------------------------------------------------+
 ```
 
-#### Core Modules
+#### Основные модули
 
-| Module | Namespace | Description |
+| Модуль | Пространство имен | Описание |
 |--------|-----------|-------------|
-| Platform | `nm::platform` | Window management, input, timing, file I/O |
-| Renderer | `nm::renderer` | 2D sprite rendering, text, effects |
-| VFS | `nm::vfs` | Virtual file system with encryption support |
-| Resource Manager | `nm::resource` | Asset loading, caching, lifecycle |
-| Scripting | `nm::scripting` | NM Script interpreter/VM |
-| Scene | `nm::scene` | Scene graph, layers, objects |
-| Audio | `nm::audio` | Sound and music playback |
-| Input | `nm::input` | Input mapping and event handling |
-| Save | `nm::save` | Game state serialization |
+| Platform | `nm::platform` | Управление окнами, ввод, таймер, файловый ввод/вывод |
+| Renderer | `nm::renderer` | 2D отрисовка спрайтов, текст, эффекты |
+| VFS | `nm::vfs` | Виртуальная файловая система с поддержкой шифрования |
+| Resource Manager | `nm::resource` | Загрузка ресурсов, кэширование, жизненный цикл |
+| Scripting | `nm::scripting` | Интерпретатор/виртуальная машина NM Script |
+| Scene | `nm::scene` | Граф сцены, слои, объекты |
+| Audio | `nm::audio` | Воспроизведение звука и музыки |
+| Input | `nm::input` | Сопоставление ввода и обработка событий |
+| Save | `nm::save` | Сериализация состояния игры |
 
-### 2. Visual Editor (`editor/`)
+### 2. Визуальный редактор (`editor/`)
 
-The visual editor is a desktop application for creating visual novel projects.
+Визуальный редактор - это настольное приложение для создания проектов визуальных новелл.
 
-#### Editor Components
+#### Компоненты редактора
 
-- **Project Dashboard** - Project management, settings
-- **Scene Editor** - Visual scene composition (WYSIWYG)
-- **Story Flow Editor** - Node-based narrative flow design
-- **Script Editor** - NM Script code editing with syntax highlighting
-- **Localization Editor** - Translation management
-- **Build System** - Project compilation interface
+- **Project Dashboard** - Управление проектами, настройки
+- **Scene Editor** - Визуальное составление сцены (WYSIWYG)
+- **Story Flow Editor** - Дизайн нарративного потока на основе узлов
+- **Script Editor** - Редактирование кода NM Script с подсветкой синтаксиса
+- **Localization Editor** - Управление переводами
+- **Build System** - Интерфейс компиляции проекта
 
-### 3. Compiler (`compiler/`)
+### 3. Компилятор (`compiler/`)
 
-The compiler transforms editor projects into runtime-ready packages.
+Компилятор преобразует проекты редактора в пакеты, готовые к выполнению.
 
-#### Compilation Pipeline
+#### Конвейер компиляции
 
 ```
 Source Assets          Intermediate           Final Output
@@ -96,13 +96,13 @@ Scripts (.nms)   --->  Bytecode         --->
 Scenes (.json)   --->  Binary Scene     --->
 ```
 
-## Data Flow
+## Поток данных
 
-### Project Data Model
+### Модель данных проекта
 
 ```
 Project
-├── Metadata (name, version, settings)
+├── Metadata (название, версия, настройки)
 ├── Characters[]
 │   ├── id, name, display_name
 │   ├── sprites[]
@@ -130,28 +130,28 @@ Project
     └── fonts/
 ```
 
-### Runtime Data Flow
+### Поток данных во время выполнения
 
-1. **Initialization**
-   - Platform layer initializes window, input, timer
-   - VFS mounts encrypted pack files
-   - Resource manager preloads essential assets
-   - Story engine loads initial scene
+1. **Инициализация**
+   - Платформенный слой инициализирует окно, ввод, таймер
+   - VFS монтирует зашифрованные файлы пакетов
+   - Менеджер ресурсов предзагружает основные ресурсы
+   - Движок истории загружает начальную сцену
 
-2. **Main Loop**
-   - Process input events
-   - Update story state
-   - Update animations/effects
-   - Render scene layers
-   - Present frame
+2. **Главный цикл**
+   - Обработка событий ввода
+   - Обновление состояния истории
+   - Обновление анимаций/эффектов
+   - Отрисовка слоев сцены
+   - Представление кадра
 
-3. **Story Execution**
-   - Fetch current node from story graph
-   - Execute node commands via scripting engine
-   - Wait for player input (dialogue advance, choice selection)
-   - Transition to next node
+3. **Исполнение истории**
+   - Получение текущего узла из графа истории
+   - Выполнение команд узла через скриптовый движок
+   - Ожидание ввода игрока (продвижение диалога, выбор)
+   - Переход к следующему узлу
 
-## Dependency Graph
+## Граф зависимостей
 
 ```
                     Application
@@ -173,27 +173,27 @@ Project
               Platform Layer
 ```
 
-## Threading Model
+## Модель потоков
 
-The engine uses a single-threaded model for simplicity:
+Движок использует однопоточную модель для простоты:
 
-- **Main Thread**: Game loop, rendering, input, audio commands
-- **Audio Thread** (optional): Streaming audio playback (managed by audio backend)
+- **Главный поток**: Игровой цикл, отрисовка, ввод, аудиокоманды
+- **Аудиопоток** (опционально): Потоковое воспроизведение аудио (управляется аудио-бэкендом)
 
-Future considerations:
-- Resource loading on background thread
-- Script execution on dedicated thread
+Планы на будущее:
+- Загрузка ресурсов в фоновом потоке
+- Выполнение скриптов в выделенном потоке
 
-## Memory Management
+## Управление памятью
 
-- **RAII principles** throughout the codebase
-- **Smart pointers** for ownership semantics
-- **Resource handles** for managed resources
-- **Pool allocators** for frequently created/destroyed objects
+- **Принципы RAII** во всей кодовой базе
+- **Умные указатели** для семантики владения
+- **Дескрипторы ресурсов** для управляемых ресурсов
+- **Пул-аллокаторы** для часто создаваемых/уничтожаемых объектов
 
-## Error Handling
+## Обработка ошибок
 
-- **Expected/Result types** for recoverable errors
-- **Exceptions disabled** - explicit error propagation
-- **Logging system** for debugging and diagnostics
-- **Assertions** for development-time checks
+- **Типы Expected/Result** для восстанавливаемых ошибок
+- **Исключения отключены** - явное распространение ошибок
+- **Система логирования** для отладки и диагностики
+- **Утверждения** для проверок на этапе разработки
