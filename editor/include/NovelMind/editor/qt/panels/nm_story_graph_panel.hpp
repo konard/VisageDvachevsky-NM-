@@ -35,19 +35,31 @@ public:
     void setNodeId(uint64_t id) { m_nodeId = id; }
     [[nodiscard]] uint64_t nodeId() const { return m_nodeId; }
 
+    void setNodeIdString(const QString& id) { m_nodeIdString = id; }
+    [[nodiscard]] QString nodeIdString() const { return m_nodeIdString; }
+
     void setSelected(bool selected);
+    void setBreakpoint(bool hasBreakpoint);
+    void setCurrentlyExecuting(bool isExecuting);
+
+    [[nodiscard]] bool hasBreakpoint() const { return m_hasBreakpoint; }
+    [[nodiscard]] bool isCurrentlyExecuting() const { return m_isCurrentlyExecuting; }
 
     QRectF boundingRect() const override;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
 
 private:
     QString m_title;
     QString m_nodeType;
     uint64_t m_nodeId = 0;
+    QString m_nodeIdString;
     bool m_isSelected = false;
+    bool m_hasBreakpoint = false;
+    bool m_isCurrentlyExecuting = false;
 
     static constexpr qreal NODE_WIDTH = 200;
     static constexpr qreal NODE_HEIGHT = 80;
@@ -159,6 +171,11 @@ public:
      */
     void loadDemoGraph();
 
+    /**
+     * @brief Find node by string ID
+     */
+    NMGraphNodeItem* findNodeByIdString(const QString& id) const;
+
 signals:
     void nodeSelected(uint64_t nodeId);
     void nodeDoubleClicked(uint64_t nodeId);
@@ -168,15 +185,20 @@ private slots:
     void onZoomOut();
     void onZoomReset();
     void onFitToGraph();
+    void onCurrentNodeChanged(const QString& nodeId);
+    void onBreakpointsChanged();
 
 private:
     void setupToolBar();
     void setupContent();
+    void updateNodeBreakpoints();
+    void updateCurrentNode(const QString& nodeId);
 
     NMStoryGraphScene* m_scene = nullptr;
     NMStoryGraphView* m_view = nullptr;
     QWidget* m_contentWidget = nullptr;
     QToolBar* m_toolBar = nullptr;
+    QString m_currentExecutingNode;
 };
 
 } // namespace NovelMind::editor::qt

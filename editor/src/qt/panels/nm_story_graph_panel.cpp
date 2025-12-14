@@ -1,5 +1,6 @@
 #include "NovelMind/editor/qt/panels/nm_story_graph_panel.hpp"
 #include "NovelMind/editor/qt/nm_style_manager.hpp"
+#include "NovelMind/editor/qt/nm_play_mode_controller.hpp"
 
 #include <QVBoxLayout>
 #include <QToolBar>
@@ -9,6 +10,8 @@
 #include <QMouseEvent>
 #include <QScrollBar>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsSceneContextMenuEvent>
+#include <QMenu>
 
 namespace NovelMind::editor::qt {
 
@@ -39,6 +42,18 @@ void NMGraphNodeItem::setSelected(bool selected)
 {
     m_isSelected = selected;
     QGraphicsItem::setSelected(selected);
+    update();
+}
+
+void NMGraphNodeItem::setBreakpoint(bool hasBreakpoint)
+{
+    m_hasBreakpoint = hasBreakpoint;
+    update();
+}
+
+void NMGraphNodeItem::setCurrentlyExecuting(bool isExecuting)
+{
+    m_isCurrentlyExecuting = isExecuting;
     update();
 }
 

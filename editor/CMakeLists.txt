@@ -70,6 +70,11 @@ add_library(novelmind_editor STATIC
     src/qt/panels/nm_localization_panel.cpp
     src/qt/panels/nm_diagnostics_panel.cpp
     src/qt/panels/nm_build_settings_panel.cpp
+
+    # Phase 5 - Play-In-Editor
+    src/qt/nm_play_mode_controller.cpp
+    src/qt/panels/nm_play_toolbar_panel.cpp
+    src/qt/panels/nm_debug_overlay_panel.cpp
 )
 
 # Alias for backward compatibility

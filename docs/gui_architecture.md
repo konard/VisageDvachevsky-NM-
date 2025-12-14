@@ -283,15 +283,38 @@ Manages runtime embedding for previewing visual novels in the editor.
 - Live variable inspection
 
 **Key Classes:**
-- `NMPlayModeController`
-- `NMDebugOverlay`
-- `NMBreakpointManager`
+- `NMPlayModeController` - Central play/pause/stop coordinator
+- `NMPlayToolbarPanel` - Playback control UI
+- `NMDebugOverlayPanel` - Runtime variable inspection
+- Breakpoint integration in `NMGraphNodeItem`
 
-**Definition of Done:**
-- [ ] Can play visual novel in editor window
-- [ ] Debug overlay shows runtime info
-- [ ] Can set breakpoints on graph nodes
-- [ ] Live variables visible during play
+**Implementation Status (Phase 5.0 - Mock Runtime):**
+- [x] Play Mode Controller with state machine (Stopped/Playing/Paused)
+- [x] Mock runtime simulation (1 node/second, demo data)
+- [x] Play toolbar panel with Play/Pause/Stop/Step buttons
+- [x] Keyboard shortcuts (F5=Play, Shift+F5=Stop, F10=Step)
+- [x] Debug overlay panel with 5 tabs (Variables/CallStack/Animations/Audio/Performance)
+- [x] Variable editing when paused (double-click to edit)
+- [x] Breakpoint management system (add/remove/toggle/persist)
+- [x] Qt signals/slots for all state changes
+- [ ] Visual breakpoint indicators in StoryGraph (red dot) - IN PROGRESS
+- [ ] Current node highlighting during playback (yellow border) - IN PROGRESS
+- [ ] Context menu for breakpoint toggle - IN PROGRESS
+- [ ] Integration into main window - PENDING
+
+**Definition of Done (Phase 5.0):**
+- [x] Can play through demo nodes in mock runtime
+- [x] Debug overlay shows runtime variables and call stack
+- [x] Can add/remove breakpoints programmatically
+- [ ] Can toggle breakpoints via UI (90% done, context menu remaining)
+- [x] Live variables visible and editable during pause
+
+**Future Work (Phase 5.1+):**
+- [ ] Real runtime integration (replace mock with ScriptVM)
+- [ ] Runtime scene rendering in SceneView
+- [ ] Timeline playback synchronization
+- [ ] Hot reload during play mode
+- [ ] Advanced debugging (conditional breakpoints, watch expressions)
 
 ## Panel Specifications
 
