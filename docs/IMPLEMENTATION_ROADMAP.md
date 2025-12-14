@@ -35,33 +35,48 @@ This document tracks the implementation status of all GUI features from Issue #3
 
 ---
 
-## 2. SceneView Panel ⚠️ 60%
+## 2. SceneView Panel ✅ 95% (🔄 UPDATED - Batch 3 Complete)
 
 ### Implemented Features
 - ✅ 2.1 Scene rendering (basic display with QGraphicsView)
 - ✅ 2.2 Pan with middle-mouse
 - ✅ 2.3 Zoom with scroll wheel
 - ✅ 2.4 Grid with toggle
+- ✅ 2.6 Transform gizmos (Move/Rotate/Scale) **NEW**
+- ✅ 2.7 Mouse object selection **NEW**
+- ✅ 2.8 Selected object highlighting **NEW**
+- ✅ 2.9 Demo scene objects (Background, 2 Characters, UI element) **NEW**
+- ✅ 2.10 Helper info overlay (cursor position, object position) **NEW**
 
 ### Missing Features
 - ❌ 2.5 Layer highlighting
-- ❌ 2.6 Transform gizmos (Move/Rotate/Scale)
-- ❌ 2.7 Mouse object selection
-- ❌ 2.8 Selected object highlighting
-- ❌ 2.9 Drag-drop from Asset Browser
-- ❌ 2.10 Helper info (cursor position, object position)
+- ⚠️ 2.9 Drag-drop from Asset Browser (framework ready, needs Asset Browser integration)
 
-### Implementation Plan
-**Priority**: HIGH (Core editing functionality)
-**Estimated Effort**: 6-8 hours
+### Recent Additions (Batch 3)
+1. **NMSceneObject Class**: 4 object types (Background/Character/UI/Effect)
+   - Type-specific placeholder rendering
+   - Movable, selectable objects
+   - Selection highlighting with blue outline + corner handles
+2. **NMTransformGizmo**: Professional gizmo system
+   - Move mode: Red (X) / Green (Y) axis arrows
+   - Rotate mode: Circle with 4 cardinal handles
+   - Scale mode: Bounding box with corner handles
+   - Auto-positioning on selected object
+3. **NMSceneInfoOverlay**: Real-time info display
+   - Cursor position (X, Y coordinates)
+   - Selected object name and position
+   - Semi-transparent overlay in top-left
+4. **Click-to-Select**: Full selection system
+   - Click object → select with gizmo
+   - Click empty space → clear selection
+   - Signals forwarded to global selection system
+5. **Demo Objects**: 4 pre-placed objects for testing
+   - Main Background (-100, -150)
+   - Protagonist character (-250, -100)
+   - Companion character (150, -100)
+   - Dialogue Box UI (-100, 250)
 
-#### Steps:
-1. Add demo scene objects (background, 2-3 character sprites)
-2. Implement click-to-select with scene item detection
-3. Add selection highlighting (blue outline)
-4. Create basic Move gizmo (3-axis arrows)
-5. Add info overlay widget showing cursor/object position
-6. Wire up drag-drop from Asset Browser
+**Status**: Nearly complete! Just needs drag-drop integration and layer system.
 
 ---
 
@@ -423,17 +438,26 @@ This document tracks the implementation status of all GUI features from Issue #3
 - ✅ Node/connection deletion (Delete key)
 
 ### Batch 2: Core Editing ✅ DONE (Inspector Complete)
-1. **Inspector Property Editing** (COMPLETE - 6 hours)
+1. **Inspector Property Editing** (COMPLETE)
    - ✅ Editable widgets for all property types
    - ⏳ Undo/Redo integration (framework ready)
 
-2. **SceneView Object Interaction** (Next - HIGH PRIORITY)
-   - Demo scene objects
-   - Click-to-select
-   - Transform gizmos
-   - Info overlay
+### Batch 3: SceneView Object Interaction ✅ DONE (6-8 hours)
+1. **Scene Objects & Selection** (COMPLETE)
+   - ✅ NMSceneObject class with 4 types
+   - ✅ Click-to-select interaction
+   - ✅ Blue outline selection highlighting
+   - ✅ Demo objects (background, 2 characters, UI)
+2. **Transform Gizmos** (COMPLETE)
+   - ✅ Move gizmo (X/Y arrows)
+   - ✅ Rotate gizmo (circle + handles)
+   - ✅ Scale gizmo (bounding box)
+   - ✅ Toolbar mode switching (W/E/R)
+3. **Info Overlay** (COMPLETE)
+   - ✅ Real-time cursor position
+   - ✅ Selected object info display
 
-### Batch 3: Advanced Editing (MEDIUM PRIORITY)
+### Batch 4: Advanced Editing (MEDIUM PRIORITY - NEXT)
 1. **Timeline Keyframe Editing** (4-6 hours)
    - Drag keyframes
    - Snap to grid
@@ -474,20 +498,31 @@ This document tracks the implementation status of all GUI features from Issue #3
 
 ### Current Overall Completion
 - **Foundation**: 95% ✅
-- **Core Editing**: 72% ⚠️ (up from 40% → Batch 1: 58% → Batch 2: 72%)
+- **Core Editing**: 85% ✅ (up from 40% → Batch 1: 58% → Batch 2: 72% → Batch 3: 85%)
 - **Advanced Features**: 72% ⚠️
 - **Production Tools**: 70% ⚠️
 - **Play-In-Editor**: 90% ✅
 
 ### Estimated Remaining Effort
-- **High Priority**: ~12 hours (down from 20)
+- **High Priority**: ~5 hours (down from 12)
 - **Medium Priority**: ~25 hours
 - **Low Priority**: ~25 hours
-- **Total**: ~62 hours to 100% completion (down from 70)
+- **Total**: ~55 hours to 100% completion (down from 62)
 
 ---
 
 ## Recent Updates
+
+### 2025-12-14 - Batch 3 Complete ✅
+- ✅ Implemented NMSceneObject class (4 types: Background/Character/UI/Effect)
+- ✅ Added click-to-select with mouse interaction
+- ✅ Implemented selection highlighting (blue outline + corner handles)
+- ✅ Created NMTransformGizmo with 3 modes (Move/Rotate/Scale)
+- ✅ Added NMSceneInfoOverlay for real-time position info
+- ✅ Placed 4 demo objects for testing
+- ✅ Connected to global selection system
+- 📊 SceneView Panel: 60% → 95% complete
+- 📊 Core Editing: 72% → 85% complete
 
 ### 2025-12-14 - Batch 2 Complete ✅
 - ✅ Added 7 property types with widget factory
@@ -506,6 +541,6 @@ This document tracks the implementation status of all GUI features from Issue #3
 - 📊 StoryGraph Editor: 50% → 75% complete
 
 ### Next Priority Goals
-- SceneView object interaction (gizmos, selection)
-- Timeline keyframe drag editing
+- Timeline keyframe drag editing + snapping
 - Asset Browser enhancements (thumbnails, context menus)
+- StoryGraph polish (minimap, validation, resizing)
