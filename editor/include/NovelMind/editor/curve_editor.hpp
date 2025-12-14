@@ -296,6 +296,8 @@ private:
     f32 m_zoom = 1.0f;
     f32 m_panX = 0.0f;
     f32 m_panY = 0.0f;
+    i32 m_width = 800;
+    i32 m_height = 600;
 
     // Selection
     std::vector<size_t> m_selectedPoints;
