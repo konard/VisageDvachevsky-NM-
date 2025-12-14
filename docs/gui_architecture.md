@@ -288,26 +288,29 @@ Manages runtime embedding for previewing visual novels in the editor.
 - `NMDebugOverlayPanel` - Runtime variable inspection
 - Breakpoint integration in `NMGraphNodeItem`
 
-**Implementation Status (Phase 5.0 - Mock Runtime):**
+**Implementation Status (Phase 5.0 - Mock Runtime): ✅ COMPLETE**
 - [x] Play Mode Controller with state machine (Stopped/Playing/Paused)
 - [x] Mock runtime simulation (1 node/second, demo data)
 - [x] Play toolbar panel with Play/Pause/Stop/Step buttons
-- [x] Keyboard shortcuts (F5=Play, Shift+F5=Stop, F10=Step)
-- [x] Debug overlay panel with 5 tabs (Variables/CallStack/Animations/Audio/Performance)
+- [x] Keyboard shortcuts (F5=Play, F6=Pause, F7=Stop, F10=Step)
+- [x] Debug overlay panel with 6 tabs (Variables/CallStack/Instruction/Animations/Audio/Performance)
 - [x] Variable editing when paused (double-click to edit)
 - [x] Breakpoint management system (add/remove/toggle/persist)
 - [x] Qt signals/slots for all state changes
-- [ ] Visual breakpoint indicators in StoryGraph (red dot) - IN PROGRESS
-- [ ] Current node highlighting during playback (yellow border) - IN PROGRESS
-- [ ] Context menu for breakpoint toggle - IN PROGRESS
-- [ ] Integration into main window - PENDING
+- [x] **Visual breakpoint indicators in StoryGraph (red circle with 3D effect)**
+- [x] **Current node highlighting during playback (pulsing green glow + execution arrow)**
+- [x] **Context menu for breakpoint toggle (right-click on node)**
+- [x] **Integration into main window (panels docked and registered)**
+- [x] **Auto-centering on currently executing node**
 
-**Definition of Done (Phase 5.0):**
+**Definition of Done (Phase 5.0): ✅ ALL COMPLETE**
 - [x] Can play through demo nodes in mock runtime
 - [x] Debug overlay shows runtime variables and call stack
 - [x] Can add/remove breakpoints programmatically
-- [ ] Can toggle breakpoints via UI (90% done, context menu remaining)
+- [x] Can toggle breakpoints via UI (context menu)
 - [x] Live variables visible and editable during pause
+- [x] Visual feedback for breakpoints and execution state
+- [x] Professional keyboard shortcuts matching industry tools
 
 **Future Work (Phase 5.1+):**
 - [ ] Real runtime integration (replace mock with ScriptVM)
