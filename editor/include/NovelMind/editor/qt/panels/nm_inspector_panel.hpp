@@ -19,6 +19,20 @@
 namespace NovelMind::editor::qt {
 
 /**
+ * @brief Property editor widget types
+ */
+enum class NMPropertyType
+{
+    String,
+    Integer,
+    Float,
+    Boolean,
+    Color,
+    Enum,
+    Asset
+};
+
+/**
  * @brief A collapsible group box for property categories
  */
 class NMPropertyGroup : public QWidget
@@ -33,10 +47,20 @@ public:
 
     void addProperty(const QString& name, const QString& value);
     void addProperty(const QString& name, QWidget* widget);
+
+    /**
+     * @brief Add an editable property
+     */
+    void addEditableProperty(const QString& name, NMPropertyType type, const QString& currentValue, const QStringList& enumValues = {});
+
     void clearProperties();
+
+signals:
+    void propertyValueChanged(const QString& propertyName, const QString& newValue);
 
 private slots:
     void onHeaderClicked();
+    void onPropertyEdited();
 
 private:
     QWidget* m_header = nullptr;
@@ -69,8 +93,9 @@ public:
      * @brief Show properties for an object
      * @param objectType Type of the object (for header display)
      * @param objectId ID of the object
+     * @param editable Whether properties should be editable
      */
-    void inspectObject(const QString& objectType, const QString& objectId);
+    void inspectObject(const QString& objectType, const QString& objectId, bool editable = true);
 
     /**
      * @brief Add a property group
@@ -82,8 +107,17 @@ public:
      */
     void showNoSelection();
 
+    /**
+     * @brief Enable or disable edit mode
+     */
+    void setEditMode(bool enabled) { m_editMode = enabled; }
+    [[nodiscard]] bool editMode() const { return m_editMode; }
+
 signals:
     void propertyChanged(const QString& objectId, const QString& propertyName, const QString& newValue);
+
+private slots:
+    void onGroupPropertyChanged(const QString& propertyName, const QString& newValue);
 
 private:
     void setupContent();
@@ -94,6 +128,8 @@ private:
     QLabel* m_headerLabel = nullptr;
     QLabel* m_noSelectionLabel = nullptr;
     QList<NMPropertyGroup*> m_groups;
+    QString m_currentObjectId;
+    bool m_editMode = true;
 };
 
 } // namespace NovelMind::editor::qt

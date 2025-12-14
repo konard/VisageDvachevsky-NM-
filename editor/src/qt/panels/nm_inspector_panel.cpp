@@ -7,6 +7,11 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QFrame>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QColorDialog>
 
 namespace NovelMind::editor::qt {
 
@@ -127,6 +132,251 @@ void NMPropertyGroup::onHeaderClicked()
     setExpanded(!m_expanded);
 }
 
+void NMPropertyGroup::addEditableProperty(const QString& name, NMPropertyType type, const QString& currentValue, const QStringList& enumValues)
+{
+    QWidget* editor = nullptr;
+    const auto& palette = NMStyleManager::instance().palette();
+
+    switch (type)
+    {
+    case NMPropertyType::String:
+    {
+        auto* lineEdit = new QLineEdit(currentValue);
+        lineEdit->setProperty("propertyName", name);
+        lineEdit->setStyleSheet(QString(
+            "QLineEdit {"
+            "  background-color: %1;"
+            "  color: %2;"
+            "  border: 1px solid %3;"
+            "  border-radius: 3px;"
+            "  padding: 4px;"
+            "}"
+            "QLineEdit:focus {"
+            "  border-color: %4;"
+            "}"
+        ).arg(palette.bgDark.name())
+         .arg(palette.textPrimary.name())
+         .arg(palette.borderDark.name())
+         .arg(palette.accentPrimary.name()));
+
+        connect(lineEdit, &QLineEdit::editingFinished, this, &NMPropertyGroup::onPropertyEdited);
+        editor = lineEdit;
+        break;
+    }
+
+    case NMPropertyType::Integer:
+    {
+        auto* spinBox = new QSpinBox();
+        spinBox->setProperty("propertyName", name);
+        spinBox->setRange(-999999, 999999);
+        spinBox->setValue(currentValue.toInt());
+        spinBox->setStyleSheet(QString(
+            "QSpinBox {"
+            "  background-color: %1;"
+            "  color: %2;"
+            "  border: 1px solid %3;"
+            "  border-radius: 3px;"
+            "  padding: 4px;"
+            "}"
+        ).arg(palette.bgDark.name())
+         .arg(palette.textPrimary.name())
+         .arg(palette.borderDark.name()));
+
+        connect(spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &NMPropertyGroup::onPropertyEdited);
+        editor = spinBox;
+        break;
+    }
+
+    case NMPropertyType::Float:
+    {
+        auto* doubleSpinBox = new QDoubleSpinBox();
+        doubleSpinBox->setProperty("propertyName", name);
+        doubleSpinBox->setRange(-999999.0, 999999.0);
+        doubleSpinBox->setDecimals(3);
+        doubleSpinBox->setValue(currentValue.toDouble());
+        doubleSpinBox->setStyleSheet(QString(
+            "QDoubleSpinBox {"
+            "  background-color: %1;"
+            "  color: %2;"
+            "  border: 1px solid %3;"
+            "  border-radius: 3px;"
+            "  padding: 4px;"
+            "}"
+        ).arg(palette.bgDark.name())
+         .arg(palette.textPrimary.name())
+         .arg(palette.borderDark.name()));
+
+        connect(doubleSpinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &NMPropertyGroup::onPropertyEdited);
+        editor = doubleSpinBox;
+        break;
+    }
+
+    case NMPropertyType::Boolean:
+    {
+        auto* checkBox = new QCheckBox();
+        checkBox->setProperty("propertyName", name);
+        checkBox->setChecked(currentValue.toLower() == "true" || currentValue == "1");
+        checkBox->setStyleSheet(QString("QCheckBox { color: %1; }").arg(palette.textPrimary.name()));
+
+        connect(checkBox, &QCheckBox::toggled, this, &NMPropertyGroup::onPropertyEdited);
+        editor = checkBox;
+        break;
+    }
+
+    case NMPropertyType::Enum:
+    {
+        auto* comboBox = new QComboBox();
+        comboBox->setProperty("propertyName", name);
+        comboBox->addItems(enumValues);
+        comboBox->setCurrentText(currentValue);
+        comboBox->setStyleSheet(QString(
+            "QComboBox {"
+            "  background-color: %1;"
+            "  color: %2;"
+            "  border: 1px solid %3;"
+            "  border-radius: 3px;"
+            "  padding: 4px;"
+            "}"
+            "QComboBox::drop-down {"
+            "  border: none;"
+            "}"
+            "QComboBox::down-arrow {"
+            "  image: none;"
+            "  border: none;"
+            "}"
+        ).arg(palette.bgDark.name())
+         .arg(palette.textPrimary.name())
+         .arg(palette.borderDark.name()));
+
+        connect(comboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &NMPropertyGroup::onPropertyEdited);
+        editor = comboBox;
+        break;
+    }
+
+    case NMPropertyType::Color:
+    {
+        auto* colorButton = new QPushButton();
+        colorButton->setProperty("propertyName", name);
+        colorButton->setFixedHeight(30);
+
+        QColor color(currentValue);
+        if (!color.isValid())
+        {
+            color = Qt::white;
+        }
+        colorButton->setProperty("currentColor", color);
+
+        colorButton->setStyleSheet(QString(
+            "QPushButton {"
+            "  background-color: %1;"
+            "  border: 1px solid %2;"
+            "  border-radius: 3px;"
+            "}"
+            "QPushButton:hover {"
+            "  border-color: %3;"
+            "}"
+        ).arg(color.name())
+         .arg(palette.borderDark.name())
+         .arg(palette.accentPrimary.name()));
+
+        connect(colorButton, &QPushButton::clicked, this, [this, colorButton, name]() {
+            QColor current = colorButton->property("currentColor").value<QColor>();
+            QColor newColor = QColorDialog::getColor(current, this, QString("Choose %1").arg(name));
+
+            if (newColor.isValid())
+            {
+                colorButton->setProperty("currentColor", newColor);
+                colorButton->setStyleSheet(QString(
+                    "QPushButton {"
+                    "  background-color: %1;"
+                    "  border: 1px solid %2;"
+                    "  border-radius: 3px;"
+                    "}"
+                ).arg(newColor.name())
+                 .arg(NMStyleManager::instance().palette().borderDark.name()));
+
+                emit propertyValueChanged(name, newColor.name());
+            }
+        });
+
+        editor = colorButton;
+        break;
+    }
+
+    case NMPropertyType::Asset:
+    {
+        // For assets, create a button that would open an asset picker dialog
+        auto* assetButton = new QPushButton(currentValue.isEmpty() ? "(Select Asset)" : currentValue);
+        assetButton->setProperty("propertyName", name);
+        assetButton->setStyleSheet(QString(
+            "QPushButton {"
+            "  background-color: %1;"
+            "  color: %2;"
+            "  border: 1px solid %3;"
+            "  border-radius: 3px;"
+            "  padding: 4px;"
+            "  text-align: left;"
+            "}"
+            "QPushButton:hover {"
+            "  border-color: %4;"
+            "}"
+        ).arg(palette.bgDark.name())
+         .arg(palette.textPrimary.name())
+         .arg(palette.borderDark.name())
+         .arg(palette.accentPrimary.name()));
+
+        connect(assetButton, &QPushButton::clicked, this, [this, name]() {
+            // TODO: Open asset picker dialog
+            // For now, just emit a change with placeholder
+            emit propertyValueChanged(name, "asset_placeholder.png");
+        });
+
+        editor = assetButton;
+        break;
+    }
+    }
+
+    if (editor)
+    {
+        addProperty(name, editor);
+    }
+}
+
+void NMPropertyGroup::onPropertyEdited()
+{
+    QObject* sender = QObject::sender();
+    if (!sender) return;
+
+    QString propertyName = sender->property("propertyName").toString();
+    QString newValue;
+
+    if (auto* lineEdit = qobject_cast<QLineEdit*>(sender))
+    {
+        newValue = lineEdit->text();
+    }
+    else if (auto* spinBox = qobject_cast<QSpinBox*>(sender))
+    {
+        newValue = QString::number(spinBox->value());
+    }
+    else if (auto* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(sender))
+    {
+        newValue = QString::number(doubleSpinBox->value(), 'f', 3);
+    }
+    else if (auto* checkBox = qobject_cast<QCheckBox*>(sender))
+    {
+        newValue = checkBox->isChecked() ? "true" : "false";
+    }
+    else if (auto* comboBox = qobject_cast<QComboBox*>(sender))
+    {
+        newValue = comboBox->currentText();
+    }
+
+    if (!propertyName.isEmpty())
+    {
+        emit propertyValueChanged(propertyName, newValue);
+    }
+}
+
 // ============================================================================
 // NMInspectorPanel
 // ============================================================================
@@ -163,10 +413,12 @@ void NMInspectorPanel::clear()
     m_headerLabel->clear();
 }
 
-void NMInspectorPanel::inspectObject(const QString& objectType, const QString& objectId)
+void NMInspectorPanel::inspectObject(const QString& objectType, const QString& objectId, bool editable)
 {
     clear();
     m_noSelectionLabel->hide();
+    m_currentObjectId = objectId;
+    m_editMode = editable;
 
     // Set header
     m_headerLabel->setText(QString("<b>%1</b><br><span style='color: gray;'>%2</span>")
@@ -176,27 +428,81 @@ void NMInspectorPanel::inspectObject(const QString& objectType, const QString& o
 
     // Add demo properties based on type
     auto* transformGroup = addGroup(tr("Transform"));
-    transformGroup->addProperty(tr("Position X"), "0.0");
-    transformGroup->addProperty(tr("Position Y"), "0.0");
-    transformGroup->addProperty(tr("Rotation"), "0.0");
-    transformGroup->addProperty(tr("Scale X"), "1.0");
-    transformGroup->addProperty(tr("Scale Y"), "1.0");
+
+    if (m_editMode)
+    {
+        transformGroup->addEditableProperty(tr("Position X"), NMPropertyType::Float, "0.0");
+        transformGroup->addEditableProperty(tr("Position Y"), NMPropertyType::Float, "0.0");
+        transformGroup->addEditableProperty(tr("Rotation"), NMPropertyType::Float, "0.0");
+        transformGroup->addEditableProperty(tr("Scale X"), NMPropertyType::Float, "1.0");
+        transformGroup->addEditableProperty(tr("Scale Y"), NMPropertyType::Float, "1.0");
+    }
+    else
+    {
+        transformGroup->addProperty(tr("Position X"), "0.0");
+        transformGroup->addProperty(tr("Position Y"), "0.0");
+        transformGroup->addProperty(tr("Rotation"), "0.0");
+        transformGroup->addProperty(tr("Scale X"), "1.0");
+        transformGroup->addProperty(tr("Scale Y"), "1.0");
+    }
+
+    connect(transformGroup, &NMPropertyGroup::propertyValueChanged,
+            this, &NMInspectorPanel::onGroupPropertyChanged);
 
     auto* renderGroup = addGroup(tr("Rendering"));
-    renderGroup->addProperty(tr("Visible"), "true");
-    renderGroup->addProperty(tr("Alpha"), "1.0");
-    renderGroup->addProperty(tr("Z-Order"), "0");
+
+    if (m_editMode)
+    {
+        renderGroup->addEditableProperty(tr("Visible"), NMPropertyType::Boolean, "true");
+        renderGroup->addEditableProperty(tr("Alpha"), NMPropertyType::Float, "1.0");
+        renderGroup->addEditableProperty(tr("Z-Order"), NMPropertyType::Integer, "0");
+        renderGroup->addEditableProperty(tr("Blend Mode"), NMPropertyType::Enum, "Normal",
+                                        {"Normal", "Additive", "Multiply", "Screen", "Overlay"});
+        renderGroup->addEditableProperty(tr("Tint Color"), NMPropertyType::Color, "#FFFFFF");
+    }
+    else
+    {
+        renderGroup->addProperty(tr("Visible"), "true");
+        renderGroup->addProperty(tr("Alpha"), "1.0");
+        renderGroup->addProperty(tr("Z-Order"), "0");
+    }
+
+    connect(renderGroup, &NMPropertyGroup::propertyValueChanged,
+            this, &NMInspectorPanel::onGroupPropertyChanged);
 
     if (objectType == "Dialogue" || objectType == "Choice")
     {
         auto* dialogueGroup = addGroup(tr("Dialogue"));
-        dialogueGroup->addProperty(tr("Speaker"), "Narrator");
-        dialogueGroup->addProperty(tr("Text"), objectId);
-        dialogueGroup->addProperty(tr("Voice Clip"), "(none)");
+
+        if (m_editMode)
+        {
+            dialogueGroup->addEditableProperty(tr("Speaker"), NMPropertyType::String, "Narrator");
+            dialogueGroup->addEditableProperty(tr("Text"), NMPropertyType::String, objectId);
+            dialogueGroup->addEditableProperty(tr("Voice Clip"), NMPropertyType::Asset, "");
+        }
+        else
+        {
+            dialogueGroup->addProperty(tr("Speaker"), "Narrator");
+            dialogueGroup->addProperty(tr("Text"), objectId);
+            dialogueGroup->addProperty(tr("Voice Clip"), "(none)");
+        }
+
+        connect(dialogueGroup, &NMPropertyGroup::propertyValueChanged,
+                this, &NMInspectorPanel::onGroupPropertyChanged);
     }
 
     // Add spacer at the end
     m_mainLayout->addStretch();
+}
+
+void NMInspectorPanel::onGroupPropertyChanged(const QString& propertyName, const QString& newValue)
+{
+    // Emit signal that property was changed
+    emit propertyChanged(m_currentObjectId, propertyName, newValue);
+
+    // TODO: Integrate with Undo/Redo system
+    // auto* undoManager = NMUndoManager::instance();
+    // undoManager->push(new PropertyChangeCommand(m_currentObjectId, propertyName, oldValue, newValue));
 }
 
 NMPropertyGroup* NMInspectorPanel::addGroup(const QString& title)
