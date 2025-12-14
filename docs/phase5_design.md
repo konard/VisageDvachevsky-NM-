@@ -1,10 +1,10 @@
-# Phase 5 Design: Play-In-Editor System
+# Дизайн фазы 5: Система Play-In-Editor
 
-## Overview
+## Обзор
 
-Phase 5 implements the Play-In-Editor (PIE) system, allowing developers to preview and debug visual novels directly within the editor. This phase integrates the NovelMind runtime engine with the Qt GUI, providing real-time debugging capabilities.
+Фаза 5 реализует систему Play-In-Editor (PIE), позволяющую разработчикам предварительно просматривать и отлаживать визуальные новеллы непосредственно в редакторе. Эта фаза интегрирует движок среды выполнения NovelMind с Qt GUI, обеспечивая возможности отладки в реальном времени.
 
-## Architecture
+## Архитектура
 
 ```
 ┌──────────────────────────────────────────────────────────┐
@@ -35,13 +35,13 @@ Phase 5 implements the Play-In-Editor (PIE) system, allowing developers to previ
 └──────────────────────────────────────────────────────────┘
 ```
 
-## Components
+## Компоненты
 
 ### 1. NMPlayModeController
 
-**Responsibility**: Central coordinator for Play-In-Editor mode
+**Ответственность**: Центральный координатор режима Play-In-Editor
 
-**Key Methods:**
+**Ключевые методы:**
 ```cpp
 class NMPlayModeController : public QObject {
     Q_OBJECT
@@ -50,23 +50,23 @@ public:
 
     static NMPlayModeController& instance();
 
-    // Playback control
+    // Управление воспроизведением
     void play();
     void pause();
     void stop();
-    void stepForward();  // Execute one instruction
+    void stepForward();  // Выполнить одну инструкцию
 
-    // State queries
+    // Запросы состояния
     PlayMode playMode() const;
     bool isPlaying() const;
     bool isPaused() const;
 
-    // Breakpoint management
+    // Управление точками останова
     void toggleBreakpoint(const QString& nodeId);
     bool hasBreakpoint(const QString& nodeId) const;
     void clearAllBreakpoints();
 
-    // Variable inspection
+    // Инспекция переменных
     QVariantMap getCurrentVariables() const;
     void setVariable(const QString& name, const QVariant& value);
 
@@ -82,42 +82,42 @@ private:
     QString m_currentNodeId;
     QVariantMap m_variables;
 
-    // Runtime integration (to be implemented)
+    // Интеграция среды выполнения (будет реализовано)
     // std::unique_ptr<RuntimeBridge> m_runtime;
 };
 ```
 
-### 2. NMPlayToolbar Panel
+### 2. Панель NMPlayToolbar
 
-**Responsibility**: Playback controls in main toolbar
+**Ответственность**: Элементы управления воспроизведением на главной панели инструментов
 
-**Features:**
-- Play button (▶️) - Start execution
-- Pause button (⏸️) - Pause at next instruction
-- Stop button (⏹️) - Terminate and reset
-- Step Forward button (⏭️) - Execute one instruction
-- Play mode indicator (status label)
-- Frame counter / time display
+**Возможности:**
+- Кнопка Play (▶️) - Начать выполнение
+- Кнопка Pause (⏸️) - Пауза на следующей инструкции
+- Кнопка Stop (⏹️) - Завершить и сбросить
+- Кнопка Step Forward (⏭️) - Выполнить одну инструкцию
+- Индикатор режима воспроизведения (метка состояния)
+- Счетчик кадров / отображение времени
 
-**UI Layout:**
+**Макет UI:**
 ```
 ┌────────────────────────────────────────────────┐
 │ [▶️ Play] [⏸️ Pause] [⏹️ Stop] [⏭️ Step] │ Stopped │
 └────────────────────────────────────────────────┘
 ```
 
-### 3. NMDebugOverlayPanel
+### 3. Панель NMDebugOverlay
 
-**Responsibility**: Runtime variable and state inspection
+**Ответственность**: Инспекция переменных и состояния среды выполнения
 
-**Features:**
-- **Variables Tab**: Live VM variables with editable values
-- **Call Stack Tab**: Current execution stack
-- **Animation Tab**: Active animations with progress bars
-- **Audio Tab**: Playing audio channels with volume meters
-- **Performance Tab**: Frame time, memory usage
+**Возможности:**
+- **Вкладка Variables**: Живые переменные VM с редактируемыми значениями
+- **Вкладка Call Stack**: Текущий стек выполнения
+- **Вкладка Animation**: Активные анимации с полосами прогресса
+- **Вкладка Audio**: Воспроизводимые аудио-каналы с индикаторами громкости
+- **Вкладка Performance**: Время кадра, использование памяти
 
-**UI Layout (Variables Tab):**
+**Макет UI (вкладка Variables):**
 ```
 ┌─────────────────────────────────────────┐
 │ Variables                         🔍    │
@@ -140,21 +140,21 @@ private:
 └─────────────────────────────────────────┘
 ```
 
-### 4. Breakpoint System Integration
+### 4. Интеграция системы точек останова
 
-**Responsibility**: Pause execution at specific graph nodes
+**Ответственность**: Приостановка выполнения на определенных узлах графа
 
-**Implementation:**
-- Visual breakpoint indicator in StoryGraph panel (red dot 🔴)
-- Click gutter to toggle breakpoints
-- Breakpoints persist in project settings
-- Breakpoint hit triggers `breakpointHit()` signal
-- Current node highlighted with yellow border
+**Реализация:**
+- Визуальный индикатор точки останова на панели StoryGraph (красная точка 🔴)
+- Клик на поле для переключения точек останова
+- Точки останова сохраняются в настройках проекта
+- Попадание на точку останова вызывает сигнал `breakpointHit()`
+- Текущий узел подсвечивается желтой границей
 
-**StoryGraph Integration:**
+**Интеграция StoryGraph:**
 ```cpp
 class NMStoryGraphPanel : public NMDockPanel {
-    // ... existing code ...
+    // ... существующий код ...
 
 protected:
     void paintEvent(QPaintEvent* event) override;
@@ -164,16 +164,16 @@ private:
     void drawBreakpointGutter(QPainter& painter);
     void handleBreakpointClick(const QPoint& pos);
 
-    QSet<QString> m_nodeBreakpoints;  // Synced with controller
-    QString m_currentExecutingNode;    // Highlighted during play
+    QSet<QString> m_nodeBreakpoints;  // Синхронизировано с контроллером
+    QString m_currentExecutingNode;    // Подсвечивается во время воспроизведения
 };
 ```
 
-### 5. Runtime Thread Management
+### 5. Управление потоком среды выполнения
 
-**Responsibility**: Run engine in separate thread to avoid blocking UI
+**Ответственность**: Запуск движка в отдельном потоке, чтобы избежать блокировки UI
 
-**Design:**
+**Дизайн:**
 ```cpp
 class RuntimeWorker : public QObject {
     Q_OBJECT
@@ -198,7 +198,7 @@ private:
     // std::unique_ptr<ScriptVM> m_vm;
 };
 
-// In NMPlayModeController:
+// В NMPlayModeController:
 void NMPlayModeController::play() {
     if (!m_workerThread) {
         m_workerThread = new QThread(this);
@@ -207,7 +207,7 @@ void NMPlayModeController::play() {
 
         connect(m_worker, &RuntimeWorker::runtimePaused,
                 this, &NMPlayModeController::onRuntimePaused);
-        // ... more connections
+        // ... больше подключений
 
         m_workerThread->start();
     }
@@ -218,200 +218,200 @@ void NMPlayModeController::play() {
 }
 ```
 
-## Implementation Plan
+## План реализации
 
-### Step 1: Controller Foundation
-- Implement `NMPlayModeController` singleton
-- Add play/pause/stop state machine
-- Emit signals for state changes
-- Add to main window toolbar
+### Шаг 1: Фундамент контроллера
+- Реализовать синглтон `NMPlayModeController`
+- Добавить конечный автомат play/pause/stop
+- Отправлять сигналы об изменениях состояния
+- Добавить на панель инструментов главного окна
 
-### Step 2: Play Toolbar Panel
-- Create `NMPlayToolbarPanel` with buttons
-- Connect buttons to controller methods
-- Update button states based on play mode
-- Add keyboard shortcuts (F5 = Play, Shift+F5 = Stop)
+### Шаг 2: Панель Play Toolbar
+- Создать `NMPlayToolbarPanel` с кнопками
+- Подключить кнопки к методам контроллера
+- Обновлять состояния кнопок на основе режима воспроизведения
+- Добавить горячие клавиши (F5 = Play, Shift+F5 = Stop)
 
-### Step 3: Breakpoint System
-- Add breakpoint toggle in `NMStoryGraphPanel`
-- Visual breakpoint indicators (red dot)
-- Sync breakpoints with controller
-- Persist breakpoints in project settings
+### Шаг 3: Система точек останова
+- Добавить переключение точки останова в `NMStoryGraphPanel`
+- Визуальные индикаторы точек останова (красная точка)
+- Синхронизировать точки останова с контроллером
+- Сохранять точки останова в настройках проекта
 
-### Step 4: Debug Overlay Panel
-- Create `NMDebugOverlayPanel` with tabs
-- Variables tree view with edit capability
-- Connect to controller variable signals
-- Add refresh button and auto-update option
+### Шаг 4: Панель Debug Overlay
+- Создать `NMDebugOverlayPanel` с вкладками
+- Древовидное представление переменных с возможностью редактирования
+- Подключить к сигналам переменных контроллера
+- Добавить кнопку обновления и опцию автообновления
 
-### Step 5: Runtime Integration (Stub for now)
-- Create runtime bridge interface
-- Implement mock VM for testing
-- Add thread management for non-blocking execution
-- Connect runtime events to controller signals
+### Шаг 5: Интеграция среды выполнения (пока заглушка)
+- Создать интерфейс моста среды выполнения
+- Реализовать макет VM для тестирования
+- Добавить управление потоками для неблокирующего выполнения
+- Подключить события среды выполнения к сигналам контроллера
 
-### Step 6: Current Node Highlighting
-- Highlight current node in StoryGraph during play
-- Scroll to active node automatically
-- Show execution path with faded connection lines
-- Timeline playback sync (if applicable)
+### Шаг 6: Подсветка текущего узла
+- Подсветить текущий узел в StoryGraph во время воспроизведения
+- Автоматическая прокрутка к активному узлу
+- Показать путь выполнения с затененными линиями соединения
+- Синхронизация воспроизведения временной шкалы (если применимо)
 
-## User Workflows
+## Пользовательские рабочие процессы
 
-### Workflow 1: Basic Playback
-1. User clicks "Play" button (or presses F5)
-2. Controller enters Playing mode
-3. Runtime starts executing from entry node
-4. Current node highlighted in StoryGraph
-5. Variables updated in Debug Overlay
-6. User clicks "Stop" to end
+### Рабочий процесс 1: Базовое воспроизведение
+1. Пользователь нажимает кнопку "Play" (или нажимает F5)
+2. Контроллер переходит в режим Playing
+3. Среда выполнения начинает выполнение с входного узла
+4. Текущий узел подсвечивается в StoryGraph
+5. Переменные обновляются в Debug Overlay
+6. Пользователь нажимает "Stop" для завершения
 
-### Workflow 2: Debugging with Breakpoints
-1. User right-clicks node in StoryGraph → "Toggle Breakpoint"
-2. Red dot appears on node
-3. User clicks "Play"
-4. Runtime executes until breakpoint node
-5. Controller enters Paused mode
-6. User inspects variables in Debug Overlay
-7. User clicks "Step Forward" to continue step-by-step
+### Рабочий процесс 2: Отладка с точками останова
+1. Пользователь щелкает правой кнопкой мыши на узле в StoryGraph → "Toggle Breakpoint"
+2. Появляется красная точка на узле
+3. Пользователь нажимает "Play"
+4. Среда выполнения выполняется до узла с точкой останова
+5. Контроллер переходит в режим Paused
+6. Пользователь проверяет переменные в Debug Overlay
+7. Пользователь нажимает "Step Forward" для пошагового продолжения
 
-### Workflow 3: Live Variable Editing
-1. Runtime is paused at breakpoint
-2. User opens Debug Overlay → Variables tab
-3. User double-clicks variable value → edit dialog
-4. User changes "affection" from 50 to 100
-5. Controller applies change to runtime
-6. User clicks "Play" to continue with new value
+### Рабочий процесс 3: Редактирование живых переменных
+1. Среда выполнения приостановлена на точке останова
+2. Пользователь открывает Debug Overlay → вкладка Variables
+3. Пользователь дважды щелкает на значении переменной → диалог редактирования
+4. Пользователь меняет "affection" с 50 на 100
+5. Контроллер применяет изменение к среде выполнения
+6. Пользователь нажимает "Play" для продолжения с новым значением
 
-## Event Flow
+## Поток событий
 
 ```
-User Action → Controller → Runtime → Controller → UI Update
+Действие пользователя → Контроллер → Среда выполнения → Контроллер → Обновление UI
 
-Example: Play Button Click
-├─ User: Click Play button
+Пример: Клик на кнопку Play
+├─ Пользователь: Клик на кнопку Play
 ├─ NMPlayToolbarPanel: emit playClicked()
 ├─ NMPlayModeController: play()
-│  ├─ Start RuntimeWorker thread
+│  ├─ Запуск потока RuntimeWorker
 │  ├─ m_playMode = Playing
 │  └─ emit playModeChanged(Playing)
 ├─ RuntimeWorker: executeInstructionLoop()
-│  ├─ VM executes node instructions
+│  ├─ VM выполняет инструкции узла
 │  ├─ emit nodeExecuted(nodeId)
 │  └─ emit variableUpdate(vars)
-├─ NMPlayModeController: Receive signals
-│  ├─ Update m_currentNodeId
-│  ├─ Update m_variables
+├─ NMPlayModeController: Получение сигналов
+│  ├─ Обновление m_currentNodeId
+│  ├─ Обновление m_variables
 │  ├─ emit currentNodeChanged(nodeId)
 │  └─ emit variablesChanged(vars)
-└─ UI Panels: Update visuals
-   ├─ NMStoryGraphPanel: Highlight current node
-   ├─ NMDebugOverlayPanel: Refresh variable tree
-   └─ NMPlayToolbarPanel: Update status label
+└─ Панели UI: Обновление визуализации
+   ├─ NMStoryGraphPanel: Подсветка текущего узла
+   ├─ NMDebugOverlayPanel: Обновление дерева переменных
+   └─ NMPlayToolbarPanel: Обновление метки состояния
 ```
 
-## Integration with Existing Systems
+## Интеграция с существующими системами
 
-### Event Bus Integration
+### Интеграция с шиной событий
 ```cpp
-// Publish events from controller
+// Публикация событий из контроллера
 QtEventBus::instance().publish(PlayModeChangedEvent{m_playMode});
 QtEventBus::instance().publish(BreakpointHitEvent{nodeId});
 
-// Panels subscribe to events
+// Панели подписываются на события
 QtEventBus::instance().subscribe<PlayModeChangedEvent>([this](const auto& e) {
     updatePlayModeUI(e.playMode);
 });
 ```
 
-### Undo/Redo Integration
-- Variable edits during play mode do NOT go through Undo/Redo
-- Only project-level changes (adding breakpoints) are undoable
-- Play mode is a separate "debug state" not part of project state
+### Интеграция с отменой/повтором
+- Редактирование переменных во время режима воспроизведения НЕ проходит через отмену/повтор
+- Только изменения на уровне проекта (добавление точек останова) можно отменить
+- Режим воспроизведения - это отдельное "состояние отладки", не часть состояния проекта
 
-### Selection System Integration
-- Current executing node is NOT treated as "selected"
-- Separate visual indicator (yellow border vs blue selection)
-- User can still select other nodes while playing
+### Интеграция с системой выбора
+- Текущий выполняемый узел НЕ рассматривается как "выбранный"
+- Отдельный визуальный индикатор (желтая граница vs синий выбор)
+- Пользователь все еще может выбирать другие узлы во время воспроизведения
 
-## File Structure
+## Структура файлов
 
 ```
 editor/
 ├── include/NovelMind/editor/qt/
-│   ├── nm_play_mode_controller.hpp      # NEW
-│   ├── nm_breakpoint_manager.hpp        # NEW
+│   ├── nm_play_mode_controller.hpp      # НОВЫЙ
+│   ├── nm_breakpoint_manager.hpp        # НОВЫЙ
 │   └── panels/
-│       ├── nm_play_toolbar_panel.hpp    # NEW
-│       └── nm_debug_overlay_panel.hpp   # NEW
+│       ├── nm_play_toolbar_panel.hpp    # НОВЫЙ
+│       └── nm_debug_overlay_panel.hpp   # НОВЫЙ
 ├── src/qt/
-│   ├── nm_play_mode_controller.cpp      # NEW
-│   ├── nm_breakpoint_manager.cpp        # NEW
+│   ├── nm_play_mode_controller.cpp      # НОВЫЙ
+│   ├── nm_breakpoint_manager.cpp        # НОВЫЙ
 │   └── panels/
-│       ├── nm_play_toolbar_panel.cpp    # NEW
-│       └── nm_debug_overlay_panel.cpp   # NEW
+│       ├── nm_play_toolbar_panel.cpp    # НОВЫЙ
+│       └── nm_debug_overlay_panel.cpp   # НОВЫЙ
 ```
 
-## Testing Strategy
+## Стратегия тестирования
 
-### Unit Tests
-- Controller state transitions (Stopped → Playing → Paused → Stopped)
-- Breakpoint add/remove/toggle
-- Variable get/set operations
+### Модульные тесты
+- Переходы состояний контроллера (Stopped → Playing → Paused → Stopped)
+- Добавление/удаление/переключение точки останова
+- Операции получения/установки переменных
 
-### Integration Tests
-- Signal/slot connections
-- Multi-threaded runtime execution
-- UI updates on state changes
+### Интеграционные тесты
+- Соединения сигнал/слот
+- Многопоточное выполнение среды выполнения
+- Обновления UI при изменениях состояния
 
-### Manual Testing
-- Keyboard shortcut responsiveness
-- Breakpoint visual indicators
-- Variable editing during pause
-- Thread safety (no UI freezing)
+### Ручное тестирование
+- Отзывчивость горячих клавиш
+- Визуальные индикаторы точек останова
+- Редактирование переменных во время паузы
+- Безопасность потоков (без зависания UI)
 
-## Phase 5 Definition of Done
+## Критерии завершения фазы 5
 
-- [ ] `NMPlayModeController` implemented with state machine
-- [ ] Play toolbar with Play/Pause/Stop/Step buttons
-- [ ] Breakpoint system in StoryGraph panel
-- [ ] Debug Overlay panel with variable tree
-- [ ] Current node highlighting during playback
-- [ ] Runtime thread management (stub implementation)
-- [ ] F5 keyboard shortcut for Play
-- [ ] All signals/slots connected
-- [ ] No UI blocking during playback
-- [ ] Breakpoints persist in project settings
-- [ ] CI passing on all platforms
+- [ ] `NMPlayModeController` реализован с конечным автоматом
+- [ ] Панель инструментов воспроизведения с кнопками Play/Pause/Stop/Step
+- [ ] Система точек останова на панели StoryGraph
+- [ ] Панель Debug Overlay с деревом переменных
+- [ ] Подсветка текущего узла во время воспроизведения
+- [ ] Управление потоком среды выполнения (заглушка реализации)
+- [ ] Горячая клавиша F5 для Play
+- [ ] Все сигналы/слоты подключены
+- [ ] Нет блокировки UI во время воспроизведения
+- [ ] Точки останова сохраняются в настройках проекта
+- [ ] CI проходит на всех платформах
 
-## Future Enhancements (Post-Phase 5)
+## Будущие улучшения (после фазы 5)
 
-- **Advanced Debugging**: Conditional breakpoints, watch expressions
-- **Performance Profiling**: CPU/memory usage per node
-- **Hot Reload**: Edit scripts during play mode
-- **Recording**: Record playthrough for testing
-- **Network Debugging**: Inspect networked visual novel state
-- **Scripting Console**: Execute arbitrary commands during play
+- **Продвинутая отладка**: Условные точки останова, выражения отслеживания
+- **Профилирование производительности**: Использование CPU/памяти на узел
+- **Горячая перезагрузка**: Редактирование скриптов во время режима воспроизведения
+- **Запись**: Запись прохождения для тестирования
+- **Сетевая отладка**: Инспекция состояния сетевой визуальной новеллы
+- **Консоль скриптинга**: Выполнение произвольных команд во время воспроизведения
 
-## Notes
+## Примечания
 
-**Runtime Integration**: For Phase 5.0, we'll implement a **mock runtime** that simulates node execution without full engine integration. This allows us to validate the GUI architecture before the complex engine integration.
+**Интеграция среды выполнения**: Для фазы 5.0 мы реализуем **макет среды выполнения**, который симулирует выполнение узлов без полной интеграции движка. Это позволяет нам проверить архитектуру GUI перед сложной интеграцией движка.
 
-**Mock Runtime Behavior**:
-- Step through demo StoryGraph nodes at 1 node/second
-- Generate fake variables (playerName, affection, chapter)
-- Respect breakpoints (pause when hit)
-- Thread-safe communication with GUI
+**Поведение макета среды выполнения**:
+- Пошаговое прохождение демо-узлов StoryGraph со скоростью 1 узел/секунду
+- Генерация поддельных переменных (playerName, affection, chapter)
+- Соблюдение точек останова (пауза при попадании)
+- Потокобезопасная связь с GUI
 
-**Real Runtime Integration** (Phase 5.1+):
-- Replace mock with actual ScriptVM
-- Integrate scene rendering in SceneView
-- Connect Timeline playback
-- Full audio/animation system
+**Реальная интеграция среды выполнения** (Фаза 5.1+):
+- Замена макета на настоящий ScriptVM
+- Интеграция отрисовки сцены в SceneView
+- Подключение воспроизведения Timeline
+- Полная система аудио/анимации
 
 ---
 
-**Status**: Ready for implementation
-**Dependencies**: None (builds on Phases 0-4)
-**Estimated Complexity**: Medium-High
-**Priority**: HIGH - Core editor functionality
+**Статус**: Готово к реализации
+**Зависимости**: Нет (строится на фазах 0-4)
+**Оценочная сложность**: Средне-высокая
+**Приоритет**: ВЫСОКИЙ - Основная функциональность редактора
