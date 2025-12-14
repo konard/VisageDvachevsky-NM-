@@ -2,6 +2,7 @@
 #include "NovelMind/editor/qt/nm_style_manager.hpp"
 #include "NovelMind/editor/qt/nm_dock_panel.hpp"
 #include "NovelMind/editor/qt/nm_undo_manager.hpp"
+#include "NovelMind/editor/qt/nm_icon_manager.hpp"
 #include "NovelMind/editor/qt/panels/nm_scene_view_panel.hpp"
 #include "NovelMind/editor/qt/panels/nm_story_graph_panel.hpp"
 #include "NovelMind/editor/qt/panels/nm_inspector_panel.hpp"
@@ -90,68 +91,83 @@ void NMMainWindow::shutdown()
 void NMMainWindow::setupMenuBar()
 {
     QMenuBar* menuBar = this->menuBar();
+    auto& iconMgr = NMIconManager::instance();
 
     // =========================================================================
     // File Menu
     // =========================================================================
     QMenu* fileMenu = menuBar->addMenu(tr("&File"));
 
-    m_actionNewProject = fileMenu->addAction(tr("&New Project..."));
+    m_actionNewProject = fileMenu->addAction(iconMgr.getIcon("file-new", 16), tr("&New Project..."));
     m_actionNewProject->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_N));
+    m_actionNewProject->setToolTip(tr("Create a new NovelMind project"));
 
-    m_actionOpenProject = fileMenu->addAction(tr("&Open Project..."));
+    m_actionOpenProject = fileMenu->addAction(iconMgr.getIcon("file-open", 16), tr("&Open Project..."));
     m_actionOpenProject->setShortcut(QKeySequence::Open);
+    m_actionOpenProject->setToolTip(tr("Open an existing project"));
 
     fileMenu->addSeparator();
 
-    m_actionSaveProject = fileMenu->addAction(tr("&Save Project"));
+    m_actionSaveProject = fileMenu->addAction(iconMgr.getIcon("file-save", 16), tr("&Save Project"));
     m_actionSaveProject->setShortcut(QKeySequence::Save);
+    m_actionSaveProject->setToolTip(tr("Save the current project"));
 
-    m_actionSaveProjectAs = fileMenu->addAction(tr("Save Project &As..."));
+    m_actionSaveProjectAs = fileMenu->addAction(iconMgr.getIcon("file-save", 16), tr("Save Project &As..."));
     m_actionSaveProjectAs->setShortcut(QKeySequence::SaveAs);
+    m_actionSaveProjectAs->setToolTip(tr("Save the project with a new name"));
 
     fileMenu->addSeparator();
 
-    m_actionCloseProject = fileMenu->addAction(tr("&Close Project"));
+    m_actionCloseProject = fileMenu->addAction(iconMgr.getIcon("file-close", 16), tr("&Close Project"));
+    m_actionCloseProject->setToolTip(tr("Close the current project"));
 
     fileMenu->addSeparator();
 
     m_actionExit = fileMenu->addAction(tr("E&xit"));
     m_actionExit->setShortcut(QKeySequence::Quit);
+    m_actionExit->setToolTip(tr("Exit the editor"));
 
     // =========================================================================
     // Edit Menu
     // =========================================================================
     QMenu* editMenu = menuBar->addMenu(tr("&Edit"));
 
-    m_actionUndo = editMenu->addAction(tr("&Undo"));
+    m_actionUndo = editMenu->addAction(iconMgr.getIcon("edit-undo", 16), tr("&Undo"));
     m_actionUndo->setShortcut(QKeySequence::Undo);
+    m_actionUndo->setToolTip(tr("Undo the last action"));
 
-    m_actionRedo = editMenu->addAction(tr("&Redo"));
+    m_actionRedo = editMenu->addAction(iconMgr.getIcon("edit-redo", 16), tr("&Redo"));
     m_actionRedo->setShortcut(QKeySequence::Redo);
+    m_actionRedo->setToolTip(tr("Redo the previously undone action"));
 
     editMenu->addSeparator();
 
-    m_actionCut = editMenu->addAction(tr("Cu&t"));
+    m_actionCut = editMenu->addAction(iconMgr.getIcon("edit-cut", 16), tr("Cu&t"));
     m_actionCut->setShortcut(QKeySequence::Cut);
+    m_actionCut->setToolTip(tr("Cut selected items"));
 
-    m_actionCopy = editMenu->addAction(tr("&Copy"));
+    m_actionCopy = editMenu->addAction(iconMgr.getIcon("edit-copy", 16), tr("&Copy"));
     m_actionCopy->setShortcut(QKeySequence::Copy);
+    m_actionCopy->setToolTip(tr("Copy selected items"));
 
-    m_actionPaste = editMenu->addAction(tr("&Paste"));
+    m_actionPaste = editMenu->addAction(iconMgr.getIcon("edit-paste", 16), tr("&Paste"));
     m_actionPaste->setShortcut(QKeySequence::Paste);
+    m_actionPaste->setToolTip(tr("Paste from clipboard"));
 
-    m_actionDelete = editMenu->addAction(tr("&Delete"));
+    m_actionDelete = editMenu->addAction(iconMgr.getIcon("edit-delete", 16), tr("&Delete"));
     m_actionDelete->setShortcut(QKeySequence::Delete);
+    m_actionDelete->setToolTip(tr("Delete selected items"));
 
     editMenu->addSeparator();
 
     m_actionSelectAll = editMenu->addAction(tr("Select &All"));
     m_actionSelectAll->setShortcut(QKeySequence::SelectAll);
+    m_actionSelectAll->setToolTip(tr("Select all items"));
 
     editMenu->addSeparator();
 
-    m_actionPreferences = editMenu->addAction(tr("&Preferences..."));
+    m_actionPreferences = editMenu->addAction(iconMgr.getIcon("settings", 16), tr("&Preferences..."));
+    m_actionPreferences->setToolTip(tr("Open editor preferences"));
 
     // =========================================================================
     // View Menu
@@ -160,67 +176,80 @@ void NMMainWindow::setupMenuBar()
 
     QMenu* panelsMenu = viewMenu->addMenu(tr("&Panels"));
 
-    m_actionToggleSceneView = panelsMenu->addAction(tr("&Scene View"));
+    m_actionToggleSceneView = panelsMenu->addAction(iconMgr.getIcon("panel-scene", 16), tr("&Scene View"));
     m_actionToggleSceneView->setCheckable(true);
     m_actionToggleSceneView->setChecked(true);
+    m_actionToggleSceneView->setToolTip(tr("Toggle Scene View panel"));
 
-    m_actionToggleStoryGraph = panelsMenu->addAction(tr("Story &Graph"));
+    m_actionToggleStoryGraph = panelsMenu->addAction(iconMgr.getIcon("panel-graph", 16), tr("Story &Graph"));
     m_actionToggleStoryGraph->setCheckable(true);
     m_actionToggleStoryGraph->setChecked(true);
+    m_actionToggleStoryGraph->setToolTip(tr("Toggle Story Graph panel"));
 
-    m_actionToggleInspector = panelsMenu->addAction(tr("&Inspector"));
+    m_actionToggleInspector = panelsMenu->addAction(iconMgr.getIcon("panel-inspector", 16), tr("&Inspector"));
     m_actionToggleInspector->setCheckable(true);
     m_actionToggleInspector->setChecked(true);
+    m_actionToggleInspector->setToolTip(tr("Toggle Inspector panel"));
 
-    m_actionToggleConsole = panelsMenu->addAction(tr("&Console"));
+    m_actionToggleConsole = panelsMenu->addAction(iconMgr.getIcon("panel-console", 16), tr("&Console"));
     m_actionToggleConsole->setCheckable(true);
     m_actionToggleConsole->setChecked(true);
+    m_actionToggleConsole->setToolTip(tr("Toggle Console panel"));
 
-    m_actionToggleAssetBrowser = panelsMenu->addAction(tr("&Asset Browser"));
+    m_actionToggleAssetBrowser = panelsMenu->addAction(iconMgr.getIcon("panel-assets", 16), tr("&Asset Browser"));
     m_actionToggleAssetBrowser->setCheckable(true);
     m_actionToggleAssetBrowser->setChecked(true);
+    m_actionToggleAssetBrowser->setToolTip(tr("Toggle Asset Browser panel"));
 
-    m_actionToggleHierarchy = panelsMenu->addAction(tr("&Hierarchy"));
+    m_actionToggleHierarchy = panelsMenu->addAction(iconMgr.getIcon("panel-hierarchy", 16), tr("&Hierarchy"));
     m_actionToggleHierarchy->setCheckable(true);
     m_actionToggleHierarchy->setChecked(true);
+    m_actionToggleHierarchy->setToolTip(tr("Toggle Hierarchy panel"));
 
     viewMenu->addSeparator();
 
-    m_actionResetLayout = viewMenu->addAction(tr("&Reset Layout"));
+    m_actionResetLayout = viewMenu->addAction(iconMgr.getIcon("refresh", 16), tr("&Reset Layout"));
+    m_actionResetLayout->setToolTip(tr("Reset all panels to default layout"));
 
     // =========================================================================
     // Play Menu
     // =========================================================================
     QMenu* playMenu = menuBar->addMenu(tr("&Play"));
 
-    m_actionPlay = playMenu->addAction(tr("&Play"));
+    m_actionPlay = playMenu->addAction(iconMgr.getIcon("play", 16), tr("&Play"));
     m_actionPlay->setShortcut(Qt::Key_F5);
+    m_actionPlay->setToolTip(tr("Start playback (F5)"));
 
-    m_actionPause = playMenu->addAction(tr("Pa&use"));
+    m_actionPause = playMenu->addAction(iconMgr.getIcon("pause", 16), tr("Pa&use"));
     m_actionPause->setShortcut(Qt::Key_F6);
     m_actionPause->setEnabled(false);
+    m_actionPause->setToolTip(tr("Pause playback (F6)"));
 
-    m_actionStop = playMenu->addAction(tr("&Stop"));
+    m_actionStop = playMenu->addAction(iconMgr.getIcon("stop", 16), tr("&Stop"));
     m_actionStop->setShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F5));
     m_actionStop->setEnabled(false);
+    m_actionStop->setToolTip(tr("Stop playback (Shift+F5)"));
 
     playMenu->addSeparator();
 
-    m_actionStepFrame = playMenu->addAction(tr("Step &Frame"));
+    m_actionStepFrame = playMenu->addAction(iconMgr.getIcon("step-forward", 16), tr("Step &Frame"));
     m_actionStepFrame->setShortcut(Qt::Key_F10);
     m_actionStepFrame->setEnabled(false);
+    m_actionStepFrame->setToolTip(tr("Step one frame forward (F10)"));
 
     // =========================================================================
     // Help Menu
     // =========================================================================
     QMenu* helpMenu = menuBar->addMenu(tr("&Help"));
 
-    m_actionDocumentation = helpMenu->addAction(tr("&Documentation"));
+    m_actionDocumentation = helpMenu->addAction(iconMgr.getIcon("help", 16), tr("&Documentation"));
     m_actionDocumentation->setShortcut(Qt::Key_F1);
+    m_actionDocumentation->setToolTip(tr("Open documentation (F1)"));
 
     helpMenu->addSeparator();
 
-    m_actionAbout = helpMenu->addAction(tr("&About NovelMind Editor..."));
+    m_actionAbout = helpMenu->addAction(iconMgr.getIcon("info", 16), tr("&About NovelMind Editor..."));
+    m_actionAbout->setToolTip(tr("About NovelMind Editor"));
 }
 
 void NMMainWindow::setupToolBar()
@@ -258,24 +287,32 @@ void NMMainWindow::setupStatusBar()
 
 void NMMainWindow::setupPanels()
 {
-    // Create all panels
+    auto& iconMgr = NMIconManager::instance();
+
+    // Create all panels with their respective icons
     m_sceneViewPanel = new NMSceneViewPanel(this);
     m_sceneViewPanel->setObjectName("SceneViewPanel");
+    m_sceneViewPanel->setWindowIcon(iconMgr.getIcon("panel-scene", 16));
 
     m_storyGraphPanel = new NMStoryGraphPanel(this);
     m_storyGraphPanel->setObjectName("StoryGraphPanel");
+    m_storyGraphPanel->setWindowIcon(iconMgr.getIcon("panel-graph", 16));
 
     m_inspectorPanel = new NMInspectorPanel(this);
     m_inspectorPanel->setObjectName("InspectorPanel");
+    m_inspectorPanel->setWindowIcon(iconMgr.getIcon("panel-inspector", 16));
 
     m_consolePanel = new NMConsolePanel(this);
     m_consolePanel->setObjectName("ConsolePanel");
+    m_consolePanel->setWindowIcon(iconMgr.getIcon("panel-console", 16));
 
     m_assetBrowserPanel = new NMAssetBrowserPanel(this);
     m_assetBrowserPanel->setObjectName("AssetBrowserPanel");
+    m_assetBrowserPanel->setWindowIcon(iconMgr.getIcon("panel-assets", 16));
 
     m_hierarchyPanel = new NMHierarchyPanel(this);
     m_hierarchyPanel->setObjectName("HierarchyPanel");
+    m_hierarchyPanel->setWindowIcon(iconMgr.getIcon("panel-hierarchy", 16));
 
     // Add panels to the main window
     addDockWidget(Qt::LeftDockWidgetArea, m_hierarchyPanel);

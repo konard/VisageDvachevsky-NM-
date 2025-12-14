@@ -1,4 +1,5 @@
 #include "NovelMind/editor/qt/panels/nm_timeline_panel.hpp"
+#include "NovelMind/editor/qt/nm_icon_manager.hpp"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -119,22 +120,32 @@ void NMTimelinePanel::setupToolbar()
     m_toolbar = new QToolBar(contentWidget());
     m_toolbar->setObjectName("TimelineToolbar");
 
+    auto& iconMgr = NMIconManager::instance();
+
     // Playback controls
-    m_btnPlay = new QPushButton("\u25B6", m_toolbar);  // Play symbol
+    m_btnPlay = new QPushButton(m_toolbar);
+    m_btnPlay->setIcon(iconMgr.getIcon("play", 16));
     m_btnPlay->setCheckable(true);
     m_btnPlay->setToolTip("Play/Pause (Space)");
+    m_btnPlay->setFlat(true);
     connect(m_btnPlay, &QPushButton::clicked, this, &NMTimelinePanel::togglePlayback);
 
-    m_btnStop = new QPushButton("\u25A0", m_toolbar);  // Stop symbol
+    m_btnStop = new QPushButton(m_toolbar);
+    m_btnStop->setIcon(iconMgr.getIcon("stop", 16));
     m_btnStop->setToolTip("Stop");
+    m_btnStop->setFlat(true);
     connect(m_btnStop, &QPushButton::clicked, this, &NMTimelinePanel::stopPlayback);
 
-    m_btnStepBack = new QPushButton("\u25C0", m_toolbar);  // Left arrow
+    m_btnStepBack = new QPushButton(m_toolbar);
+    m_btnStepBack->setIcon(iconMgr.getIcon("step-backward", 16));
     m_btnStepBack->setToolTip("Step Backward");
+    m_btnStepBack->setFlat(true);
     connect(m_btnStepBack, &QPushButton::clicked, this, &NMTimelinePanel::stepBackward);
 
-    m_btnStepForward = new QPushButton("\u25B6", m_toolbar);  // Right arrow
+    m_btnStepForward = new QPushButton(m_toolbar);
+    m_btnStepForward->setIcon(iconMgr.getIcon("step-forward", 16));
     m_btnStepForward->setToolTip("Step Forward");
+    m_btnStepForward->setFlat(true);
     connect(m_btnStepForward, &QPushButton::clicked, this, &NMTimelinePanel::stepForward);
 
     // Frame display
@@ -150,16 +161,22 @@ void NMTimelinePanel::setupToolbar()
     m_timeLabel->setMinimumWidth(60);
 
     // Zoom controls
-    m_btnZoomIn = new QPushButton("+", m_toolbar);
+    m_btnZoomIn = new QPushButton(m_toolbar);
+    m_btnZoomIn->setIcon(iconMgr.getIcon("zoom-in", 16));
     m_btnZoomIn->setToolTip("Zoom In");
+    m_btnZoomIn->setFlat(true);
     connect(m_btnZoomIn, &QPushButton::clicked, this, &NMTimelinePanel::zoomIn);
 
-    m_btnZoomOut = new QPushButton("-", m_toolbar);
+    m_btnZoomOut = new QPushButton(m_toolbar);
+    m_btnZoomOut->setIcon(iconMgr.getIcon("zoom-out", 16));
     m_btnZoomOut->setToolTip("Zoom Out");
+    m_btnZoomOut->setFlat(true);
     connect(m_btnZoomOut, &QPushButton::clicked, this, &NMTimelinePanel::zoomOut);
 
-    m_btnZoomFit = new QPushButton("Fit", m_toolbar);
+    m_btnZoomFit = new QPushButton(m_toolbar);
+    m_btnZoomFit->setIcon(iconMgr.getIcon("zoom-fit", 16));
     m_btnZoomFit->setToolTip("Zoom to Fit");
+    m_btnZoomFit->setFlat(true);
     connect(m_btnZoomFit, &QPushButton::clicked, this, &NMTimelinePanel::zoomToFit);
 
     // Add widgets to toolbar

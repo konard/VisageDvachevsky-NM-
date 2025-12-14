@@ -4,13 +4,13 @@
 # replacing the previous ImGui/SDL2 implementation.
 
 # Find Qt6
-find_package(Qt6 COMPONENTS Widgets Core Gui QUIET)
+find_package(Qt6 COMPONENTS Widgets Core Gui Svg QUIET)
 
 if(NOT Qt6_FOUND)
     message(STATUS "NovelMind Editor: Qt6 not found - Editor will not be built")
     message(STATUS "  Install Qt6 development packages to enable the editor:")
-    message(STATUS "    Ubuntu/Debian: sudo apt-get install qt6-base-dev")
-    message(STATUS "    Fedora: sudo dnf install qt6-qtbase-devel")
+    message(STATUS "    Ubuntu/Debian: sudo apt-get install qt6-base-dev qt6-svg-dev")
+    message(STATUS "    Fedora: sudo dnf install qt6-qtbase-devel qt6-qtsvg-devel")
     message(STATUS "    macOS: brew install qt@6")
     message(STATUS "    Windows: Download Qt6 from qt.io")
 
@@ -53,6 +53,7 @@ add_library(novelmind_editor STATIC
     src/qt/nm_dock_panel.cpp
     src/qt/nm_welcome_dialog.cpp
     src/qt/nm_undo_manager.cpp
+    src/qt/nm_icon_manager.cpp
 
     # Phase 0 & 1 panels
     src/qt/panels/nm_scene_view_panel.cpp
@@ -86,6 +87,7 @@ target_link_libraries(novelmind_editor
         Qt6::Widgets
         Qt6::Core
         Qt6::Gui
+        Qt6::Svg
     PRIVATE
         novelmind_compiler_options
 )
@@ -106,6 +108,7 @@ target_link_libraries(novelmind_editor_app
         Qt6::Widgets
         Qt6::Core
         Qt6::Gui
+        Qt6::Svg
         novelmind_compiler_options
 )
 
