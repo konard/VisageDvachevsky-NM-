@@ -6,74 +6,91 @@
 
 namespace NovelMind::editor::qt {
 
-NMDockPanel::NMDockPanel(const QString &title, QWidget *parent)
-    : QDockWidget(title, parent) {
-  // Set default dock widget features
-  setFeatures(QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable |
-              QDockWidget::DockWidgetFloatable);
+NMDockPanel::NMDockPanel(const QString& title, QWidget* parent)
+    : QDockWidget(title, parent)
+{
+    // Set default dock widget features
+    setFeatures(QDockWidget::DockWidgetClosable |
+                QDockWidget::DockWidgetMovable |
+                QDockWidget::DockWidgetFloatable);
 
-  // Enable focus tracking
-  setFocusPolicy(Qt::StrongFocus);
+    // Enable focus tracking
+    setFocusPolicy(Qt::StrongFocus);
 }
 
-NMDockPanel::~NMDockPanel() { onShutdown(); }
-
-void NMDockPanel::onUpdate(double /*deltaTime*/) {
-  // Default implementation does nothing
-  // Subclasses override this for continuous updates
+NMDockPanel::~NMDockPanel()
+{
+    onShutdown();
 }
 
-void NMDockPanel::onInitialize() {
-  // Default implementation does nothing
-  // Subclasses override this for initialization
+void NMDockPanel::onUpdate(double /*deltaTime*/)
+{
+    // Default implementation does nothing
+    // Subclasses override this for continuous updates
 }
 
-void NMDockPanel::onShutdown() {
-  // Default implementation does nothing
-  // Subclasses override this for cleanup
+void NMDockPanel::onInitialize()
+{
+    // Default implementation does nothing
+    // Subclasses override this for initialization
 }
 
-void NMDockPanel::onFocusGained() {
-  // Default implementation does nothing
+void NMDockPanel::onShutdown()
+{
+    // Default implementation does nothing
+    // Subclasses override this for cleanup
 }
 
-void NMDockPanel::onFocusLost() {
-  // Default implementation does nothing
+void NMDockPanel::onFocusGained()
+{
+    // Default implementation does nothing
 }
 
-void NMDockPanel::onResize(int /*width*/, int /*height*/) {
-  // Default implementation does nothing
+void NMDockPanel::onFocusLost()
+{
+    // Default implementation does nothing
 }
 
-void NMDockPanel::setContentWidget(QWidget *widget) {
-  m_contentWidget = widget;
-  setWidget(widget);
+void NMDockPanel::onResize(int /*width*/, int /*height*/)
+{
+    // Default implementation does nothing
 }
 
-void NMDockPanel::focusInEvent(QFocusEvent *event) {
-  QDockWidget::focusInEvent(event);
-  onFocusGained();
-  emit focusGained();
+void NMDockPanel::setContentWidget(QWidget* widget)
+{
+    m_contentWidget = widget;
+    setWidget(widget);
 }
 
-void NMDockPanel::focusOutEvent(QFocusEvent *event) {
-  QDockWidget::focusOutEvent(event);
-  onFocusLost();
-  emit focusLost();
+void NMDockPanel::focusInEvent(QFocusEvent* event)
+{
+    QDockWidget::focusInEvent(event);
+    onFocusGained();
+    emit focusGained();
 }
 
-void NMDockPanel::resizeEvent(QResizeEvent *event) {
-  QDockWidget::resizeEvent(event);
-  onResize(event->size().width(), event->size().height());
+void NMDockPanel::focusOutEvent(QFocusEvent* event)
+{
+    QDockWidget::focusOutEvent(event);
+    onFocusLost();
+    emit focusLost();
 }
 
-void NMDockPanel::showEvent(QShowEvent *event) {
-  QDockWidget::showEvent(event);
+void NMDockPanel::resizeEvent(QResizeEvent* event)
+{
+    QDockWidget::resizeEvent(event);
+    onResize(event->size().width(), event->size().height());
+}
 
-  if (!m_initialized) {
-    m_initialized = true;
-    onInitialize();
-  }
+void NMDockPanel::showEvent(QShowEvent* event)
+{
+    QDockWidget::showEvent(event);
+
+    if (!m_initialized)
+    {
+        m_initialized = true;
+        onInitialize();
+    }
 }
 
 } // namespace NovelMind::editor::qt
