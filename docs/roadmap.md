@@ -208,19 +208,22 @@ See `docs/gui_architecture.md` and `docs/gui-assessment.md` for details.
 - ✅ SceneView panel with QGraphicsView
 - ✅ Pan (middle-mouse) and zoom (scroll wheel)
 - ✅ Grid overlay
+- ✅ Inspector with full property editing (Phase 2.2 complete - String, Int, Float, Bool, Color, Enum)
 - ⏳ WYSIWYG preview (pending real renderer integration)
-- ⏳ Object placement and properties (pending Phase 2.2)
-- ⏳ Layer management (pending Phase 2.2)
+- ⏳ Object placement (pending real scene objects)
+- ⏳ Layer management (pending scene architecture)
 - ⏳ Preview playback (pending Phase 5.1 runtime)
 
-### 10.3 Story Flow Editor ⚠️ **PARTIAL**
+### 10.3 Story Flow Editor ✅ **COMPLETE** (Phase 3.3)
 - ✅ Node graph visualization (QGraphicsView/Scene)
 - ✅ Pan and zoom
 - ✅ Breakpoint indicators (red circles)
 - ✅ Execution highlighting (green glow)
-- ✅ Context menu (breakpoint toggle)
-- ⏳ Node creation/deletion (pending Phase 3.3)
-- ⏳ Choice and condition nodes (pending Phase 3.3)
+- ✅ Context menu (breakpoint toggle, edit, delete)
+- ✅ Node creation/deletion (Phase 3.3 complete)
+- ✅ Node palette with 6 node types (Entry, Dialogue, Choice, Scene, Label, Script)
+- ✅ Connection drawing (Ctrl+Click drag)
+- ✅ Connection deletion (Delete/Backspace)
 - ✅ Variable inspector (Debug Overlay panel)
 
 ### 10.4 Script Editor ⏳ **PENDING** (Phase 6+)
