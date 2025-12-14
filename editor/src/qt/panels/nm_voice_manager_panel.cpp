@@ -8,7 +8,7 @@
 namespace NovelMind::editor::qt {
 
 NMVoiceManagerPanel::NMVoiceManagerPanel(QWidget* parent)
-    : NMDockPanel(parent)
+    : NMDockPanel("Voice Manager", parent)
 {
 }
 

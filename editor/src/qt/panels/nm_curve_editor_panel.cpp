@@ -11,7 +11,7 @@
 namespace NovelMind::editor::qt {
 
 NMCurveEditorPanel::NMCurveEditorPanel(QWidget* parent)
-    : NMDockPanel(parent)
+    : NMDockPanel("Curve Editor", parent)
 {
 }
 

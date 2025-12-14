@@ -11,7 +11,7 @@
 namespace NovelMind::editor::qt {
 
 NMLocalizationPanel::NMLocalizationPanel(QWidget* parent)
-    : NMDockPanel(parent)
+    : NMDockPanel("Localization Manager", parent)
 {
 }
 

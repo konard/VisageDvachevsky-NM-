@@ -70,7 +70,7 @@ Keyframe* TimelineTrack::getKeyframe(int frame)
 // =============================================================================
 
 NMTimelinePanel::NMTimelinePanel(QWidget* parent)
-    : NMDockPanel(parent)
+    : NMDockPanel("Timeline", parent)
 {
 }
 

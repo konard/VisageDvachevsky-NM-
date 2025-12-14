@@ -12,7 +12,7 @@
 namespace NovelMind::editor::qt {
 
 NMBuildSettingsPanel::NMBuildSettingsPanel(QWidget* parent)
-    : NMDockPanel(parent)
+    : NMDockPanel("Build Settings", parent)
 {
 }
 

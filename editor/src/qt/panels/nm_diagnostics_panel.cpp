@@ -8,7 +8,7 @@
 namespace NovelMind::editor::qt {
 
 NMDiagnosticsPanel::NMDiagnosticsPanel(QWidget* parent)
-    : NMDockPanel(parent)
+    : NMDockPanel("Diagnostics", parent)
 {
 }
 
