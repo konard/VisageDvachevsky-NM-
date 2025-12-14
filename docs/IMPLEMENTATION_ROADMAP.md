@@ -1,591 +1,591 @@
-# NovelMind GUI Implementation Roadmap
+# Дорожная карта реализации GUI NovelMind
 
-This document tracks the implementation status of all GUI features from Issue #33.
+Этот документ отслеживает статус реализации всех функций GUI из Issue #33.
 
-## Status Legend
-- ✅ **Complete**: Fully implemented and tested
-- ⚠️ **Partial**: Basic framework exists, needs enhancement
-- ❌ **Missing**: Not yet implemented
-- 🔄 **In Progress**: Currently being implemented
+## Легенда статусов
+- ✅ **Завершено**: Полностью реализовано и протестировано
+- ⚠️ **Частично**: Базовый фреймворк существует, требуется улучшение
+- ❌ **Отсутствует**: Еще не реализовано
+- 🔄 **В процессе**: В данный момент реализуется
 
-## Implementation Status Summary
+## Резюме статуса реализации
 
-| Category | Complete | Partial | Missing | Overall |
+| Категория | Завершено | Частично | Отсутствует | Общее |
 |----------|----------|---------|---------|---------|
-| **Foundation (Phase 0-1)** | 95% | 5% | 0% | ✅ |
-| **Core Editing (Phase 2)** | 40% | 35% | 25% | ⚠️ |
-| **Advanced Editors (Phase 3)** | 75% | 20% | 5% | ⚠️ |
-| **Production Tools (Phase 4)** | 70% | 25% | 5% | ⚠️ |
-| **Play-In-Editor (Phase 5)** | 90% | 10% | 0% | ✅ |
+| **Основа (Фаза 0-1)** | 95% | 5% | 0% | ✅ |
+| **Основное редактирование (Фаза 2)** | 40% | 35% | 25% | ⚠️ |
+| **Продвинутые редакторы (Фаза 3)** | 75% | 20% | 5% | ⚠️ |
+| **Продакшн-инструменты (Фаза 4)** | 70% | 25% | 5% | ⚠️ |
+| **Play-In-Editor (Фаза 5)** | 90% | 10% | 0% | ✅ |
 
 ---
 
 ## 1. Main Window & Docking System ✅ 100%
 
-### Implemented Features
-- ✅ 1.1 Main window with docking panel (`NMMainWindow`)
-- ✅ 1.2 Move/dock panels (left/right/top/bottom)
-- ✅ 1.3 Save/load custom layout
-- ✅ 1.4 Reset to default layout
-- ✅ 1.5 Tab system within panels
-- ✅ 1.6 Dark theme by default
-- ✅ 1.7 DPI scaling support
+### Реализованные функции
+- ✅ 1.1 Главное окно с панелью докинга (`NMMainWindow`)
+- ✅ 1.2 Перемещение/докинг панелей (лево/право/верх/низ)
+- ✅ 1.3 Сохранение/загрузка пользовательского макета
+- ✅ 1.4 Сброс к макету по умолчанию
+- ✅ 1.5 Система вкладок внутри панелей
+- ✅ 1.6 Темная тема по умолчанию
+- ✅ 1.7 Поддержка масштабирования DPI
 
-**Status**: Complete - all requirements met
+**Статус**: Завершено - все требования выполнены
 
 ---
 
-## 2. SceneView Panel ✅ 95% (🔄 UPDATED - Batch 3 Complete)
+## 2. Панель SceneView ✅ 95% (🔄 ОБНОВЛЕНО - Пакет 3 завершен)
 
-### Implemented Features
-- ✅ 2.1 Scene rendering (basic display with QGraphicsView)
-- ✅ 2.2 Pan with middle-mouse
-- ✅ 2.3 Zoom with scroll wheel
-- ✅ 2.4 Grid with toggle
-- ✅ 2.6 Transform gizmos (Move/Rotate/Scale) **NEW**
-- ✅ 2.7 Mouse object selection **NEW**
-- ✅ 2.8 Selected object highlighting **NEW**
-- ✅ 2.9 Demo scene objects (Background, 2 Characters, UI element) **NEW**
-- ✅ 2.10 Helper info overlay (cursor position, object position) **NEW**
+### Реализованные функции
+- ✅ 2.1 Рендеринг сцены (базовое отображение с QGraphicsView)
+- ✅ 2.2 Панорамирование средней кнопкой мыши
+- ✅ 2.3 Зум колесом прокрутки
+- ✅ 2.4 Сетка с переключением
+- ✅ 2.6 Гизмо трансформации (Move/Rotate/Scale) **НОВОЕ**
+- ✅ 2.7 Выбор объектов мышью **НОВОЕ**
+- ✅ 2.8 Подсветка выбранного объекта **НОВОЕ**
+- ✅ 2.9 Демо-объекты сцены (Background, 2 Characters, UI element) **НОВОЕ**
+- ✅ 2.10 Оверлей вспомогательной информации (позиция курсора, позиция объекта) **НОВОЕ**
 
-### Missing Features
-- ❌ 2.5 Layer highlighting
-- ⚠️ 2.9 Drag-drop from Asset Browser (framework ready, needs Asset Browser integration)
+### Отсутствующие функции
+- ❌ 2.5 Подсветка слоев
+- ⚠️ 2.9 Перетаскивание из Asset Browser (фреймворк готов, требуется интеграция Asset Browser)
 
-### Recent Additions (Batch 3)
-1. **NMSceneObject Class**: 4 object types (Background/Character/UI/Effect)
-   - Type-specific placeholder rendering
-   - Movable, selectable objects
-   - Selection highlighting with blue outline + corner handles
-2. **NMTransformGizmo**: Professional gizmo system
-   - Move mode: Red (X) / Green (Y) axis arrows
-   - Rotate mode: Circle with 4 cardinal handles
-   - Scale mode: Bounding box with corner handles
-   - Auto-positioning on selected object
-3. **NMSceneInfoOverlay**: Real-time info display
-   - Cursor position (X, Y coordinates)
-   - Selected object name and position
-   - Semi-transparent overlay in top-left
-4. **Click-to-Select**: Full selection system
-   - Click object → select with gizmo
-   - Click empty space → clear selection
-   - Signals forwarded to global selection system
-5. **Demo Objects**: 4 pre-placed objects for testing
+### Недавние дополнения (Пакет 3)
+1. **Класс NMSceneObject**: 4 типа объектов (Background/Character/UI/Effect)
+   - Рендеринг заглушек для конкретного типа
+   - Перемещаемые, выбираемые объекты
+   - Подсветка выбора с синей границей + угловыми ручками
+2. **NMTransformGizmo**: Профессиональная система гизмо
+   - Режим перемещения: Красные (X) / Зеленые (Y) стрелки осей
+   - Режим поворота: Круг с 4 кардинальными ручками
+   - Режим масштаба: Ограничивающая рамка с угловыми ручками
+   - Автопозиционирование на выбранном объекте
+3. **NMSceneInfoOverlay**: Отображение информации в реальном времени
+   - Позиция курсора (X, Y координаты)
+   - Имя и позиция выбранного объекта
+   - Полупрозрачный оверлей в верхнем левом углу
+4. **Клик-для-выбора**: Полная система выбора
+   - Клик на объект → выбор с гизмо
+   - Клик на пустое место → очистка выбора
+   - Сигналы направлены в глобальную систему выбора
+5. **Демо-объекты**: 4 предварительно размещенных объекта для тестирования
    - Main Background (-100, -150)
-   - Protagonist character (-250, -100)
-   - Companion character (150, -100)
-   - Dialogue Box UI (-100, 250)
+   - Главный герой (-250, -100)
+   - Компаньон (150, -100)
+   - Диалоговое окно UI (-100, 250)
 
-**Status**: Nearly complete! Just needs drag-drop integration and layer system.
-
----
-
-## 3. StoryGraph Editor ⚠️ 75% (🔄 UPDATED)
-
-### Implemented Features
-- ✅ 3.1 Canvas for visual editing
-- ✅ 3.2 Pan and zoom
-- ✅ 3.3 Create nodes (via NMNodePalette) **NEW**
-- ✅ 3.4 Drag-drop nodes (already supported via ItemIsMovable)
-- ✅ 3.6 Connect nodes with mouse (Ctrl+Drag) **NEW**
-- ✅ 3.7 Delete nodes and connections (Delete key) **NEW**
-- ✅ 3.11 Current node indicator during play (green glow + arrow)
-- ⚠️ 3.8 Context menu (Edit/Delete - partial, needs Edit implementation)
-- ⚠️ Breakpoint support (visual + toggle via context menu)
-
-### Missing Features
-- ❌ 3.5 Resize nodes
-- ❌ 3.9 Error highlighting (cycles, missing exits)
-- ❌ 3.10 Minimap
-- ❌ 3.12 Jump to node from Diagnostics
-
-### Recent Additions (Batch 1)
-1. **NMNodePalette**: Left-side panel with buttons for creating nodes
-   - Entry, Dialogue, Choice, Scene, Label, Script types
-   - Beautiful styling with hover effects
-2. **Connection Drawing**: Ctrl+Drag from node to node creates connections
-   - Visual feedback with dashed bezier curve
-   - Duplicate connection prevention
-3. **Node/Connection Deletion**: Delete key removes selected items
-   - Automatic cleanup of connections when node deleted
-4. **Enhanced Scene**: removeNode(), removeConnection(), findConnectionsForNode()
-
-### Implementation Plan (Remaining)
-**Priority**: MEDIUM
-**Estimated Effort**: 4-6 hours
-
-#### Steps:
-1. Add node resizing (corner drag handles)
-2. Implement cycle detection algorithm
-3. Add error visualization (red outline for problematic nodes)
-4. Create minimap widget (QGraphicsView with scene overview)
-5. Wire up jump-to-node from Diagnostics panel
+**Статус**: Почти завершено! Требуется только интеграция перетаскивания и система слоев.
 
 ---
 
-## 4. Timeline Editor ⚠️ 70%
+## 3. Редактор StoryGraph ⚠️ 75% (🔄 ОБНОВЛЕНО)
 
-### Implemented Features
-- ✅ 4.1 Display animation tracks
-- ✅ 4.2 Add/remove tracks
-- ⚠️ 4.3 Add/remove keyframes (UI present, backend needed)
-- ✅ 4.5 Timeline ruler with divisions
-- ✅ 4.6 Timeline zoom
-- ✅ 4.9 Curve Editor support (separate panel)
+### Реализованные функции
+- ✅ 3.1 Холст для визуального редактирования
+- ✅ 3.2 Панорамирование и зум
+- ✅ 3.3 Создание узлов (через NMNodePalette) **НОВОЕ**
+- ✅ 3.4 Перетаскивание узлов (уже поддерживается через ItemIsMovable)
+- ✅ 3.6 Соединение узлов мышью (Ctrl+Перетаскивание) **НОВОЕ**
+- ✅ 3.7 Удаление узлов и соединений (клавиша Delete) **НОВОЕ**
+- ✅ 3.11 Индикатор текущего узла во время воспроизведения (зеленое свечение + стрелка)
+- ⚠️ 3.8 Контекстное меню (Edit/Delete - частично, требуется реализация Edit)
+- ⚠️ Поддержка точек останова (визуальная + переключение через контекстное меню)
 
-### Missing Features
-- ❌ 4.4 Move/stretch/edit keyframes (drag interaction)
-- ❌ 4.7 Snap keyframes to grid
-- ❌ 4.8 Easing curve selection per keyframe
-- ❌ 4.10 Timeline playback sync with Play-In-Editor
+### Отсутствующие функции
+- ❌ 3.5 Изменение размера узлов
+- ❌ 3.9 Подсветка ошибок (циклы, отсутствующие выходы)
+- ❌ 3.10 Мини-карта
+- ❌ 3.12 Навигация к узлу из Diagnostics
 
-### Implementation Plan
-**Priority**: MEDIUM
-**Estimated Effort**: 4-6 hours
+### Недавние дополнения (Пакет 1)
+1. **NMNodePalette**: Левая боковая панель с кнопками для создания узлов
+   - Типы Entry, Dialogue, Choice, Scene, Label, Script
+   - Красивая стилизация с эффектами наведения
+2. **Рисование соединений**: Ctrl+Перетаскивание от узла к узлу создает соединения
+   - Визуальная обратная связь с пунктирной кривой Безье
+   - Предотвращение дублирования соединений
+3. **Удаление узлов/соединений**: Клавиша Delete удаляет выбранные элементы
+   - Автоматическая очистка соединений при удалении узла
+4. **Улучшенная сцена**: removeNode(), removeConnection(), findConnectionsForNode()
 
-#### Steps:
-1. Make keyframes draggable (QGraphicsItem with ItemIsMovable)
-2. Add snap-to-grid when dragging (modulo frame grid)
-3. Double-click keyframe → open easing curve dialog
-4. Connect Timeline to Play Mode Controller for sync
+### План реализации (оставшееся)
+**Приоритет**: СРЕДНИЙ
+**Оценочные усилия**: 4-6 часов
+
+#### Шаги:
+1. Добавить изменение размера узлов (угловые ручки перетаскивания)
+2. Реализовать алгоритм обнаружения циклов
+3. Добавить визуализацию ошибок (красная граница для проблемных узлов)
+4. Создать виджет мини-карты (QGraphicsView с обзором сцены)
+5. Подключить навигацию к узлу из панели Diagnostics
 
 ---
 
-## 5. Inspector Panel ✅ 85% (🔄 UPDATED - Batch 2 Complete)
+## 4. Редактор Timeline ⚠️ 70%
 
-### Implemented Features
-- ✅ 5.2 Property categories support (NMPropertyGroup)
-- ✅ 5.3 Foldout groups
-- ✅ 5.4 Edit numeric fields (QSpinBox, QDoubleSpinBox) **NEW**
-- ✅ 5.5 Edit text fields (QLineEdit) **NEW**
-- ✅ 5.6 Dropdown for enums (QComboBox) **NEW**
-- ✅ 5.7 Color picker (QPushButton + QColorDialog) **NEW**
-- ✅ 5.8 Asset picker (button ready, dialog TODO) **NEW**
-- ✅ 5.10 Instant property application **NEW**
-- ⚠️ 5.11 Undo/Redo ready (TODO: wire to UndoManager)
+### Реализованные функции
+- ✅ 4.1 Отображение треков анимации
+- ✅ 4.2 Добавление/удаление треков
+- ⚠️ 4.3 Добавление/удаление ключевых кадров (UI присутствует, требуется бэкенд)
+- ✅ 4.5 Линейка таймлайна с делениями
+- ✅ 4.6 Зум таймлайна
+- ✅ 4.9 Поддержка Curve Editor (отдельная панель)
 
-### Missing Features
-- ❌ 5.1 Auto-generate UI from Property Introspection (backend integration)
-- ❌ 5.9 Curve editing (CurveRef) widget
+### Отсутствующие функции
+- ❌ 4.4 Перемещение/растяжение/редактирование ключевых кадров (взаимодействие перетаскивания)
+- ❌ 4.7 Привязка ключевых кадров к сетке
+- ❌ 4.8 Выбор кривой смягчения для каждого ключевого кадра
+- ❌ 4.10 Синхронизация воспроизведения таймлайна с Play-In-Editor
 
-### Recent Additions (Batch 2)
-1. **NMPropertyType Enum**: 7 property types (String/Integer/Float/Boolean/Color/Enum/Asset)
-2. **Widget Factory**: `addEditableProperty()` creates appropriate widget for each type
-3. **Styled Widgets**: All widgets match dark theme with focus highlights
-4. **Signal System**: `propertyValueChanged` → `propertyChanged(objectId, propertyName, newValue)`
-5. **Edit Mode**: Toggle between editable and read-only display
-6. **Example Properties**:
-   - Transform: 5 float properties
+### План реализации
+**Приоритет**: СРЕДНИЙ
+**Оценочные усилия**: 4-6 часов
+
+#### Шаги:
+1. Сделать ключевые кадры перетаскиваемыми (QGraphicsItem с ItemIsMovable)
+2. Добавить привязку к сетке при перетаскивании (modulo grid frame)
+3. Двойной клик на ключевой кадр → открыть диалог кривой смягчения
+4. Подключить Timeline к Play Mode Controller для синхронизации
+
+---
+
+## 5. Панель Inspector ✅ 85% (🔄 ОБНОВЛЕНО - Пакет 2 завершен)
+
+### Реализованные функции
+- ✅ 5.2 Поддержка категорий свойств (NMPropertyGroup)
+- ✅ 5.3 Сворачиваемые группы
+- ✅ 5.4 Редактирование числовых полей (QSpinBox, QDoubleSpinBox) **НОВОЕ**
+- ✅ 5.5 Редактирование текстовых полей (QLineEdit) **НОВОЕ**
+- ✅ 5.6 Выпадающий список для enum (QComboBox) **НОВОЕ**
+- ✅ 5.7 Выбор цвета (QPushButton + QColorDialog) **НОВОЕ**
+- ✅ 5.8 Выбор ассета (кнопка готова, диалог TODO) **НОВОЕ**
+- ✅ 5.10 Мгновенное применение свойств **НОВОЕ**
+- ⚠️ 5.11 Undo/Redo готова (TODO: подключить к UndoManager)
+
+### Отсутствующие функции
+- ❌ 5.1 Автогенерация UI из Property Introspection (интеграция бэкенда)
+- ❌ 5.9 Виджет редактирования кривых (CurveRef)
+
+### Недавние дополнения (Пакет 2)
+1. **Enum NMPropertyType**: 7 типов свойств (String/Integer/Float/Boolean/Color/Enum/Asset)
+2. **Фабрика виджетов**: `addEditableProperty()` создает подходящий виджет для каждого типа
+3. **Стилизованные виджеты**: Все виджеты соответствуют темной теме с подсветкой фокуса
+4. **Система сигналов**: `propertyValueChanged` → `propertyChanged(objectId, propertyName, newValue)`
+5. **Режим редактирования**: Переключение между редактируемым и только для чтения отображением
+6. **Примеры свойств**:
+   - Transform: 5 float свойств
    - Rendering: Boolean, Float, Integer, Enum (Blend Mode), Color (Tint)
    - Dialogue: String (Speaker, Text), Asset (Voice Clip)
 
-### Implementation Plan (Remaining)
-**Priority**: MEDIUM (integration work)
-**Estimated Effort**: 2-3 hours
+### План реализации (оставшееся)
+**Приоритет**: СРЕДНИЙ (интеграционная работа)
+**Оценочные усилия**: 2-3 часа
 
-#### Steps:
-1. Connect to backend property introspection system
-2. Wire property changes to UndoManager
-3. Add CurveRef editing widget
-4. Create asset picker dialog
+#### Шаги:
+1. Подключить к системе интроспекции свойств бэкенда
+2. Подключить изменения свойств к UndoManager
+3. Добавить виджет редактирования CurveRef
+4. Создать диалог выбора ассетов
 
 ---
 
 ## 6. Asset Browser ⚠️ 50%
 
-### Implemented Features
-- ✅ 6.1 Asset tree (folders/nested)
-- ✅ 6.6 Search by name
-- ✅ 6.7 Filter by file type
+### Реализованные функции
+- ✅ 6.1 Дерево ассетов (папки/вложенные)
+- ✅ 6.6 Поиск по имени
+- ✅ 6.7 Фильтр по типу файла
 
-### Missing Features
-- ❌ 6.2 Grid View / List View toggle
-- ❌ 6.3 Image thumbnails
-- ❌ 6.4 Audio waveform preview
-- ❌ 6.5 Asset metadata (size/duration/format)
-- ❌ 6.8 Drag-drop to other panels
-- ❌ 6.9 Context menu (Rename/Delete/Duplicate/Reimport/Show in Explorer)
-- ❌ 6.10 Future importer support
+### Отсутствующие функции
+- ❌ 6.2 Переключение Grid View / List View
+- ❌ 6.3 Миниатюры изображений
+- ❌ 6.4 Предпросмотр аудио формы волны
+- ❌ 6.5 Метаданные ассетов (размер/длительность/формат)
+- ❌ 6.8 Перетаскивание на другие панели
+- ❌ 6.9 Контекстное меню (Rename/Delete/Duplicate/Reimport/Show in Explorer)
+- ❌ 6.10 Поддержка будущего импортера
 
-### Implementation Plan
-**Priority**: MEDIUM
-**Estimated Effort**: 5-7 hours
+### План реализации
+**Приоритет**: СРЕДНИЙ
+**Оценочные усилия**: 5-7 часов
 
-#### Steps:
-1. Add Grid/List toggle button to toolbar
-2. Create thumbnail generator (QImage scaled preview)
-3. Generate audio waveforms (QPixmap visualization)
-4. Add metadata display (file size, duration, format)
-5. Implement context menu with actions
-6. Add drag-drop MIME data support
+#### Шаги:
+1. Добавить кнопку переключения Grid/List на панель инструментов
+2. Создать генератор миниатюр (масштабированный предпросмотр QImage)
+3. Генерировать формы волн аудио (визуализация QPixmap)
+4. Добавить отображение метаданных (размер файла, длительность, формат)
+5. Реализовать контекстное меню с действиями
+6. Добавить поддержку MIME данных для перетаскивания
 
 ---
 
-## 7. Hierarchy Panel ⚠️ 60%
+## 7. Панель Hierarchy ⚠️ 60%
 
-### Implemented Features
-- ✅ 7.1 Tree display of scene objects
-- ⚠️ 7.5 Partial sync with SceneView
-- ⚠️ 7.6 Auto-update framework ready
+### Реализованные функции
+- ✅ 7.1 Отображение дерева объектов сцены
+- ⚠️ 7.5 Частичная синхронизация с SceneView
+- ⚠️ 7.6 Фреймворк автообновления готов
 
-### Missing Features
-- ❌ 7.2 Multi-selection (Ctrl+Click, Shift+Click)
-- ❌ 7.3 Drag-drop for reparenting
-- ❌ 7.4 Context menu (Create Child/Duplicate/Delete/Isolate)
+### Отсутствующие функции
+- ❌ 7.2 Множественный выбор (Ctrl+Click, Shift+Click)
+- ❌ 7.3 Перетаскивание для изменения родителя
+- ❌ 7.4 Контекстное меню (Create Child/Duplicate/Delete/Isolate)
 
-### Implementation Plan
-**Priority**: MEDIUM
-**Estimated Effort**: 3-4 hours
+### План реализации
+**Приоритет**: СРЕДНИЙ
+**Оценочные усилия**: 3-4 часа
 
 ---
 
 ## 8. Voice Manager ⚠️ 50%
 
-### Implemented Features
-- ⚠️ 8.1 Table with basic columns
-- ✅ 8.3 Audio playback
+### Реализованные функции
+- ⚠️ 8.1 Таблица с базовыми колонками
+- ✅ 8.3 Воспроизведение аудио
 
-### Missing Features
-- ❌ 8.2 Status color indicators (Missing/AutoMapped/Manual/Error)
-- ❌ 8.4 Auto-link files by name
-- ❌ 8.5 Manual linking
-- ❌ 8.6 Search strings
-- ❌ 8.7 Export/import voice tables
-- ❌ 8.8 Jump to StoryGraph node
+### Отсутствующие функции
+- ❌ 8.2 Индикаторы цвета статуса (Missing/AutoMapped/Manual/Error)
+- ❌ 8.4 Автосвязывание файлов по имени
+- ❌ 8.5 Ручное связывание
+- ❌ 8.6 Поиск строк
+- ❌ 8.7 Экспорт/импорт таблиц озвучки
+- ❌ 8.8 Навигация к узлу StoryGraph
 
-### Implementation Plan
-**Priority**: LOW
-**Estimated Effort**: 4-5 hours
+### План реализации
+**Приоритет**: НИЗКИЙ
+**Оценочные усилия**: 4-5 часов
 
 ---
 
 ## 9. Localization Manager ⚠️ 50%
 
-### Implemented Features
-- ✅ 9.1 String table (Key/Source/Translation/Status)
-- ⚠️ 9.2 Edit translations (UI present, backend needed)
-- ✅ 9.3 Multiple language support
+### Реализованные функции
+- ✅ 9.1 Таблица строк (Key/Source/Translation/Status)
+- ⚠️ 9.2 Редактирование переводов (UI присутствует, требуется бэкенд)
+- ✅ 9.3 Поддержка нескольких языков
 
-### Missing Features
-- ❌ 9.4 Search and filters (missing/outdated)
-- ❌ 9.5 Import/export (JSON/CSV/PO/XLIFF)
-- ❌ 9.6 Highlight missing translations
-- ❌ 9.7 Jump to usage location
+### Отсутствующие функции
+- ❌ 9.4 Поиск и фильтры (отсутствующие/устаревшие)
+- ❌ 9.5 Импорт/экспорт (JSON/CSV/PO/XLIFF)
+- ❌ 9.6 Подсветка отсутствующих переводов
+- ❌ 9.7 Навигация к месту использования
 
-### Implementation Plan
-**Priority**: LOW
-**Estimated Effort**: 4-5 hours
-
----
-
-## 10. Debug Overlay ✅ 100% (🔄 UPDATED - Phase 1a)
-
-### Implemented Features
-- ✅ 10.1 VM variables display
-- ✅ 10.2 Current instruction display **NEW**
-- ✅ 10.3 Call stack
-- ✅ 10.4 Active animations
-- ✅ 10.5 Audio channels
-- ✅ 10.6 Frame time info
-- ✅ 10.7 Display modes (Minimal/Extended) **NEW**
-
-### Recent Additions (Phase 1a)
-1. **Current Instruction Tab**: Shows executing node, instruction index, and code
-2. **Display Mode Toggle**: Toolbar with Minimal/Extended modes
-   - Minimal: Shows only Variables + Current Instruction
-   - Extended: Shows all 6 tabs (default)
-3. **Dynamic Tab Visibility**: Seamless switching between modes
-
-**Status**: Complete! ✅
+### План реализации
+**Приоритет**: НИЗКИЙ
+**Оценочные усилия**: 4-5 часов
 
 ---
 
-## 11. Console Panel ✅ 100% (🔄 UPDATED - Phase 1a)
+## 10. Debug Overlay ✅ 100% (🔄 ОБНОВЛЕНО - Фаза 1a)
 
-### Implemented Features
-- ✅ 11.1 Log output (editor + runtime)
-- ✅ 11.2 Sort by time
-- ✅ 11.3 Filter by level
-- ✅ 11.4 Auto-scroll
-- ✅ 11.5 Copy text to clipboard **NEW**
-- ✅ 11.6 Clear console (already existed)
+### Реализованные функции
+- ✅ 10.1 Отображение переменных VM
+- ✅ 10.2 Отображение текущей инструкции **НОВОЕ**
+- ✅ 10.3 Стек вызовов
+- ✅ 10.4 Активные анимации
+- ✅ 10.5 Аудиоканалы
+- ✅ 10.6 Информация о времени кадра
+- ✅ 10.7 Режимы отображения (Minimal/Extended) **НОВОЕ**
 
-### Recent Additions (Phase 1a)
-1. **Copy Action**: Copy button with icon + Ctrl+C shortcut
-2. **Clipboard Integration**: Copies selected text to system clipboard
-3. **Enhanced Toolbar**: Added copy and clear icons for better UX
+### Недавние дополнения (Фаза 1a)
+1. **Вкладка Current Instruction**: Показывает исполняемый узел, индекс инструкции и код
+2. **Переключение режима отображения**: Панель инструментов с режимами Minimal/Extended
+   - Minimal: Показывает только Variables + Current Instruction
+   - Extended: Показывает все 6 вкладок (по умолчанию)
+3. **Динамическая видимость вкладок**: Плавное переключение между режимами
 
-**Status**: Complete! ✅
+**Статус**: Завершено! ✅
 
 ---
 
-## 12. Diagnostics Panel ⚠️ 60%
+## 11. Панель Console ✅ 100% (🔄 ОБНОВЛЕНО - Фаза 1a)
 
-### Implemented Features
-- ✅ 12.1 List errors and warnings
-- ✅ 12.2 Categories
-- ✅ 12.3 Severity highlighting
+### Реализованные функции
+- ✅ 11.1 Вывод логов (редактор + рантайм)
+- ✅ 11.2 Сортировка по времени
+- ✅ 11.3 Фильтр по уровню
+- ✅ 11.4 Автопрокрутка
+- ✅ 11.5 Копирование текста в буфер обмена **НОВОЕ**
+- ✅ 11.6 Очистка консоли (уже существовала)
 
-### Missing Features
-- ❌ 12.4 Jump to source (StoryGraph/Script/Asset)
-- ❌ 12.5 Auto-update during play mode
-- ❌ 12.6 Quick Fixes display
+### Недавние дополнения (Фаза 1a)
+1. **Действие копирования**: Кнопка Copy с иконкой + горячая клавиша Ctrl+C
+2. **Интеграция буфера обмена**: Копирует выбранный текст в системный буфер обмена
+3. **Улучшенная панель инструментов**: Добавлены иконки копирования и очистки для лучшего UX
 
-### Implementation Plan
-**Priority**: MEDIUM
-**Estimated Effort**: 2-3 hours
+**Статус**: Завершено! ✅
+
+---
+
+## 12. Панель Diagnostics ⚠️ 60%
+
+### Реализованные функции
+- ✅ 12.1 Список ошибок и предупреждений
+- ✅ 12.2 Категории
+- ✅ 12.3 Подсветка серьезности
+
+### Отсутствующие функции
+- ❌ 12.4 Навигация к источнику (StoryGraph/Script/Asset)
+- ❌ 12.5 Автообновление во время режима play
+- ❌ 12.6 Отображение быстрых исправлений
+
+### План реализации
+**Приоритет**: СРЕДНИЙ
+**Оценочные усилия**: 2-3 часа
 
 ---
 
 ## 13. Build Settings ✅ 85%
 
-### Implemented Features
-- ✅ 13.1-13.4 Platform/preset/encryption/compression settings
+### Реализованные функции
+- ✅ 13.1-13.4 Настройки платформы/пресета/шифрования/сжатия
 
-### Missing Features
-- ❌ 13.5 Build size preview
-- ❌ 13.6 Missing resource warnings
-- ❌ 13.7 Build execution and status
+### Отсутствующие функции
+- ❌ 13.5 Предпросмотр размера сборки
+- ❌ 13.6 Предупреждения об отсутствующих ресурсах
+- ❌ 13.7 Выполнение и статус сборки
 
-### Implementation Plan
-**Priority**: LOW
-**Estimated Effort**: 3-4 hours
+### План реализации
+**Приоритет**: НИЗКИЙ
+**Оценочные усилия**: 3-4 часа
 
 ---
 
 ## 14. Play-In-Editor ✅ 90%
 
-### Implemented Features
-- ✅ 14.1-14.2 Play/Pause/Stop controls + status
-- ✅ 14.3 Jump to active StoryGraph node (90% - visual integration complete)
-- ✅ 14.6-14.7 Show/edit script variables
-- ✅ 14.8 Breakpoints in StoryGraph (visual indicators + toggle)
+### Реализованные функции
+- ✅ 14.1-14.2 Элементы управления Play/Pause/Stop + статус
+- ✅ 14.3 Навигация к активному узлу StoryGraph (90% - визуальная интеграция завершена)
+- ✅ 14.6-14.7 Показ/редактирование переменных скрипта
+- ✅ 14.8 Точки останова в StoryGraph (визуальные индикаторы + переключение)
 
-### Missing Features
-- ❌ 14.4 Display active dialogue
-- ❌ 14.5 Timeline time control
+### Отсутствующие функции
+- ❌ 14.4 Отображение активного диалога
+- ❌ 14.5 Управление временем таймлайна
 
-### Implementation Plan
-**Priority**: MEDIUM
-**Estimated Effort**: 2-3 hours
+### План реализации
+**Приоритет**: СРЕДНИЙ
+**Оценочные усилия**: 2-3 часа
 
 ---
 
-## 15. Hotkey System ⚠️ 60%
+## 15. Система горячих клавиш ⚠️ 60%
 
-### Implemented Features
-- ✅ 15.1 Ctrl+S (Save project)
+### Реализованные функции
+- ✅ 15.1 Ctrl+S (Сохранить проект)
 - ✅ 15.2 Ctrl+Z/Y (Undo/Redo)
 - ✅ 15.3 F5 (Play-In-Editor)
 
-### Missing Features
-- ❌ 15.4 Delete (Delete object/node) - **Implemented in StoryGraph, needs global**
-- ❌ 15.5 F2 (Rename)
-- ❌ 15.6 Customizable keymap
+### Отсутствующие функции
+- ❌ 15.4 Delete (Удалить объект/узел) - **Реализовано в StoryGraph, требуется глобально**
+- ❌ 15.5 F2 (Переименовать)
+- ❌ 15.6 Настраиваемая раскладка клавиш
 
-### Implementation Plan
-**Priority**: HIGH
-**Estimated Effort**: 2-3 hours
+### План реализации
+**Приоритет**: ВЫСОКИЙ
+**Оценочные усилия**: 2-3 часа
 
 ---
 
-## 16. Undo/Redo System ✅ 90%
+## 16. Система Undo/Redo ✅ 90%
 
-### Implemented Features
-- ✅ 16.1 Unified command stack
-- ⚠️ 16.2-16.4 Framework ready for StoryGraph/Timeline/Inspector
+### Реализованные функции
+- ✅ 16.1 Единый стек команд
+- ⚠️ 16.2-16.4 Фреймворк готов для StoryGraph/Timeline/Inspector
 
-### Missing Features
-- ❌ 16.5 Asset operation undo
+### Отсутствующие функции
+- ❌ 16.5 Undo операций с ассетами
 
-**Status**: Core system complete, needs integration
+**Статус**: Основная система завершена, требуется интеграция
 
 ---
 
 ## 17. Event Bus ✅ 95%
 
-### Implemented Features
-- ✅ 17.1-17.2 All event types + panel subscriptions
+### Реализованные функции
+- ✅ 17.1-17.2 Все типы событий + подписки панелей
 
-### Missing
-- ⚠️ 17.3 Full backend event generation
+### Отсутствует
+- ⚠️ 17.3 Полная генерация событий бэкендом
 
-**Status**: Nearly complete
-
----
-
-## 18. Selection System ⚠️ 70%
-
-### Implemented Features
-- ✅ 18.1 Single source of truth
-- ⚠️ 18.2 Framework ready for multi-selection
-- ✅ 18.3 Panel sync
-
-### Missing Features
-- ❌ 18.4 Selection history (navigate back/forward)
-
-### Implementation Plan
-**Priority**: MEDIUM
-**Estimated Effort**: 2-3 hours
+**Статус**: Почти завершено
 
 ---
 
-## 19. Style Guide ✅ 100%
+## 18. Система выбора ⚠️ 70%
 
-### Implemented Features
-- ✅ 19.1-19.6 Complete style system with 40+ SVG icons
+### Реализованные функции
+- ✅ 18.1 Единый источник истины
+- ⚠️ 18.2 Фреймворк готов для множественного выбора
+- ✅ 18.3 Синхронизация панелей
 
-**Status**: Complete!
+### Отсутствующие функции
+- ❌ 18.4 История выбора (навигация назад/вперед)
 
----
-
-## 20. Documentation ❌ 10%
-
-### Missing
-- ❌ 20.1-20.7 All documentation (user manual, panel docs, guides)
-
-### Implementation Plan
-**Priority**: LOW
-**Estimated Effort**: 8-12 hours
+### План реализации
+**Приоритет**: СРЕДНИЙ
+**Оценочные усилия**: 2-3 часа
 
 ---
 
-## Priority Implementation Order
+## 19. Руководство по стилю ✅ 100%
 
-### Batch 1: StoryGraph Editing ✅ DONE (Committed)
-- ✅ Node creation palette
-- ✅ Connection drawing (Ctrl+Drag)
-- ✅ Node/connection deletion (Delete key)
+### Реализованные функции
+- ✅ 19.1-19.6 Полная система стилей с 40+ SVG-иконками
 
-### Batch 2: Core Editing ✅ DONE (Inspector Complete)
-1. **Inspector Property Editing** (COMPLETE)
-   - ✅ Editable widgets for all property types
-   - ⏳ Undo/Redo integration (framework ready)
-
-### Batch 3: SceneView Object Interaction ✅ DONE (6-8 hours)
-1. **Scene Objects & Selection** (COMPLETE)
-   - ✅ NMSceneObject class with 4 types
-   - ✅ Click-to-select interaction
-   - ✅ Blue outline selection highlighting
-   - ✅ Demo objects (background, 2 characters, UI)
-2. **Transform Gizmos** (COMPLETE)
-   - ✅ Move gizmo (X/Y arrows)
-   - ✅ Rotate gizmo (circle + handles)
-   - ✅ Scale gizmo (bounding box)
-   - ✅ Toolbar mode switching (W/E/R)
-3. **Info Overlay** (COMPLETE)
-   - ✅ Real-time cursor position
-   - ✅ Selected object info display
-
-### Batch 4: Advanced Editing (MEDIUM PRIORITY - NEXT)
-1. **Timeline Keyframe Editing** (4-6 hours)
-   - Drag keyframes
-   - Snap to grid
-   - Easing selection
-
-2. **Asset Browser Enhancements** (5-7 hours)
-   - Thumbnails/waveforms
-   - Context menus
-   - Grid/List toggle
-
-3. **Multi-Selection Support** (3-4 hours)
-   - Across all panels
-   - Selection history
-
-### Batch 4: Polish & Production (LOW-MEDIUM PRIORITY)
-1. **StoryGraph Polish** (4-6 hours)
-   - Minimap
-   - Error validation
-   - Node resizing
-
-2. **Navigation Features** (3-4 hours)
-   - Jump-to-source from Diagnostics
-   - Cross-panel navigation
-
-3. **UI/UX Enhancements** (4-6 hours)
-   - Smooth animations
-   - Hover effects
-   - Loading states
-
-### Batch 5: Production Tools (LOW PRIORITY)
-1. Voice/Localization completion
-2. Build Settings enhancements
-3. Documentation
+**Статус**: Завершено!
 
 ---
 
-## Metrics
+## 20. Документация ❌ 10%
 
-### Current Overall Completion
-- **Foundation**: 95% ✅
-- **Core Editing**: 85% ✅ (up from 40% → Batch 1: 58% → Batch 2: 72% → Batch 3: 85%)
-- **Advanced Features**: 72% ⚠️
-- **Production Tools**: 75% ✅ (up from 70%, Phase 1a complete)
+### Отсутствует
+- ❌ 20.1-20.7 Вся документация (руководство пользователя, документация панелей, руководства)
+
+### План реализации
+**Приоритет**: НИЗКИЙ
+**Оценочные усилия**: 8-12 часов
+
+---
+
+## Порядок реализации по приоритету
+
+### Пакет 1: Редактирование StoryGraph ✅ ВЫПОЛНЕНО (Закоммичено)
+- ✅ Палитра создания узлов
+- ✅ Рисование соединений (Ctrl+Перетаскивание)
+- ✅ Удаление узлов/соединений (клавиша Delete)
+
+### Пакет 2: Основное редактирование ✅ ВЫПОЛНЕНО (Inspector завершен)
+1. **Редактирование свойств Inspector** (ЗАВЕРШЕНО)
+   - ✅ Редактируемые виджеты для всех типов свойств
+   - ⏳ Интеграция Undo/Redo (фреймворк готов)
+
+### Пакет 3: Взаимодействие с объектами SceneView ✅ ВЫПОЛНЕНО (6-8 часов)
+1. **Объекты сцены и выбор** (ЗАВЕРШЕНО)
+   - ✅ Класс NMSceneObject с 4 типами
+   - ✅ Взаимодействие клик-для-выбора
+   - ✅ Подсветка выбора синей границей
+   - ✅ Демо-объекты (background, 2 characters, UI)
+2. **Гизмо трансформации** (ЗАВЕРШЕНО)
+   - ✅ Гизмо перемещения (стрелки X/Y)
+   - ✅ Гизмо поворота (круг + ручки)
+   - ✅ Гизмо масштаба (ограничивающая рамка)
+   - ✅ Переключение режима панели инструментов (W/E/R)
+3. **Информационный оверлей** (ЗАВЕРШЕНО)
+   - ✅ Позиция курсора в реальном времени
+   - ✅ Отображение информации о выбранном объекте
+
+### Пакет 4: Продвинутое редактирование (СРЕДНИЙ ПРИОРИТЕТ - СЛЕДУЮЩИЙ)
+1. **Редактирование ключевых кадров Timeline** (4-6 часов)
+   - Перетаскивание ключевых кадров
+   - Привязка к сетке
+   - Выбор смягчения
+
+2. **Улучшения Asset Browser** (5-7 часов)
+   - Миниатюры/формы волн
+   - Контекстные меню
+   - Переключение Grid/List
+
+3. **Поддержка множественного выбора** (3-4 часа)
+   - Через все панели
+   - История выбора
+
+### Пакет 4: Полировка и продакшн (НИЗКИЙ-СРЕДНИЙ ПРИОРИТЕТ)
+1. **Полировка StoryGraph** (4-6 часов)
+   - Мини-карта
+   - Валидация ошибок
+   - Изменение размера узлов
+
+2. **Функции навигации** (3-4 часов)
+   - Навигация к источнику из Diagnostics
+   - Кросс-панельная навигация
+
+3. **Улучшения UI/UX** (4-6 часов)
+   - Плавные анимации
+   - Эффекты наведения
+   - Состояния загрузки
+
+### Пакет 5: Продакшн-инструменты (НИЗКИЙ ПРИОРИТЕТ)
+1. Завершение Voice/Localization
+2. Улучшения Build Settings
+3. Документация
+
+---
+
+## Метрики
+
+### Текущее общее завершение
+- **Основа**: 95% ✅
+- **Основное редактирование**: 85% ✅ (рост от 40% → Пакет 1: 58% → Пакет 2: 72% → Пакет 3: 85%)
+- **Продвинутые функции**: 72% ⚠️
+- **Продакшн-инструменты**: 75% ✅ (рост от 70%, Фаза 1a завершена)
 - **Play-In-Editor**: 90% ✅
 
-### Feature Completion by Category
-- **Fully Complete (100%)**: 3 categories
+### Завершение функций по категориям
+- **Полностью завершено (100%)**: 3 категории
   - Main Window & Docking ✅
-  - Console Panel ✅
+  - Панель Console ✅
   - Debug Overlay ✅
-- **Near Complete (85%+)**: 3 categories
+- **Почти завершено (85%+)**: 3 категории
   - SceneView (95%)
   - Inspector (85%)
   - Build Settings (85%)
-- **In Progress (50-84%)**: 8 categories
-- **Needs Work (<50%)**: 6 categories
+- **В процессе (50-84%)**: 8 категорий
+- **Требуется работа (<50%)**: 6 категорий
 
-### Estimated Remaining Effort
-- **High Priority**: ~4 hours (down from 5)
-- **Medium Priority**: ~25 hours
-- **Low Priority**: ~25 hours
-- **Total**: ~54 hours to 100% completion (down from 55)
+### Оставшиеся оценочные усилия
+- **Высокий приоритет**: ~4 часа (рост от 5)
+- **Средний приоритет**: ~25 часов
+- **Низкий приоритет**: ~25 часов
+- **Всего**: ~54 часа до 100% завершения (рост от 55)
 
 ---
 
-## Recent Updates
+## Недавние обновления
 
-### 2025-12-14 - Phase 1a Complete: Console & Debug Overlay ✅ **NEW**
-- ✅ Completed Console Panel to 100%
-  - Added copy selected text (Ctrl+C)
-  - Enhanced toolbar with icons
-- ✅ Completed Debug Overlay to 100%
-  - Added Current Instruction tab
-  - Implemented Minimal/Extended display modes
-  - Dynamic tab visibility switching
-- ✅ Created comprehensive GAP_ANALYSIS.md (140 features analyzed)
+### 2025-12-14 - Фаза 1a завершена: Console и Debug Overlay ✅ **НОВОЕ**
+- ✅ Панель Console завершена до 100%
+  - Добавлено копирование выбранного текста (Ctrl+C)
+  - Улучшенная панель инструментов с иконками
+- ✅ Debug Overlay завершен до 100%
+  - Добавлена вкладка Current Instruction
+  - Реализованы режимы отображения Minimal/Extended
+  - Динамическое переключение видимости вкладок
+- ✅ Создан комплексный GAP_ANALYSIS.md (проанализировано 140 функций)
 - 📊 Console: 67% → 100% (+33%)
 - 📊 Debug Overlay: 71% → 100% (+29%)
-- 📊 Overall progress: 2 more panels at 100%!
+- 📊 Общий прогресс: еще 2 панели на 100%!
 
-### 2025-12-14 - Batch 3 Complete ✅
-- ✅ Implemented NMSceneObject class (4 types: Background/Character/UI/Effect)
-- ✅ Added click-to-select with mouse interaction
-- ✅ Implemented selection highlighting (blue outline + corner handles)
-- ✅ Created NMTransformGizmo with 3 modes (Move/Rotate/Scale)
-- ✅ Added NMSceneInfoOverlay for real-time position info
-- ✅ Placed 4 demo objects for testing
-- ✅ Connected to global selection system
-- 📊 SceneView Panel: 60% → 95% complete
-- 📊 Core Editing: 72% → 85% complete
+### 2025-12-14 - Пакет 3 завершен ✅
+- ✅ Реализован класс NMSceneObject (4 типа: Background/Character/UI/Effect)
+- ✅ Добавлен клик-для-выбора с взаимодействием мыши
+- ✅ Реализована подсветка выбора (синяя граница + угловые ручки)
+- ✅ Создан NMTransformGizmo с 3 режимами (Move/Rotate/Scale)
+- ✅ Добавлен NMSceneInfoOverlay для информации о позиции в реальном времени
+- ✅ Размещены 4 демо-объекта для тестирования
+- ✅ Подключено к глобальной системе выбора
+- 📊 Панель SceneView: 60% → 95% завершено
+- 📊 Основное редактирование: 72% → 85% завершено
 
-### 2025-12-14 - Batch 2 Complete ✅
-- ✅ Added 7 property types with widget factory
-- ✅ Implemented editable widgets (String/Int/Float/Bool/Color/Enum/Asset)
-- ✅ Added propertyValueChanged signal system
-- ✅ Dark theme styling for all property widgets
-- ✅ Edit mode toggle for Inspector
-- 📊 Inspector Panel: 40% → 85% complete
-- 📊 Core Editing: 58% → 72% complete
+### 2025-12-14 - Пакет 2 завершен ✅
+- ✅ Добавлено 7 типов свойств с фабрикой виджетов
+- ✅ Реализованы редактируемые виджеты (String/Int/Float/Bool/Color/Enum/Asset)
+- ✅ Добавлена система сигналов propertyValueChanged
+- ✅ Стилизация темной темы для всех виджетов свойств
+- ✅ Переключение режима редактирования для Inspector
+- 📊 Панель Inspector: 40% → 85% завершено
+- 📊 Основное редактирование: 58% → 72% завершено
 
-### 2025-12-14 - Batch 1 Complete ✅
-- ✅ Added NMNodePalette for node creation
-- ✅ Implemented Ctrl+Drag connection drawing
-- ✅ Added Delete key for node/connection removal
-- ✅ Enhanced NMStoryGraphScene with removal methods
-- 📊 StoryGraph Editor: 50% → 75% complete
+### 2025-12-14 - Пакет 1 завершен ✅
+- ✅ Добавлен NMNodePalette для создания узлов
+- ✅ Реализовано рисование соединений Ctrl+Перетаскивание
+- ✅ Добавлена клавиша Delete для удаления узлов/соединений
+- ✅ Улучшен NMStoryGraphScene с методами удаления
+- 📊 Редактор StoryGraph: 50% → 75% завершено
 
-### Next Priority Goals
-- Timeline keyframe drag editing + snapping
-- Asset Browser enhancements (thumbnails, context menus)
-- StoryGraph polish (minimap, validation, resizing)
+### Следующие приоритетные цели
+- Редактирование перетаскивания ключевых кадров Timeline + привязка
+- Улучшения Asset Browser (миниатюры, контекстные меню)
+- Полировка StoryGraph (мини-карта, валидация, изменение размера)
