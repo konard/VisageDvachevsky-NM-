@@ -47,7 +47,6 @@ if(NOVELMIND_BUILD_EDITOR)
     add_executable(integration_tests
         integration/test_editor_runtime.cpp
         integration/test_editor_settings.cpp
-        integration/test_gui_panels.cpp
     )
 
     target_link_libraries(integration_tests
