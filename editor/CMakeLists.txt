@@ -53,12 +53,22 @@ add_library(novelmind_editor STATIC
     src/qt/nm_dock_panel.cpp
     src/qt/nm_welcome_dialog.cpp
     src/qt/nm_undo_manager.cpp
+
+    # Phase 0 & 1 panels
     src/qt/panels/nm_scene_view_panel.cpp
     src/qt/panels/nm_story_graph_panel.cpp
     src/qt/panels/nm_inspector_panel.cpp
     src/qt/panels/nm_console_panel.cpp
     src/qt/panels/nm_asset_browser_panel.cpp
     src/qt/panels/nm_hierarchy_panel.cpp
+
+    # Phase 3 & 4 panels
+    src/qt/panels/nm_timeline_panel.cpp
+    src/qt/panels/nm_curve_editor_panel.cpp
+    src/qt/panels/nm_voice_manager_panel.cpp
+    src/qt/panels/nm_localization_panel.cpp
+    src/qt/panels/nm_diagnostics_panel.cpp
+    src/qt/panels/nm_build_settings_panel.cpp
 )
 
 # Alias for backward compatibility

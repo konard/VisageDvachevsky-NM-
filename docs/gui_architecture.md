@@ -41,6 +41,25 @@ This document describes the comprehensive GUI architecture for the NovelMind Edi
 └─────────────────────────────────────────────────────────────┘
 ```
 
+## Welcome/Startup Screen
+
+The editor features a modern welcome screen inspired by Unreal Engine and Unity Hub:
+
+**Features:**
+- Recent projects list with timestamps and quick access
+- Project templates (Blank, Visual Novel, Dating Sim, Mystery, RPG, Horror)
+- Quick action buttons (New Project, Open Project, Browse Examples)
+- Learning resources panel with documentation links
+- Search functionality for projects and templates
+- "Don't show again" option with persistent settings
+- Command-line `--no-welcome` flag to skip
+
+**Implementation:**
+- `NMWelcomeDialog` - Modal dialog shown on startup
+- Integrated into `main.cpp` startup flow
+- Uses QSettings for persistence
+- Unreal-like dark theme styling
+
 ## Core Components
 
 ### 1. Event Bus (`QtEventBus`)
@@ -75,16 +94,38 @@ Centralized selection management across all panels.
 - Notifies listeners via Event Bus
 - Provides selection history for navigation
 
-### 3. Undo/Redo Command System
+### 3. Undo/Redo Command System (`NMUndoManager`)
 
-Based on Qt's `QUndoStack` and `QUndoCommand`.
+Centralized undo/redo management using Qt's `QUndoStack`.
+
+**Features:**
+- Global undo/redo stack for all editor operations
+- Command pattern for reversible actions
+- Command merging for smooth operations (e.g., continuous transforms)
+- Undo limit configuration (default: 100 operations)
+- Clean state tracking for unsaved changes
+- Macro support for grouping operations
+- Integration with Main Window menu/toolbar
+- Dynamic menu text updates
+
+**Base Command Classes:**
+- `PropertyChangeCommand` - Property value modifications
+- `AddObjectCommand` / `DeleteObjectCommand` - Object lifecycle
+- `TransformObjectCommand` - Position/rotation/scale (with merging)
+- `CreateGraphNodeCommand` / `DeleteGraphNodeCommand` - Story graph nodes
+- `ConnectGraphNodesCommand` - Node connections
 
 ```cpp
 class MoveNodeCommand : public QUndoCommand {
 public:
     void undo() override;
     void redo() override;
+    bool mergeWith(const QUndoCommand* other) override;
+    int id() const override { return 1; }
 };
+
+// Usage
+NMUndoManager::instance().pushCommand(new PropertyChangeCommand(...));
 ```
 
 ### 4. Play-In-Editor Bridge
@@ -116,11 +157,12 @@ Manages runtime embedding for previewing visual novels in the editor.
 - Qt Style Sheets (QSS)
 
 **Definition of Done:**
-- [ ] Editor launches with empty main window
-- [ ] Docking framework functional
-- [ ] Dark theme applied
-- [ ] Event Bus can publish/subscribe events
-- [ ] Selection System tracks basic selection
+- [x] Editor launches with empty main window
+- [x] Docking framework functional
+- [x] Dark theme applied
+- [x] Event Bus can publish/subscribe events
+- [x] Selection System tracks basic selection
+- [x] Welcome/Startup screen with recent projects and templates
 
 ### Phase 1 - Core Panels (Read-Only)
 
@@ -143,10 +185,12 @@ Manages runtime embedding for previewing visual novels in the editor.
 - `QTextEdit`
 
 **Definition of Done:**
-- [ ] SceneView displays scene objects (no interaction)
-- [ ] StoryGraph displays nodes and connections (no editing)
-- [ ] Inspector shows properties of selected object
-- [ ] Console displays log messages
+- [x] SceneView displays scene objects (no interaction)
+- [x] StoryGraph displays nodes and connections (no editing)
+- [x] Inspector shows properties of selected object
+- [x] Console displays log messages
+- [x] Asset Browser with tree/list split view
+- [x] Hierarchy panel with expand/collapse
 
 ### Phase 2 - Editable Core
 
@@ -169,11 +213,13 @@ Manages runtime embedding for previewing visual novels in the editor.
 - Custom property widgets
 
 **Definition of Done:**
-- [ ] Click to select objects
-- [ ] Multi-select with Ctrl+Click
-- [ ] Inspector edits properties
-- [ ] Undo/Redo works for property changes
-- [ ] Assets can be browsed
+- [x] Undo/Redo system with QUndoStack
+- [x] Command pattern for all editor operations
+- [x] Undo/Redo integrated with Main Window
+- [ ] Click to select objects (framework ready)
+- [ ] Multi-select with Ctrl+Click (framework ready)
+- [ ] Inspector edits properties (Phase 2.2 - future work)
+- [x] Assets can be browsed
 
 ### Phase 3 - Advanced Editors
 
@@ -196,10 +242,13 @@ Manages runtime embedding for previewing visual novels in the editor.
 - Custom painting
 
 **Definition of Done:**
-- [ ] Create/delete/connect nodes in StoryGraph
-- [ ] Timeline shows tracks and keyframes
-- [ ] Curve Editor for animation curves
-- [ ] Hierarchy shows scene tree with drag-drop reordering
+- [x] Timeline Editor with multiple tracks
+- [x] Timeline playback controls and frame scrubbing
+- [x] Keyframe visualization
+- [x] Curve Editor with interpolation types
+- [x] Grid visualization and curve path rendering
+- [ ] Create/delete/connect nodes in StoryGraph (Phase 3.3 - future work)
+- [ ] Hierarchy drag-drop reordering (Phase 3.3 - future work)
 
 ### Phase 4 - Production Tools
 
@@ -216,10 +265,14 @@ Manages runtime embedding for previewing visual novels in the editor.
 - `NMBuildSettingsPanel : NMDockPanel`
 
 **Definition of Done:**
-- [ ] Voice files can be managed and previewed
-- [ ] Localization strings can be edited
-- [ ] Diagnostics shows errors/warnings with navigation
-- [ ] Build settings configurable
+- [x] Voice Manager panel with import/playback controls
+- [x] Voice file list and preview
+- [x] Localization Manager panel with language selector
+- [x] String table editor for translations
+- [x] Diagnostics panel with error/warning display
+- [x] Diagnostics filtering by type
+- [x] Build Settings panel with platform selector
+- [x] Build configuration options and output settings
 
 ### Phase 5 - Play-In-Editor
 
