@@ -1,503 +1,503 @@
-# NovelMind Troubleshooting Guide
+# Руководство по устранению неполадок NovelMind
 
-This guide helps you diagnose and resolve common issues when using NovelMind.
+Это руководство поможет вам диагностировать и решать распространённые проблемы при использовании NovelMind.
 
-## Table of Contents
+## Содержание
 
-- [Editor Issues](#editor-issues)
-- [Build Issues](#build-issues)
-- [Runtime Issues](#runtime-issues)
-- [Script Issues](#script-issues)
-- [Asset Issues](#asset-issues)
-- [Performance Issues](#performance-issues)
-- [Platform-Specific Issues](#platform-specific-issues)
+- [Проблемы с редактором](#проблемы-с-редактором)
+- [Проблемы со сборкой](#проблемы-со-сборкой)
+- [Проблемы выполнения](#проблемы-выполнения)
+- [Проблемы со скриптами](#проблемы-со-скриптами)
+- [Проблемы с ресурсами](#проблемы-с-ресурсами)
+- [Проблемы производительности](#проблемы-производительности)
+- [Платформенные проблемы](#платформенные-проблемы)
 
 ---
 
-## Editor Issues
+## Проблемы с редактором
 
-### Editor Won't Start
+### Редактор не запускается
 
-**Symptoms**: The editor crashes on launch or shows a blank window.
+**Симптомы**: Редактор падает при запуске или показывает пустое окно.
 
-**Solutions**:
+**Решения**:
 
-1. **Check System Requirements**
-   - C++20-compatible system
-   - OpenGL 3.3 or higher
-   - SDL2 installed
+1. **Проверьте системные требования**
+   - Система с поддержкой C++20
+   - OpenGL 3.3 или выше
+   - Установлен SDL2
 
-2. **Reset Editor Settings**
+2. **Сброс настроек редактора**
    ```bash
-   # Delete settings file to reset
+   # Удалите файл настроек для сброса
    rm ~/.novelmind/editor_settings.json
    ```
 
-3. **Check Graphics Drivers**
-   - Update to latest GPU drivers
-   - Try running with software rendering:
+3. **Проверьте драйверы графики**
+   - Обновите до последних драйверов GPU
+   - Попробуйте запустить с программным рендерингом:
    ```bash
    SDL_RENDER_DRIVER=software ./novelmind_editor
    ```
 
-4. **Check Console Output**
-   - Run from terminal to see error messages:
+4. **Проверьте вывод консоли**
+   - Запустите из терминала, чтобы увидеть сообщения об ошибках:
    ```bash
    ./novelmind_editor 2>&1 | tee editor.log
    ```
 
-### Editor Freezes or Hangs
+### Редактор зависает или не отвечает
 
-**Symptoms**: The editor becomes unresponsive.
+**Симптомы**: Редактор становится неотзывчивым.
 
-**Solutions**:
+**Решения**:
 
-1. **Check for Infinite Loops in Script**
-   - Open the Console panel for error messages
-   - Check for recursive scene transitions (scene A -> scene B -> scene A)
+1. **Проверьте бесконечные циклы в скрипте**
+   - Откройте панель Console для сообщений об ошибках
+   - Проверьте рекурсивные переходы сцен (сцена A -> сцена B -> сцена A)
 
-2. **Large Asset Loading**
-   - Wait for assets to finish loading (check progress bar)
-   - Consider optimizing large images
+2. **Загрузка больших ресурсов**
+   - Дождитесь завершения загрузки ресурсов (проверьте прогресс-бар)
+   - Рассмотрите оптимизацию больших изображений
 
-3. **Force Close and Recover**
-   - NovelMind auto-saves periodically
-   - Check `ProjectSettings/autosave/` for recovery files
+3. **Принудительное закрытие и восстановление**
+   - NovelMind периодически автоматически сохраняет
+   - Проверьте `ProjectSettings/autosave/` для файлов восстановления
 
-### Changes Not Saving
+### Изменения не сохраняются
 
-**Symptoms**: Edits disappear after restarting the editor.
+**Симптомы**: Правки исчезают после перезапуска редактора.
 
-**Solutions**:
+**Решения**:
 
-1. **Check Write Permissions**
-   - Ensure the project folder is writable
-   - Don't work in system directories
+1. **Проверьте права записи**
+   - Убедитесь, что папка проекта доступна для записи
+   - Не работайте в системных директориях
 
-2. **Verify Project Path**
-   - Avoid special characters in project path
-   - Keep path length reasonable (< 200 characters)
+2. **Проверьте путь к проекту**
+   - Избегайте специальных символов в пути проекта
+   - Держите длину пути разумной (< 200 символов)
 
-3. **Manual Save**
-   - Use `Ctrl+S` to force save
-   - Check **File > Recent Projects** for correct path
+3. **Ручное сохранение**
+   - Используйте `Ctrl+S` для принудительного сохранения
+   - Проверьте **File > Recent Projects** на правильность пути
 
 ---
 
-## Build Issues
+## Проблемы со сборкой
 
-### Build Fails to Start
+### Сборка не запускается
 
-**Symptoms**: Clicking Build does nothing or shows an error.
+**Симптомы**: Нажатие Build ничего не делает или показывает ошибку.
 
-**Solutions**:
+**Решения**:
 
-1. **Check Build Configuration**
-   - Open **Build > Build Settings**
-   - Verify target platform is selected
-   - Ensure output path exists and is writable
+1. **Проверьте конфигурацию сборки**
+   - Откройте **Build > Build Settings**
+   - Проверьте, что целевая платформа выбрана
+   - Убедитесь, что выходной путь существует и доступен для записи
 
-2. **Validate Project**
-   - Run **Tools > Validate Project** first
-   - Fix all reported errors before building
+2. **Проверьте проект**
+   - Запустите **Tools > Validate Project** сначала
+   - Исправьте все обнаруженные ошибки перед сборкой
 
-3. **Check Disk Space**
-   - Build process needs temporary space
-   - Ensure at least 500MB free space
+3. **Проверьте свободное место на диске**
+   - Процессу сборки нужно временное пространство
+   - Убедитесь, что есть как минимум 500 МБ свободного места
 
-### Missing Resources in Build
+### Отсутствующие ресурсы в сборке
 
-**Symptoms**: Built game is missing images, audio, or other assets.
+**Симптомы**: Собранная игра не содержит изображений, аудио или других ресурсов.
 
-**Solutions**:
+**Решения**:
 
-1. **Check Asset References**
-   - Verify all asset paths in scripts are correct
-   - Use relative paths, not absolute paths
+1. **Проверьте ссылки на ресурсы**
+   - Убедитесь, что все пути к ресурсам в скриптах корректны
+   - Используйте относительные пути, а не абсолютные
 
-2. **Rebuild Asset Database**
+2. **Пересоберите базу данных ресурсов**
    - **Assets > Rebuild Database**
-   - Check for errors in Console
+   - Проверьте ошибки в Console
 
-3. **Check Pack Settings**
-   - Ensure assets are included in pack configuration
-   - Review **Build > Pack Settings**
+3. **Проверьте настройки пака**
+   - Убедитесь, что ресурсы включены в конфигурацию пака
+   - Просмотрите **Build > Pack Settings**
 
-### Build Crashes on Specific Platform
+### Сборка падает на определённой платформе
 
-**Symptoms**: Build works on one platform but crashes on another.
+**Симптомы**: Сборка работает на одной платформе, но падает на другой.
 
-**Solutions**:
+**Решения**:
 
-1. **Check Platform Requirements**
-   - Some features require specific OS versions
-   - Check minimum requirements for target platform
+1. **Проверьте требования платформы**
+   - Некоторые функции требуют определённых версий ОС
+   - Проверьте минимальные требования для целевой платформы
 
-2. **Test Asset Compatibility**
-   - Verify image formats are cross-platform (PNG, JPEG)
-   - Check audio codecs (OGG recommended)
+2. **Проверьте совместимость ресурсов**
+   - Убедитесь, что форматы изображений кроссплатформенные (PNG, JPEG)
+   - Проверьте аудио кодеки (рекомендуется OGG)
 
-3. **Review Console Logs**
-   - Check `Build/logs/` for detailed error messages
+3. **Просмотрите логи консоли**
+   - Проверьте `Build/logs/` для подробных сообщений об ошибках
 
 ---
 
-## Runtime Issues
+## Проблемы выполнения
 
-### Game Won't Launch
+### Игра не запускается
 
-**Symptoms**: The built game executable doesn't start.
+**Симптомы**: Исполняемый файл собранной игры не запускается.
 
-**Solutions**:
+**Решения**:
 
-1. **Check Dependencies**
-   - Windows: Ensure Visual C++ Runtime is installed
-   - Linux: Check for missing libraries with `ldd ./game`
-   - macOS: Grant security permissions in System Preferences
+1. **Проверьте зависимости**
+   - Windows: Убедитесь, что установлен Visual C++ Runtime
+   - Linux: Проверьте отсутствующие библиотеки с помощью `ldd ./game`
+   - macOS: Предоставьте разрешения безопасности в System Preferences
 
-2. **Run from Terminal**
+2. **Запустите из терминала**
    ```bash
    ./my_game 2>&1 | tee game.log
    ```
 
-3. **Check Pack File Integrity**
-   - Ensure `.pack` files weren't corrupted during transfer
-   - Re-build if necessary
+3. **Проверьте целостность файла пака**
+   - Убедитесь, что `.pack` файлы не были повреждены при передаче
+   - Пересоберите при необходимости
 
-### Save/Load Not Working
+### Сохранение/Загрузка не работает
 
-**Symptoms**: Game state doesn't persist between sessions.
+**Симптомы**: Состояние игры не сохраняется между сессиями.
 
-**Solutions**:
+**Решения**:
 
-1. **Check Write Permissions**
-   - Save directory must be writable
-   - Default: `~/.novelmind/saves/` (Linux/macOS) or `%APPDATA%\NovelMind\saves\` (Windows)
+1. **Проверьте права записи**
+   - Директория сохранения должна быть доступна для записи
+   - По умолчанию: `~/.novelmind/saves/` (Linux/macOS) или `%APPDATA%\NovelMind\saves\` (Windows)
 
-2. **Verify Save Data**
-   - Check if save files are created
-   - Look for corruption messages in console
+2. **Проверьте данные сохранения**
+   - Проверьте, создаются ли файлы сохранения
+   - Ищите сообщения о повреждении в консоли
 
-3. **Test in Debug Mode**
-   - Build with debug enabled
-   - Check save/load callbacks in console
+3. **Тестируйте в режиме отладки**
+   - Соберите с включённой отладкой
+   - Проверьте обратные вызовы сохранения/загрузки в консоли
 
-### Audio Not Playing
+### Аудио не воспроизводится
 
-**Symptoms**: No sound or music in the game.
+**Симптомы**: Нет звука или музыки в игре.
 
-**Solutions**:
+**Решения**:
 
-1. **Check Audio Files**
-   - Verify files exist in Assets/Music and Assets/Sounds
-   - Supported formats: OGG, WAV, MP3
+1. **Проверьте аудиофайлы**
+   - Убедитесь, что файлы существуют в Assets/Music и Assets/Sounds
+   - Поддерживаемые форматы: OGG, WAV, MP3
 
-2. **Check Audio Settings**
-   - Verify system volume isn't muted
-   - Check in-game volume settings
+2. **Проверьте настройки аудио**
+   - Убедитесь, что системная громкость не выключена
+   - Проверьте настройки громкости в игре
 
-3. **Audio Driver Issues**
-   - Linux: Ensure PulseAudio/ALSA is running
-   - Try different audio backend:
+3. **Проблемы с аудио драйвером**
+   - Linux: Убедитесь, что запущен PulseAudio/ALSA
+   - Попробуйте другой аудио бэкенд:
    ```bash
    SDL_AUDIODRIVER=alsa ./my_game
    ```
 
 ---
 
-## Script Issues
+## Проблемы со скриптами
 
-### Script Syntax Errors
+### Синтаксические ошибки в скриптах
 
-**Symptoms**: Red errors in the Console about script parsing.
+**Симптомы**: Красные ошибки в Console о парсинге скриптов.
 
-**Solutions**:
+**Решения**:
 
-1. **Check Error Location**
-   - Error message includes line and column
-   - Navigate to the location in Script Editor
+1. **Проверьте расположение ошибки**
+   - Сообщение об ошибке включает строку и столбец
+   - Перейдите к этому месту в Script Editor
 
-2. **Common Syntax Issues**
+2. **Распространённые синтаксические проблемы**
    ```nm
-   # Wrong: Missing quotes
-   say hero Hello world
+   # Неправильно: Отсутствуют кавычки
+   say hero Привет мир
 
-   # Correct
-   say hero "Hello world"
+   # Правильно
+   say hero "Привет мир"
 
-   # Wrong: Unclosed brace
+   # Неправильно: Незакрытая скобка
    scene test {
-       say hero "Hello"
+       say hero "Привет"
 
-   # Correct
+   # Правильно
    scene test {
-       say hero "Hello"
+       say hero "Привет"
    }
    ```
 
-3. **Use Script Validator**
+3. **Используйте валидатор скриптов**
    - **Tools > Validate Script**
-   - Shows all errors and warnings
+   - Показывает все ошибки и предупреждения
 
-### Variables Not Updating
+### Переменные не обновляются
 
-**Symptoms**: Variable values don't change as expected.
+**Симптомы**: Значения переменных не изменяются, как ожидается.
 
-**Solutions**:
+**Решения**:
 
-1. **Check Variable Scope**
-   - Global variables persist across scenes
-   - Local variables reset on scene change
+1. **Проверьте область видимости переменной**
+   - Глобальные переменные сохраняются между сценами
+   - Локальные переменные сбрасываются при смене сцены
 
-2. **Verify Condition Syntax**
+2. **Проверьте синтаксис условия**
    ```nm
-   # Wrong: Assignment instead of comparison
+   # Неправильно: Присваивание вместо сравнения
    if score = 10 { ... }
 
-   # Correct: Comparison
+   # Правильно: Сравнение
    if score == 10 { ... }
    ```
 
-3. **Debug with Console**
-   - Add debug output:
+3. **Отладка с помощью консоли**
+   - Добавьте отладочный вывод:
    ```nm
-   debug "Current score: " + score
+   debug "Текущий счёт: " + score
    ```
 
-### Choices Not Appearing
+### Выборы не появляются
 
-**Symptoms**: Choice menu doesn't show or has wrong options.
+**Симптомы**: Меню выбора не показывается или имеет неправильные опции.
 
-**Solutions**:
+**Решения**:
 
-1. **Check Choice Conditions**
+1. **Проверьте условия выборов**
    ```nm
    choice {
-       "Option A" if flag_unlocked -> scene_a
-       "Option B" -> scene_b
+       "Опция A" if flag_unlocked -> scene_a
+       "Опция B" -> scene_b
    }
    ```
-   - Verify conditions evaluate to true
+   - Проверьте, что условия оцениваются как истинные
 
-2. **Validate Choice Structure**
-   - Each option needs text and target
-   - Targets must exist
+2. **Проверьте структуру выбора**
+   - Каждая опция нуждается в тексте и цели
+   - Цели должны существовать
 
-3. **Check UI Settings**
-   - Choice menu might be hidden
-   - Verify UI layer is visible
+3. **Проверьте настройки UI**
+   - Меню выбора может быть скрыто
+   - Проверьте, что слой UI видимый
 
 ---
 
-## Asset Issues
+## Проблемы с ресурсами
 
-### Images Not Displaying
+### Изображения не отображаются
 
-**Symptoms**: Characters or backgrounds show as blank or placeholder.
+**Симптомы**: Персонажи или фоны показываются пустыми или как плейсхолдеры.
 
-**Solutions**:
+**Решения**:
 
-1. **Check File Path**
-   - Use forward slashes: `Assets/Characters/hero.png`
-   - Paths are case-sensitive on Linux
+1. **Проверьте путь к файлу**
+   - Используйте прямые слеши: `Assets/Characters/hero.png`
+   - Пути чувствительны к регистру на Linux
 
-2. **Verify Image Format**
-   - Supported: PNG, JPEG, BMP, TGA
-   - Recommended: PNG for transparency
+2. **Проверьте формат изображения**
+   - Поддерживаются: PNG, JPEG, BMP, TGA
+   - Рекомендуется: PNG для прозрачности
 
-3. **Check Image Dimensions**
-   - Maximum texture size depends on GPU
-   - Typical limit: 4096x4096 pixels
+3. **Проверьте размеры изображения**
+   - Максимальный размер текстуры зависит от GPU
+   - Типичный лимит: 4096x4096 пикселей
 
-4. **Rebuild Asset Database**
+4. **Пересоберите базу данных ресурсов**
    - **Assets > Rebuild Database**
 
-### Asset Import Failing
+### Импорт ресурсов не работает
 
-**Symptoms**: Can't add new assets to the project.
+**Симптомы**: Невозможно добавить новые ресурсы в проект.
 
-**Solutions**:
+**Решения**:
 
-1. **Check File Format**
-   - Images: PNG, JPEG, BMP, TGA
-   - Audio: OGG, WAV, MP3
-   - Fonts: TTF, OTF
+1. **Проверьте формат файла**
+   - Изображения: PNG, JPEG, BMP, TGA
+   - Аудио: OGG, WAV, MP3
+   - Шрифты: TTF, OTF
 
-2. **Check File Size**
-   - Very large files may fail to import
-   - Consider compressing before import
+2. **Проверьте размер файла**
+   - Очень большие файлы могут не импортироваться
+   - Рассмотрите сжатие перед импортом
 
-3. **Check File Names**
-   - Avoid special characters
-   - Use only alphanumeric, underscore, hyphen
+3. **Проверьте имена файлов**
+   - Избегайте специальных символов
+   - Используйте только буквенно-цифровые, подчёркивание, дефис
 
-### Hot-Reload Not Working
+### Hot-Reload не работает
 
-**Symptoms**: Asset changes aren't reflected in editor.
+**Симптомы**: Изменения ресурсов не отражаются в редакторе.
 
-**Solutions**:
+**Решения**:
 
-1. **Check Hot-Reload Settings**
-   - **Edit > Preferences > Hot Reload**: Enabled
-   - Set appropriate interval
+1. **Проверьте настройки Hot-Reload**
+   - **Edit > Preferences > Hot Reload**: Включено
+   - Установите подходящий интервал
 
-2. **Manual Refresh**
-   - Right-click asset > **Reimport**
-   - Or **Assets > Refresh All**
+2. **Ручное обновление**
+   - Правый клик на ресурс > **Reimport**
+   - Или **Assets > Refresh All**
 
-3. **File Watcher Issues**
-   - Linux: Check inotify limits
+3. **Проблемы с файловым наблюдателем**
+   - Linux: Проверьте лимиты inotify
    ```bash
    sudo sysctl fs.inotify.max_user_watches=524288
    ```
 
 ---
 
-## Performance Issues
+## Проблемы производительности
 
-### Slow Editor Performance
+### Медленная производительность редактора
 
-**Symptoms**: Editor feels sluggish or laggy.
+**Симптомы**: Редактор работает медленно или с задержками.
 
-**Solutions**:
+**Решения**:
 
-1. **Reduce Asset Preview Quality**
+1. **Уменьшите качество предпросмотра ресурсов**
    - **Edit > Preferences > Preview Quality**: Low
 
-2. **Close Unused Panels**
-   - Each panel consumes resources
+2. **Закройте неиспользуемые панели**
+   - Каждая панель потребляет ресурсы
 
-3. **Optimize Large Projects**
-   - Archive unused assets
-   - Split into multiple pack files
+3. **Оптимизируйте большие проекты**
+   - Архивируйте неиспользуемые ресурсы
+   - Разбейте на несколько файлов паков
 
-4. **Check System Resources**
-   - Close other applications
-   - Monitor CPU/RAM usage
+4. **Проверьте системные ресурсы**
+   - Закройте другие приложения
+   - Мониторьте использование CPU/RAM
 
-### Slow Game Performance
+### Медленная производительность игры
 
-**Symptoms**: Built game runs slowly.
+**Симптомы**: Собранная игра работает медленно.
 
-**Solutions**:
+**Решения**:
 
-1. **Profile the Game**
-   - Enable profiling in debug build
-   - Check `profile_results.json`
+1. **Профилируйте игру**
+   - Включите профилирование в отладочной сборке
+   - Проверьте `profile_results.json`
 
-2. **Optimize Assets**
-   - Reduce image resolutions
-   - Compress audio files
-   - Use texture atlases
+2. **Оптимизируйте ресурсы**
+   - Уменьшите разрешения изображений
+   - Сожмите аудиофайлы
+   - Используйте атласы текстур
 
-3. **Reduce Effects**
-   - Simplify transitions
-   - Limit simultaneous animations
+3. **Уменьшите эффекты**
+   - Упростите переходы
+   - Ограничьте одновременные анимации
 
-4. **Check Update Loop**
-   - Avoid complex logic in scene update
-   - Cache frequently used values
+4. **Проверьте цикл обновления**
+   - Избегайте сложной логики в обновлении сцены
+   - Кэшируйте часто используемые значения
 
-### High Memory Usage
+### Высокое использование памяти
 
-**Symptoms**: Game uses too much RAM.
+**Симптомы**: Игра использует слишком много RAM.
 
-**Solutions**:
+**Решения**:
 
-1. **Optimize Image Sizes**
-   - Don't use larger images than needed
-   - Scale down backgrounds to display resolution
+1. **Оптимизируйте размеры изображений**
+   - Не используйте изображения больше необходимого
+   - Масштабируйте фоны до разрешения экрана
 
-2. **Unload Unused Assets**
-   - Assets are cached by default
-   - Clear cache between chapters:
+2. **Выгружайте неиспользуемые ресурсы**
+   - Ресурсы по умолчанию кэшируются
+   - Очищайте кэш между главами:
    ```nm
    clear_cache
    ```
 
-3. **Check for Memory Leaks**
-   - Build with ASAN enabled:
+3. **Проверьте утечки памяти**
+   - Соберите с включённым ASAN:
    ```bash
    cmake -DNOVELMIND_ENABLE_ASAN=ON ..
    ```
 
 ---
 
-## Platform-Specific Issues
+## Платформенные проблемы
 
 ### Windows
 
-**Issue**: "VCRUNTIME140.dll not found"
-- Install Visual C++ Redistributable 2022
+**Проблема**: "VCRUNTIME140.dll не найден"
+- Установите Visual C++ Redistributable 2022
 
-**Issue**: Windows Defender blocks executable
-- Add game folder to exclusions
-- Or sign the executable for distribution
+**Проблема**: Windows Defender блокирует исполняемый файл
+- Добавьте папку игры в исключения
+- Или подпишите исполняемый файл для распространения
 
-**Issue**: Path too long error
-- Keep project paths short
-- Enable long path support in Windows
+**Проблема**: Ошибка "Путь слишком длинный"
+- Держите пути проектов короткими
+- Включите поддержку длинных путей в Windows
 
 ### Linux
 
-**Issue**: "libSDL2 not found"
+**Проблема**: "libSDL2 не найдена"
 ```bash
 sudo apt-get install libsdl2-2.0-0  # Debian/Ubuntu
 sudo dnf install SDL2               # Fedora
 ```
 
-**Issue**: No permission to execute
+**Проблема**: Нет разрешения на выполнение
 ```bash
 chmod +x ./my_game
 ```
 
-**Issue**: Wayland display issues
+**Проблема**: Проблемы с отображением Wayland
 ```bash
 SDL_VIDEODRIVER=x11 ./my_game
 ```
 
 ### macOS
 
-**Issue**: "Cannot be opened because the developer cannot be verified"
+**Проблема**: "Не может быть открыт, потому что разработчик не может быть проверен"
 - System Preferences > Security & Privacy > Allow
-- Or right-click > Open
+- Или правый клик > Open
 
-**Issue**: Retina display scaling
-- Check HiDPI settings in game configuration
-- Ensure assets have @2x variants if needed
+**Проблема**: Масштабирование Retina дисплея
+- Проверьте настройки HiDPI в конфигурации игры
+- Убедитесь, что ресурсы имеют @2x варианты при необходимости
 
 ---
 
-## Getting More Help
+## Получение дополнительной помощи
 
-If you can't resolve your issue:
+Если вы не можете решить свою проблему:
 
-1. **Search Existing Issues**
+1. **Поиск существующих проблем**
    - [GitHub Issues](https://github.com/VisageDvachevsky/NM-/issues)
 
-2. **Report a Bug**
-   - Include NovelMind version
-   - Include operating system
-   - Include steps to reproduce
-   - Attach relevant log files
+2. **Сообщить об ошибке**
+   - Укажите версию NovelMind
+   - Укажите операционную систему
+   - Укажите шаги для воспроизведения
+   - Прикрепите соответствующие файлы логов
 
-3. **Check Documentation**
-   - [Architecture Overview](architecture_overview.md)
-   - [NM Script Specification](nm_script_specification.md)
+3. **Проверьте документацию**
+   - [Обзор архитектуры](architecture_overview.md)
+   - [Спецификация NM Script](nm_script_specification.md)
 
-4. **Enable Verbose Logging**
+4. **Включите подробное логирование**
    ```bash
    NOVELMIND_LOG_LEVEL=debug ./novelmind_editor
    ```
 
 ---
 
-## Log File Locations
+## Расположение файлов логов
 
-| Platform | Location |
-|----------|----------|
+| Платформа | Расположение |
+|-----------|--------------|
 | Windows | `%APPDATA%\NovelMind\logs\` |
 | Linux | `~/.novelmind/logs/` |
 | macOS | `~/Library/Application Support/NovelMind/logs/` |
 
-Include these logs when reporting issues.
+Включайте эти логи при сообщении о проблемах.

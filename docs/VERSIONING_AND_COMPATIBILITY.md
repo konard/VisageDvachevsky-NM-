@@ -1,58 +1,58 @@
-# NovelMind Versioning and Compatibility Policy
+# Политика версионирования и совместимости NovelMind
 
-This document defines the versioning scheme, API stability guarantees, and compatibility policies for the NovelMind engine and editor.
+Этот документ определяет схему версионирования, гарантии стабильности API и политику совместимости для движка и редактора NovelMind.
 
-## Version Numbering
+## Нумерация версий
 
-NovelMind follows [Semantic Versioning 2.0.0](https://semver.org/) with the format `MAJOR.MINOR.PATCH`:
+NovelMind следует [Семантическому версионированию 2.0.0](https://semver.org/) с форматом `MAJOR.MINOR.PATCH`:
 
-- **MAJOR**: Breaking changes to public APIs
-- **MINOR**: New features, backward-compatible
-- **PATCH**: Bug fixes, backward-compatible
+- **MAJOR**: Обратно несовместимые изменения публичных API
+- **MINOR**: Новые функции, обратно совместимые
+- **PATCH**: Исправления ошибок, обратно совместимые
 
-### Current Versions
+### Текущие версии
 
-| Component | Version | Status |
+| Компонент | Версия | Статус |
 |-----------|---------|--------|
-| NovelMind Engine | 0.1.0 | Alpha |
-| NovelMind Editor | 0.1.0 | Alpha |
-| NM Script Language | 1.0 | Stable |
-| Pack File Format | 1 | Stable |
-| Project Format | 1 | Stable |
+| NovelMind Engine | 0.1.0 | Альфа |
+| NovelMind Editor | 0.1.0 | Альфа |
+| NM Script Language | 1.0 | Стабильный |
+| Pack File Format | 1 | Стабильный |
+| Project Format | 1 | Стабильный |
 
-## Stability Tiers
+## Уровни стабильности
 
-APIs and file formats are classified into stability tiers:
+API и форматы файлов классифицируются по уровням стабильности:
 
-### Tier 1: Stable
+### Уровень 1: Стабильный
 
-These APIs are considered stable and will maintain backward compatibility:
+Эти API считаются стабильными и будут поддерживать обратную совместимость:
 
-- **NM Script 1.0 Language Syntax**
-  - All documented keywords and constructs
-  - Character/scene declarations
-  - Dialogue, choice, and control flow statements
-  - Built-in functions and operators
+- **Синтаксис языка NM Script 1.0**
+  - Все документированные ключевые слова и конструкции
+  - Объявления персонажей/сцен
+  - Диалоги, выборы и операторы управления потоком
+  - Встроенные функции и операторы
 
-- **Pack File Format v1**
-  - Header structure
-  - Resource table format
-  - Encryption scheme (AES-256-GCM)
-  - Compression (zlib)
+- **Формат файла пакета v1**
+  - Структура заголовка
+  - Формат таблицы ресурсов
+  - Схема шифрования (AES-256-GCM)
+  - Сжатие (zlib)
 
-- **Project File Format v1**
-  - `project.json` schema
-  - Directory structure conventions
-  - Asset reference format
+- **Формат файла проекта v1**
+  - Схема `project.json`
+  - Соглашения о структуре каталогов
+  - Формат ссылок на ресурсы
 
-- **Save File Format v1**
-  - Save slot structure
-  - State serialization format
-  - Integrity verification
+- **Формат файла сохранений v1**
+  - Структура слотов сохранений
+  - Формат сериализации состояния
+  - Проверка целостности
 
-### Tier 2: Provisional
+### Уровень 2: Предварительный
 
-These APIs are functional but may change in minor versions:
+Эти API функциональны, но могут измениться в минорных версиях:
 
 - **SceneGraph API**
   - `NovelMind::scene::SceneGraph`
@@ -66,112 +66,112 @@ These APIs are functional but may change in minor versions:
 
 - **Audio System 2.0 API**
   - `NovelMind::audio::AudioManager`
-  - Channel configuration
-  - Voice ducking parameters
+  - Конфигурация каналов
+  - Параметры приглушения озвучки
 
 - **Localization API**
   - `NovelMind::localization::LocalizationManager`
-  - Plural forms handling
-  - Import/export formats
+  - Обработка форм множественного числа
+  - Форматы импорта/экспорта
 
 - **UI Framework API**
-  - `NovelMind::ui::Widget` hierarchy
-  - Layout system
-  - Event routing
+  - Иерархия `NovelMind::ui::Widget`
+  - Система компоновки
+  - Маршрутизация событий
 
-### Tier 3: Experimental
+### Уровень 3: Экспериментальный
 
-These APIs are under active development and may change significantly:
+Эти API находятся в активной разработке и могут значительно измениться:
 
 - **Editor APIs**
   - `NovelMind::editor::EditorRuntimeHost`
   - `NovelMind::editor::VoiceManager`
-  - Panel and settings APIs
+  - API панелей и настроек
 
 - **Visual Graph/IR**
   - `NovelMind::scripting::VisualGraph`
   - `NovelMind::scripting::IRNode`
-  - Round-trip conversion
+  - Двунаправленная конверсия
 
-- **Plugin System** (planned)
-  - Custom node registration
-  - Asset importer extensions
+- **Plugin System** (запланировано)
+  - Регистрация пользовательских узлов
+  - Расширения импорта ресурсов
 
-## Breaking Change Policy
+## Политика обратно несовместимых изменений
 
-### What Constitutes a Breaking Change
+### Что составляет обратно несовместимое изменение
 
-1. **API Changes**
-   - Removing or renaming public classes, methods, or functions
-   - Changing method signatures (parameters, return types)
-   - Changing behavior of documented APIs
-   - Removing enum values
+1. **Изменения API**
+   - Удаление или переименование публичных классов, методов или функций
+   - Изменение сигнатур методов (параметры, типы возвращаемых значений)
+   - Изменение поведения документированных API
+   - Удаление значений перечислений
 
-2. **File Format Changes**
-   - Changing file structure requiring migration
-   - Removing support for older format versions
-   - Changing encryption or compression schemes
+2. **Изменения формата файлов**
+   - Изменение структуры файла, требующее миграции
+   - Удаление поддержки старых версий формата
+   - Изменение схем шифрования или сжатия
 
-3. **Language Changes**
-   - Removing NM Script keywords or constructs
-   - Changing semantic meaning of statements
-   - Making previously valid scripts invalid
+3. **Изменения языка**
+   - Удаление ключевых слов или конструкций NM Script
+   - Изменение семантического значения операторов
+   - Превращение ранее валидных скриптов в невалидные
 
-### How Breaking Changes Are Introduced
+### Как вводятся обратно несовместимые изменения
 
-1. **Announcement**: Breaking changes are documented at least one minor version before implementation
+1. **Объявление**: Обратно несовместимые изменения документируются как минимум за одну минорную версию до внедрения
 
-2. **Deprecation**: Affected APIs are marked deprecated with warnings:
+2. **Устаревание**: Затронутые API помечаются как устаревшие с предупреждениями:
    ```cpp
    [[deprecated("Use newMethod() instead. Will be removed in v1.0.0")]]
    void oldMethod();
    ```
 
-3. **Migration Path**: Clear documentation and tools for migration are provided
+3. **Путь миграции**: Предоставляется четкая документация и инструменты для миграции
 
-4. **Version Bump**: Breaking changes result in a MAJOR version increment (after 1.0.0)
+4. **Увеличение версии**: Обратно несовместимые изменения приводят к увеличению версии MAJOR (после 1.0.0)
 
-## Format Migration
+## Миграция форматов
 
-### Pack File Format
+### Формат файла пакета
 
-When the pack format changes:
+При изменении формата пакета:
 
-1. New format gets a new version number
-2. Runtime can read all older format versions
-3. Editor exports to latest format only
-4. Migration tool provided for batch conversion
+1. Новый формат получает новый номер версии
+2. Среда выполнения может читать все старые версии формата
+3. Редактор экспортирует только в последний формат
+4. Предоставляется инструмент миграции для пакетной конверсии
 
-### Project Format
+### Формат проекта
 
-Project format changes:
+Изменения формата проекта:
 
-1. Editor detects project format version on open
-2. Offers automatic migration if needed
-3. Creates backup before migration
-4. Documents all changes in release notes
+1. Редактор определяет версию формата проекта при открытии
+2. Предлагает автоматическую миграцию при необходимости
+3. Создает резервную копию перед миграцией
+4. Документирует все изменения в примечаниях к релизу
 
-### Save Format
+### Формат сохранений
 
-Save format compatibility:
+Совместимость формата сохранений:
 
-1. New game versions can always load older saves
-2. Older game versions cannot load newer saves (graceful error)
-3. Save version stored in save file header
+1. Новые версии игры всегда могут загружать старые сохранения
+2. Старые версии игры не могут загружать новые сохранения (корректная ошибка)
+3. Версия сохранения хранится в заголовке файла сохранения
 
-## Deprecated APIs
+## Устаревшие API
 
-Currently deprecated APIs (will be removed in specified version):
+Текущие устаревшие API (будут удалены в указанной версии):
 
-| API | Deprecated In | Remove In | Replacement |
+| API | Устарел в | Удалить в | Замена |
 |-----|---------------|-----------|-------------|
-| *None currently* | - | - | - |
+| *В настоящее время нет* | - | - | - |
 
-## NM Script Language Versioning
+## Версионирование языка NM Script
 
-### Language Version Declaration
+### Объявление версии языка
 
-Projects can declare their NM Script version:
+Проекты могут объявлять свою версию NM Script:
 
 ```json
 {
@@ -179,21 +179,21 @@ Projects can declare their NM Script version:
 }
 ```
 
-### Language Evolution
+### Эволюция языка
 
-1. **1.x**: Backward compatible additions
-   - New optional keywords
-   - New built-in functions
-   - Extended syntax (backward compatible)
+1. **1.x**: Обратно совместимые дополнения
+   - Новые опциональные ключевые слова
+   - Новые встроенные функции
+   - Расширенный синтаксис (обратно совместимый)
 
-2. **2.0**: May include breaking changes
-   - Reserved keywords becoming active
-   - Stricter parsing rules
-   - Semantic changes
+2. **2.0**: Может включать обратно несовместимые изменения
+   - Зарезервированные ключевые слова становятся активными
+   - Более строгие правила парсинга
+   - Семантические изменения
 
-### Reserved Keywords
+### Зарезервированные ключевые слова
 
-The following keywords are reserved for future use:
+Следующие ключевые слова зарезервированы для будущего использования:
 
 ```
 async await yield import export module
@@ -204,58 +204,58 @@ public private protected
 static const let var
 ```
 
-## Compatibility Testing
+## Тестирование совместимости
 
-### Automated Compatibility Tests
+### Автоматизированные тесты совместимости
 
-- Unit tests for all Tier 1 and Tier 2 APIs
-- Integration tests with sample projects
-- Regression tests for file format loading
-- Cross-version save/load tests
+- Модульные тесты для всех API уровня 1 и 2
+- Интеграционные тесты с примерами проектов
+- Регрессионные тесты для загрузки формата файлов
+- Тесты сохранения/загрузки между версиями
 
-### Compatibility Matrix
+### Матрица совместимости
 
-Maintained in CI:
+Поддерживается в CI:
 
-| Engine Version | Script v1.0 | Pack v1 | Project v1 | Save v1 |
+| Версия движка | Script v1.0 | Pack v1 | Project v1 | Save v1 |
 |---------------|-------------|---------|------------|---------|
 | 0.1.x         | ✓           | ✓       | ✓          | ✓       |
 
-## Support Lifecycle
+## Жизненный цикл поддержки
 
-### Version Support
+### Поддержка версий
 
-- **Current**: Full support, bug fixes, security updates
-- **Previous Minor**: Security updates only for 6 months
-- **Previous Major**: Security updates only for 12 months
+- **Текущая**: Полная поддержка, исправления ошибок, обновления безопасности
+- **Предыдущая минорная**: Только обновления безопасности в течение 6 месяцев
+- **Предыдущая мажорная**: Только обновления безопасности в течение 12 месяцев
 
-### End of Life
+### Конец жизненного цикла
 
-When a version reaches end of life:
+Когда версия достигает конца жизненного цикла:
 
-1. Announcement 3 months in advance
-2. Final security-only release
-3. Archived but available for download
-4. Migration documentation maintained
+1. Объявление за 3 месяца до этого
+2. Финальный релиз только с безопасностью
+3. Архивируется, но остается доступной для скачивания
+4. Документация по миграции поддерживается
 
-## Reporting Compatibility Issues
+## Сообщение о проблемах совместимости
 
-If you encounter a compatibility issue:
+Если вы столкнулись с проблемой совместимости:
 
-1. Check the [Known Issues](./KNOWN_ISSUES.md) document
-2. Search existing [GitHub Issues](https://github.com/VisageDvachevsky/NM-/issues)
-3. Open a new issue with:
-   - NovelMind version numbers
-   - Steps to reproduce
-   - Expected vs actual behavior
-   - Sample project if applicable
+1. Проверьте документ [Известные проблемы](./KNOWN_ISSUES.md)
+2. Поищите существующие [GitHub Issues](https://github.com/VisageDvachevsky/NM-/issues)
+3. Откройте новую проблему с:
+   - Номерами версий NovelMind
+   - Шагами для воспроизведения
+   - Ожидаемым и фактическим поведением
+   - Примером проекта, если применимо
 
-## Changelog
+## Журнал изменений
 
-All changes are documented in [CHANGELOG.md](../CHANGELOG.md) with:
+Все изменения документируются в [CHANGELOG.md](../CHANGELOG.md) с:
 
-- Version number and date
-- Breaking changes (highlighted)
-- New features
-- Bug fixes
-- Deprecations
+- Номером версии и датой
+- Обратно несовместимыми изменениями (выделены)
+- Новыми функциями
+- Исправлениями ошибок
+- Устареваниями

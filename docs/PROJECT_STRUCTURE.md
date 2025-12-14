@@ -1,66 +1,66 @@
-# NovelMind Project Structure
+# Структура проекта NovelMind
 
-This document describes the standard directory structure for NovelMind visual novel projects.
+Этот документ описывает стандартную структуру каталогов для проектов визуальных новелл NovelMind.
 
-## Standard Project Layout
+## Стандартная структура проекта
 
 ```
 MyProject/
-├── project.json           # Project configuration and metadata
-├── .gitignore             # Version control exclusions
+├── project.json           # Конфигурация проекта и метаданные
+├── .gitignore             # Исключения системы контроля версий
 │
-├── assets/                # All project assets
-│   ├── backgrounds/       # Background images
+├── assets/                # Все ресурсы проекта
+│   ├── backgrounds/       # Фоновые изображения
 │   │   ├── day/
 │   │   └── night/
-│   ├── characters/        # Character sprites
+│   ├── characters/        # Спрайты персонажей
 │   │   ├── hero/
 │   │   │   ├── expressions/
 │   │   │   └── poses/
 │   │   └── sidekick/
-│   ├── ui/                # UI elements
+│   ├── ui/                # Элементы UI
 │   │   ├── buttons/
 │   │   ├── frames/
 │   │   └── icons/
-│   ├── effects/           # Visual effects
-│   ├── fonts/             # Custom fonts
-│   ├── voice/             # Voice-over files
+│   ├── effects/           # Визуальные эффекты
+│   ├── fonts/             # Пользовательские шрифты
+│   ├── voice/             # Файлы озвучки
 │   │   ├── hero/
 │   │   └── narrator/
-│   ├── music/             # Background music
-│   └── sounds/            # Sound effects
+│   ├── music/             # Фоновая музыка
+│   └── sounds/            # Звуковые эффекты
 │
-├── scripts/               # NM Script source files
-│   ├── main.nms           # Entry point script
-│   ├── characters.nms     # Character definitions
-│   ├── scenes/            # Scene scripts
+├── scripts/               # Исходные файлы NM Script
+│   ├── main.nms           # Точка входа скрипта
+│   ├── characters.nms     # Определения персонажей
+│   ├── scenes/            # Скрипты сцен
 │   │   ├── prologue.nms
 │   │   ├── chapter1/
 │   │   └── endings/
-│   └── common/            # Shared scripts
+│   └── common/            # Общие скрипты
 │
-├── locales/               # Localization files
-│   ├── en.json            # English strings
-│   ├── ja.json            # Japanese strings
-│   └── templates/         # Translation templates
+├── locales/               # Файлы локализации
+│   ├── en.json            # Английские строки
+│   ├── ja.json            # Японские строки
+│   └── templates/         # Шаблоны перевода
 │
-├── data/                  # Game data files
-│   ├── config.json        # Runtime configuration
-│   └── achievements.json  # Achievement definitions
+├── data/                  # Файлы игровых данных
+│   ├── config.json        # Конфигурация времени выполнения
+│   └── achievements.json  # Определения достижений
 │
-├── docs/                  # Project documentation
-│   └── design/            # Design documents
+├── docs/                  # Документация проекта
+│   └── design/            # Проектные документы
 │
-└── Build/                 # Build outputs (ignored by VCS)
+└── Build/                 # Результаты сборки (игнорируются VCS)
     ├── debug/
     └── release/
 ```
 
-## Directory Descriptions
+## Описание каталогов
 
 ### `/project.json`
 
-The project configuration file containing:
+Файл конфигурации проекта, содержащий:
 
 ```json
 {
@@ -81,39 +81,39 @@ The project configuration file containing:
 
 ### `/assets/`
 
-Contains all media assets used by the project.
+Содержит все медиа-ресурсы, используемые проектом.
 
-**Organization Guidelines:**
-- Use subdirectories to group related assets
-- Use descriptive, lowercase names with underscores
-- Keep character assets in character-named folders
-- Voice files should match dialogue line naming conventions
+**Рекомендации по организации:**
+- Используйте подкаталоги для группировки связанных ресурсов
+- Используйте описательные имена в нижнем регистре с подчеркиваниями
+- Храните ресурсы персонажей в папках с именами персонажей
+- Файлы озвучки должны соответствовать соглашениям именования строк диалога
 
-**Supported Formats:**
-- Images: PNG, JPEG, WebP
-- Audio: OGG, WAV, MP3, FLAC
-- Fonts: TTF, OTF
+**Поддерживаемые форматы:**
+- Изображения: PNG, JPEG, WebP
+- Аудио: OGG, WAV, MP3, FLAC
+- Шрифты: TTF, OTF
 
 ### `/scripts/`
 
-Contains NM Script source files.
+Содержит исходные файлы NM Script.
 
-**Organization Guidelines:**
-- `main.nms` is the entry point
-- Group scene scripts by chapter or story section
-- Keep shared/utility scripts in `common/`
-- Character definitions can be centralized or per-chapter
+**Рекомендации по организации:**
+- `main.nms` является точкой входа
+- Группируйте скрипты сцен по главам или разделам истории
+- Храните общие/утилитарные скрипты в `common/`
+- Определения персонажей могут быть централизованными или разделены по главам
 
 ### `/locales/`
 
-Contains localization files for multi-language support.
+Содержит файлы локализации для многоязычной поддержки.
 
-**Organization Guidelines:**
-- One file per locale (e.g., `en.json`, `ja.json`)
-- Use ISO 639-1 language codes
-- Keep template files for translators
+**Рекомендации по организации:**
+- Один файл на локаль (например, `en.json`, `ja.json`)
+- Используйте коды языков ISO 639-1
+- Храните файлы шаблонов для переводчиков
 
-**File Format:**
+**Формат файла:**
 ```json
 {
     "greeting": "Hello!",
@@ -125,167 +125,167 @@ Contains localization files for multi-language support.
 
 ### `/data/`
 
-Contains game configuration and data files.
+Содержит конфигурацию игры и файлы данных.
 
-- `config.json`: Runtime settings
-- Achievement definitions
-- Custom game data
+- `config.json`: Настройки времени выполнения
+- Определения достижений
+- Пользовательские игровые данные
 
 ### `/Build/`
 
-Build output directory. **Always ignored by version control.**
+Каталог вывода сборки. **Всегда игнорируется системой контроля версий.**
 
-Contains:
-- Compiled scripts
-- Packed assets
-- Final executables
+Содержит:
+- Скомпилированные скрипты
+- Упакованные ресурсы
+- Финальные исполняемые файлы
 
-## Asset Naming Conventions
+## Соглашения об именовании ресурсов
 
-### Backgrounds
+### Фоны
 
 ```
 location_variant_time.png
 
-Examples:
+Примеры:
 school_classroom_day.png
 school_classroom_night.png
 park_fountain.png
 ```
 
-### Character Sprites
+### Спрайты персонажей
 
 ```
 character/expression_pose.png
 
-Examples:
+Примеры:
 hero/happy_standing.png
 hero/sad_sitting.png
 sidekick/neutral_default.png
 ```
 
-### Voice Files
+### Файлы озвучки
 
 ```
 character_lineId.ogg
 
-Examples:
+Примеры:
 hero_001_greeting.ogg
 narrator_intro_001.ogg
 sidekick_ch1_045.ogg
 ```
 
-Pattern recognition supports:
+Распознавание паттернов поддерживает:
 - `{character}_{id}.{ext}`
 - `{character}_{number}_{description}.{ext}`
 - `{scene}_{character}_{line}.{ext}`
 
-### Music
+### Музыка
 
 ```
 type_name.ogg
 
-Examples:
+Примеры:
 bgm_main_theme.ogg
 bgm_battle.ogg
 bgm_sad_moment.ogg
 ```
 
-### Sound Effects
+### Звуковые эффекты
 
 ```
 category_name.ogg
 
-Examples:
+Примеры:
 ui_click.ogg
 sfx_door_open.ogg
 ambient_rain.ogg
 ```
 
-## Version Control Best Practices
+## Лучшие практики контроля версий
 
-### Files to Include
+### Файлы для включения
 
-- All source scripts (`.nms`)
-- Localization files (`.json`, `.csv`, `.po`)
-- Project configuration (`project.json`)
-- Documentation (`/docs/`)
-- Asset source files (images, audio)
+- Все исходные скрипты (`.nms`)
+- Файлы локализации (`.json`, `.csv`, `.po`)
+- Конфигурация проекта (`project.json`)
+- Документация (`/docs/`)
+- Исходные файлы ресурсов (изображения, аудио)
 
-### Files to Exclude
+### Файлы для исключения
 
-Use the provided `.gitignore` template to exclude:
+Используйте предоставленный шаблон `.gitignore` для исключения:
 
-- Build outputs (`/Build/`)
-- Editor cache (`.nmcache/`)
-- Thumbnails and previews
-- Log files
-- Local configuration
-- OS-specific files
-- IDE configuration
+- Результаты сборки (`/Build/`)
+- Кэш редактора (`.nmcache/`)
+- Миниатюры и превью
+- Файлы логов
+- Локальная конфигурация
+- Специфичные для ОС файлы
+- Конфигурация IDE
 
-## Multi-Developer Workflow
+## Рабочий процесс с несколькими разработчиками
 
-### Branch Strategy
+### Стратегия ветвления
 
 ```
-main              # Stable releases
-├── develop       # Integration branch
-│   ├── feature/* # Feature branches
-│   └── fix/*     # Bug fix branches
-└── release/*     # Release preparation
+main              # Стабильные релизы
+├── develop       # Ветка интеграции
+│   ├── feature/* # Ветки функций
+│   └── fix/*     # Ветки исправлений
+└── release/*     # Подготовка релиза
 ```
 
-### Asset Handling
+### Обработка ресурсов
 
-For large binary assets:
-- Consider Git LFS for voice files and music
-- Use asset bundles for team distribution
-- Document asset ownership/responsibility
+Для больших бинарных ресурсов:
+- Рассмотрите Git LFS для файлов озвучки и музыки
+- Используйте наборы ресурсов для распространения в команде
+- Документируйте владение/ответственность за ресурсы
 
-### Merge Conflicts
+### Конфликты слияния
 
-Common conflict sources:
-- `project.json` version changes
-- Localization string additions
-- Script modifications
+Распространенные источники конфликтов:
+- Изменения версии в `project.json`
+- Добавление строк локализации
+- Модификации скриптов
 
-Resolution:
-- Prefer JSON merge tools for data files
-- Use NM Script's module system to reduce conflicts
-- Communicate about shared resources
+Разрешение:
+- Предпочитайте инструменты слияния JSON для файлов данных
+- Используйте модульную систему NM Script для уменьшения конфликтов
+- Общайтесь о общих ресурсах
 
-## Creating New Projects
+## Создание новых проектов
 
-### From Template
+### Из шаблона
 
-1. Open NovelMind Editor
+1. Откройте редактор NovelMind
 2. File > New Project
-3. Select template:
+3. Выберите шаблон:
    - Empty Project
    - Kinetic Novel
    - Branching Story
-4. Choose location
-5. Configure project settings
+4. Выберите расположение
+5. Настройте параметры проекта
 
-### Manual Setup
+### Ручная настройка
 
-1. Create project directory
-2. Copy `project.gitignore` as `.gitignore`
-3. Create `project.json` with required fields
-4. Create standard directories:
+1. Создайте каталог проекта
+2. Скопируйте `project.gitignore` как `.gitignore`
+3. Создайте `project.json` с необходимыми полями
+4. Создайте стандартные каталоги:
    - `assets/`
    - `scripts/`
    - `locales/`
-5. Add `scripts/main.nms` entry point
+5. Добавьте точку входа `scripts/main.nms`
 
-## Project Migration
+## Миграция проекта
 
-When migrating from older versions:
+При миграции со старых версий:
 
-1. Back up the entire project
-2. Open in new editor version
-3. Follow migration prompts
-4. Verify all assets load correctly
-5. Test gameplay from start to finish
-6. Update `project.json` version if needed
+1. Создайте резервную копию всего проекта
+2. Откройте в новой версии редактора
+3. Следуйте подсказкам миграции
+4. Проверьте, что все ресурсы загружаются корректно
+5. Протестируйте геймплей от начала до конца
+6. Обновите версию в `project.json` при необходимости

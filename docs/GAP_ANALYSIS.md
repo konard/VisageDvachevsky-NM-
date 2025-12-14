@@ -1,434 +1,434 @@
-# NovelMind GUI - Gap Analysis
+# NovelMind GUI - Анализ пробелов
 
-This document compares the user's comprehensive feature checklist against the current implementation status.
+Этот документ сравнивает комплексный контрольный список функций пользователя с текущим статусом реализации.
 
-## Status Legend
-- ✅ **Complete**: Fully implemented
-- ⚠️ **Partial**: Partially implemented, needs work
-- ❌ **Missing**: Not implemented yet
+## Легенда статусов
+- ✅ **Завершено**: Полностью реализовано
+- ⚠️ **Частично**: Частично реализовано, требуется работа
+- ❌ **Отсутствует**: Еще не реализовано
 
 ---
 
 ## 1. Main Window & Docking - 100% ✅
 
-| ID | Feature | Status | Notes |
+| ID | Функция | Статус | Примечания |
 |----|---------|--------|-------|
-| 1.1 | Main window with docking | ✅ | NMMainWindow with QDockWidget |
-| 1.2 | Move/dock panels | ✅ | Full Qt docking support |
-| 1.3 | Save/load custom layout | ✅ | QSettings persistence |
-| 1.4 | Reset to default layout | ✅ | restoreDefaultLayout() |
-| 1.5 | Tab system within panels | ✅ | QDockWidget tabs |
-| 1.6 | Dark theme by default | ✅ | Complete QSS theme |
-| 1.7 | DPI scaling support | ✅ | Qt::AA_EnableHighDpiScaling |
+| 1.1 | Главное окно с докингом | ✅ | NMMainWindow с QDockWidget |
+| 1.2 | Перемещение/докинг панелей | ✅ | Полная поддержка докинга Qt |
+| 1.3 | Сохранение/загрузка пользовательского макета | ✅ | Сохранение QSettings |
+| 1.4 | Сброс к макету по умолчанию | ✅ | restoreDefaultLayout() |
+| 1.5 | Система вкладок в панелях | ✅ | Вкладки QDockWidget |
+| 1.6 | Темная тема по умолчанию | ✅ | Комплексная тема QSS |
+| 1.7 | Поддержка масштабирования DPI | ✅ | Qt::AA_EnableHighDpiScaling |
 
-**Completion: 7/7 features ✅**
+**Завершено: 7/7 функций ✅**
 
 ---
 
-## 2. SceneView Panel - 90% ⚠️
+## 2. Панель SceneView - 90% ⚠️
 
-| ID | Feature | Status | Notes |
+| ID | Функция | Статус | Примечания |
 |----|---------|--------|-------|
-| 2.1 | Scene rendering | ✅ | QGraphicsView/Scene |
-| 2.2 | Pan (middle-mouse) | ✅ | Full pan support |
-| 2.3 | Zoom (scroll wheel) | ✅ | Full zoom support |
-| 2.4 | Grid toggle | ✅ | Grid overlay |
-| 2.5 | Layer highlighting | ❌ | **TODO** |
-| 2.6 | Transform gizmos | ✅ | Move/Rotate/Scale (Batch 3) |
-| 2.7 | Mouse selection | ✅ | Click-to-select (Batch 3) |
-| 2.8 | Selection highlighting | ✅ | Blue outline + handles (Batch 3) |
-| 2.9 | Drag-drop from Asset Browser | ❌ | **TODO** |
-| 2.10 | Helper info overlay | ✅ | Cursor + object position (Batch 3) |
+| 2.1 | Рендеринг сцены | ✅ | QGraphicsView/Scene |
+| 2.2 | Панорамирование (средняя кнопка мыши) | ✅ | Полная поддержка панорамирования |
+| 2.3 | Зум (колесо прокрутки) | ✅ | Полная поддержка зума |
+| 2.4 | Переключение сетки | ✅ | Оверлей сетки |
+| 2.5 | Подсветка слоя | ❌ | **TODO** |
+| 2.6 | Гизмо трансформации | ✅ | Move/Rotate/Scale (Пакет 3) |
+| 2.7 | Выбор мышью | ✅ | Клик-для-выбора (Пакет 3) |
+| 2.8 | Подсветка выбора | ✅ | Синяя граница + ручки (Пакет 3) |
+| 2.9 | Перетаскивание из Asset Browser | ❌ | **TODO** |
+| 2.10 | Оверлей вспомогательной информации | ✅ | Позиция курсора + объекта (Пакет 3) |
 
-**Completion: 8/10 features (80%) ⚠️**
+**Завершено: 8/10 функций (80%) ⚠️**
 
-**Missing:**
-- Layer highlighting system
-- Drag-drop integration with Asset Browser
+**Отсутствует:**
+- Система подсветки слоев
+- Интеграция перетаскивания с Asset Browser
 
 ---
 
-## 3. StoryGraph Editor - 75% ⚠️
+## 3. Редактор StoryGraph - 75% ⚠️
 
-| ID | Feature | Status | Notes |
+| ID | Функция | Статус | Примечания |
 |----|---------|--------|-------|
-| 3.1 | Visual editing canvas | ✅ | QGraphicsView |
-| 3.2 | Pan and zoom | ✅ | Full support |
-| 3.3 | Create nodes | ✅ | NMNodePalette (Batch 1) |
-| 3.4 | Drag-drop nodes | ✅ | ItemIsMovable |
-| 3.5 | Resize nodes | ❌ | **TODO** |
-| 3.6 | Connect nodes | ✅ | Ctrl+Drag (Batch 1) |
-| 3.7 | Delete nodes/connections | ✅ | Delete key (Batch 1) |
-| 3.8 | Context menu | ⚠️ | Edit/Delete partial |
-| 3.9 | Error highlighting | ❌ | **TODO** |
-| 3.10 | Minimap | ❌ | **TODO** |
-| 3.11 | Current node indicator | ✅ | Green glow + arrow |
-| 3.12 | Jump from Diagnostics | ❌ | **TODO** |
+| 3.1 | Холст визуального редактирования | ✅ | QGraphicsView |
+| 3.2 | Панорамирование и зум | ✅ | Полная поддержка |
+| 3.3 | Создание узлов | ✅ | NMNodePalette (Пакет 1) |
+| 3.4 | Перетаскивание узлов | ✅ | ItemIsMovable |
+| 3.5 | Изменение размера узлов | ❌ | **TODO** |
+| 3.6 | Соединение узлов | ✅ | Ctrl+Перетаскивание (Пакет 1) |
+| 3.7 | Удаление узлов/соединений | ✅ | Клавиша Delete (Пакет 1) |
+| 3.8 | Контекстное меню | ⚠️ | Частичная поддержка Edit/Delete |
+| 3.9 | Подсветка ошибок | ❌ | **TODO** |
+| 3.10 | Мини-карта | ❌ | **TODO** |
+| 3.11 | Индикатор текущего узла | ✅ | Зеленое свечение + стрелка |
+| 3.12 | Навигация из Diagnostics | ❌ | **TODO** |
 
-**Completion: 7/12 features (58%) ⚠️**
+**Завершено: 7/12 функций (58%) ⚠️**
 
-**Missing:**
-- Node resizing (corner drag handles)
-- Cycle detection and error highlighting
-- Minimap widget
-- Jump-to-node integration
+**Отсутствует:**
+- Изменение размера узлов (угловые ручки перетаскивания)
+- Обнаружение циклов и подсветка ошибок
+- Виджет мини-карты
+- Интеграция навигации к узлу
 
 ---
 
-## 4. Timeline Editor - 60% ⚠️
+## 4. Редактор Timeline - 60% ⚠️
 
-| ID | Feature | Status | Notes |
+| ID | Функция | Статус | Примечания |
 |----|---------|--------|-------|
-| 4.1 | Display tracks | ✅ | 6 track types |
-| 4.2 | Add/remove tracks | ✅ | Full support |
-| 4.3 | Add/remove keyframes | ⚠️ | UI ready, backend needed |
-| 4.4 | Move/stretch keyframes | ❌ | **TODO** |
-| 4.5 | Timeline ruler | ✅ | With divisions |
-| 4.6 | Zoom timeline | ✅ | Full zoom support |
-| 4.7 | Snap to grid | ❌ | **TODO** |
-| 4.8 | Easing curve selection | ❌ | **TODO** |
-| 4.9 | Curve Editor support | ✅ | Separate panel |
-| 4.10 | Playback sync with PIE | ❌ | **TODO** |
+| 4.1 | Отображение треков | ✅ | 6 типов треков |
+| 4.2 | Добавление/удаление треков | ✅ | Полная поддержка |
+| 4.3 | Добавление/удаление ключевых кадров | ⚠️ | UI готов, требуется бэкенд |
+| 4.4 | Перемещение/растяжение ключевых кадров | ❌ | **TODO** |
+| 4.5 | Линейка таймлайна | ✅ | С делениями |
+| 4.6 | Зум таймлайна | ✅ | Полная поддержка зума |
+| 4.7 | Привязка к сетке | ❌ | **TODO** |
+| 4.8 | Выбор кривой смягчения | ❌ | **TODO** |
+| 4.9 | Поддержка Curve Editor | ✅ | Отдельная панель |
+| 4.10 | Синхронизация воспроизведения с PIE | ❌ | **TODO** |
 
-**Completion: 5/10 features (50%) ⚠️**
+**Завершено: 5/10 функций (50%) ⚠️**
 
-**Missing:**
-- Draggable keyframes
-- Snap-to-grid functionality
-- Per-keyframe easing selection
-- Play-In-Editor synchronization
+**Отсутствует:**
+- Перетаскиваемые ключевые кадры
+- Функциональность привязки к сетке
+- Выбор смягчения для каждого ключевого кадра
+- Синхронизация Play-In-Editor
 
 ---
 
-## 5. Inspector Panel - 70% ⚠️
+## 5. Панель Inspector - 70% ⚠️
 
-| ID | Feature | Status | Notes |
+| ID | Функция | Статус | Примечания |
 |----|---------|--------|-------|
-| 5.1 | Auto-generate from introspection | ❌ | **TODO** (backend) |
-| 5.2 | Property categories | ✅ | NMPropertyGroup |
-| 5.3 | Foldout groups | ✅ | Collapsible |
-| 5.4 | Edit numeric fields | ✅ | Spin boxes (Batch 2) |
-| 5.5 | Edit text fields | ✅ | QLineEdit (Batch 2) |
-| 5.6 | Enum dropdown | ✅ | QComboBox (Batch 2) |
-| 5.7 | Color picker | ✅ | QColorDialog (Batch 2) |
-| 5.8 | Asset picker | ⚠️ | Button ready, dialog TODO |
-| 5.9 | Curve editing | ❌ | **TODO** |
-| 5.10 | Instant application | ✅ | Signal-based (Batch 2) |
-| 5.11 | Undo/Redo | ⚠️ | Framework ready, wiring TODO |
+| 5.1 | Автогенерация из интроспекции | ❌ | **TODO** (бэкенд) |
+| 5.2 | Категории свойств | ✅ | NMPropertyGroup |
+| 5.3 | Сворачиваемые группы | ✅ | Сворачиваемые |
+| 5.4 | Редактирование числовых полей | ✅ | Spin boxes (Пакет 2) |
+| 5.5 | Редактирование текстовых полей | ✅ | QLineEdit (Пакет 2) |
+| 5.6 | Выпадающий список enum | ✅ | QComboBox (Пакет 2) |
+| 5.7 | Выбор цвета | ✅ | QColorDialog (Пакет 2) |
+| 5.8 | Выбор ассета | ⚠️ | Кнопка готова, диалог TODO |
+| 5.9 | Редактирование кривых | ❌ | **TODO** |
+| 5.10 | Мгновенное применение | ✅ | На основе сигналов (Пакет 2) |
+| 5.11 | Undo/Redo | ⚠️ | Фреймворк готов, требуется подключение |
 
-**Completion: 7/11 features (64%) ⚠️**
+**Завершено: 7/11 функций (64%) ⚠️**
 
-**Missing:**
-- Property introspection integration
-- Asset picker dialog
-- CurveRef widget
-- Undo/Redo wiring
+**Отсутствует:**
+- Интеграция интроспекции свойств
+- Диалог выбора ассета
+- Виджет CurveRef
+- Подключение Undo/Redo
 
 ---
 
 ## 6. Asset Browser - 40% ⚠️
 
-| ID | Feature | Status | Notes |
+| ID | Функция | Статус | Примечания |
 |----|---------|--------|-------|
-| 6.1 | Asset tree | ✅ | Folders/nested |
-| 6.2 | Grid/List toggle | ❌ | **TODO** |
-| 6.3 | Image thumbnails | ❌ | **TODO** |
-| 6.4 | Audio waveform preview | ❌ | **TODO** |
-| 6.5 | Asset metadata | ❌ | **TODO** |
-| 6.6 | Search by name | ✅ | Full support |
-| 6.7 | Filter by type | ✅ | Full support |
-| 6.8 | Drag-drop to panels | ❌ | **TODO** |
-| 6.9 | Context menu | ❌ | **TODO** |
-| 6.10 | Future importer support | ❌ | **TODO** |
+| 6.1 | Дерево ассетов | ✅ | Папки/вложенные |
+| 6.2 | Переключение Grid/List | ❌ | **TODO** |
+| 6.3 | Миниатюры изображений | ❌ | **TODO** |
+| 6.4 | Предпросмотр аудио формы волны | ❌ | **TODO** |
+| 6.5 | Метаданные ассетов | ❌ | **TODO** |
+| 6.6 | Поиск по имени | ✅ | Полная поддержка |
+| 6.7 | Фильтр по типу | ✅ | Полная поддержка |
+| 6.8 | Перетаскивание на панели | ❌ | **TODO** |
+| 6.9 | Контекстное меню | ❌ | **TODO** |
+| 6.10 | Поддержка будущего импортера | ❌ | **TODO** |
 
-**Completion: 3/10 features (30%) ❌**
+**Завершено: 3/10 функций (30%) ❌**
 
-**Missing:**
-- View mode toggle (Grid/List)
-- Thumbnail generation
-- Waveform visualization
-- Metadata display
-- Drag-drop MIME data
-- Context menu actions
-- Importer framework
+**Отсутствует:**
+- Переключение режима просмотра (Grid/List)
+- Генерация миниатюр
+- Визуализация формы волны
+- Отображение метаданных
+- Данные MIME для перетаскивания
+- Действия контекстного меню
+- Фреймворк импортера
 
 ---
 
-## 7. Hierarchy Panel - 40% ⚠️
+## 7. Панель Hierarchy - 40% ⚠️
 
-| ID | Feature | Status | Notes |
+| ID | Функция | Статус | Примечания |
 |----|---------|--------|-------|
-| 7.1 | Tree display | ✅ | Scene object tree |
-| 7.2 | Multi-selection | ❌ | **TODO** |
-| 7.3 | Drag-drop reparenting | ❌ | **TODO** |
-| 7.4 | Context menu | ❌ | **TODO** |
-| 7.5 | Sync with SceneView | ⚠️ | Partial |
-| 7.6 | Auto-update | ⚠️ | Framework ready |
+| 7.1 | Отображение дерева | ✅ | Дерево объектов сцены |
+| 7.2 | Множественный выбор | ❌ | **TODO** |
+| 7.3 | Перетаскивание для изменения родителя | ❌ | **TODO** |
+| 7.4 | Контекстное меню | ❌ | **TODO** |
+| 7.5 | Синхронизация с SceneView | ⚠️ | Частично |
+| 7.6 | Автообновление | ⚠️ | Фреймворк готов |
 
-**Completion: 2/6 features (33%) ❌**
+**Завершено: 2/6 функций (33%) ❌**
 
-**Missing:**
-- Multi-selection (Ctrl+Click, Shift+Click)
-- Drag-drop reparenting
-- Context menu (Create Child/Duplicate/Delete/Isolate)
-- Full SceneView synchronization
+**Отсутствует:**
+- Множественный выбор (Ctrl+Click, Shift+Click)
+- Перетаскивание для изменения родителя
+- Контекстное меню (Create Child/Duplicate/Delete/Isolate)
+- Полная синхронизация SceneView
 
 ---
 
 ## 8. Voice Manager - 30% ❌
 
-| ID | Feature | Status | Notes |
+| ID | Функция | Статус | Примечания |
 |----|---------|--------|-------|
-| 8.1 | Table with columns | ⚠️ | Basic structure |
-| 8.2 | Status color indicators | ❌ | **TODO** |
-| 8.3 | Audio playback | ✅ | Full support |
-| 8.4 | Auto-link by name | ❌ | **TODO** |
-| 8.5 | Manual linking | ❌ | **TODO** |
-| 8.6 | Search strings | ❌ | **TODO** |
-| 8.7 | Export/import tables | ❌ | **TODO** |
-| 8.8 | Jump to StoryGraph | ❌ | **TODO** |
+| 8.1 | Таблица с колонками | ⚠️ | Базовая структура |
+| 8.2 | Индикаторы цвета статуса | ❌ | **TODO** |
+| 8.3 | Воспроизведение аудио | ✅ | Полная поддержка |
+| 8.4 | Автосвязывание по имени | ❌ | **TODO** |
+| 8.5 | Ручное связывание | ❌ | **TODO** |
+| 8.6 | Поиск строк | ❌ | **TODO** |
+| 8.7 | Экспорт/импорт таблиц | ❌ | **TODO** |
+| 8.8 | Навигация к StoryGraph | ❌ | **TODO** |
 
-**Completion: 2/8 features (25%) ❌**
+**Завершено: 2/8 функций (25%) ❌**
 
-**Missing:**
-- Color-coded status (Missing/AutoMapped/Manual/Error)
-- File linking (auto + manual)
-- Search functionality
-- Import/export
-- Cross-panel navigation
+**Отсутствует:**
+- Статус с цветовой кодировкой (Missing/AutoMapped/Manual/Error)
+- Связывание файлов (автоматическое + ручное)
+- Функциональность поиска
+- Импорт/экспорт
+- Кросс-панельная навигация
 
 ---
 
 ## 9. Localization Manager - 40% ⚠️
 
-| ID | Feature | Status | Notes |
+| ID | Функция | Статус | Примечания |
 |----|---------|--------|-------|
-| 9.1 | String table | ✅ | Key/Source/Translation/Status |
-| 9.2 | Edit translations | ⚠️ | UI ready, backend needed |
-| 9.3 | Multiple languages | ✅ | Full support |
-| 9.4 | Search and filters | ❌ | **TODO** |
-| 9.5 | Import/export formats | ❌ | **TODO** |
-| 9.6 | Highlight missing | ❌ | **TODO** |
-| 9.7 | Jump to usage | ❌ | **TODO** |
+| 9.1 | Таблица строк | ✅ | Key/Source/Translation/Status |
+| 9.2 | Редактирование переводов | ⚠️ | UI готов, требуется бэкенд |
+| 9.3 | Несколько языков | ✅ | Полная поддержка |
+| 9.4 | Поиск и фильтры | ❌ | **TODO** |
+| 9.5 | Форматы импорта/экспорта | ❌ | **TODO** |
+| 9.6 | Подсветка отсутствующих | ❌ | **TODO** |
+| 9.7 | Навигация к использованию | ❌ | **TODO** |
 
-**Completion: 3/7 features (43%) ⚠️**
+**Завершено: 3/7 функций (43%) ⚠️**
 
-**Missing:**
-- Search/filter (missing/outdated)
-- Import/export (JSON/CSV/PO/XLIFF)
-- Visual highlighting for missing translations
-- Jump-to-usage navigation
+**Отсутствует:**
+- Поиск/фильтр (отсутствующие/устаревшие)
+- Импорт/экспорт (JSON/CSV/PO/XLIFF)
+- Визуальная подсветка отсутствующих переводов
+- Навигация к использованию
 
 ---
 
 ## 10. Debug Overlay - 85% ✅
 
-| ID | Feature | Status | Notes |
+| ID | Функция | Статус | Примечания |
 |----|---------|--------|-------|
-| 10.1 | VM variables display | ✅ | Full support |
-| 10.2 | Current instruction | ❌ | **TODO** |
-| 10.3 | Call stack | ✅ | Full support |
-| 10.4 | Active animations | ✅ | Full support |
-| 10.5 | Audio channels | ✅ | Full support |
-| 10.6 | Frame time info | ✅ | Full support |
-| 10.7 | Display modes | ❌ | **TODO** |
+| 10.1 | Отображение переменных VM | ✅ | Полная поддержка |
+| 10.2 | Текущая инструкция | ❌ | **TODO** |
+| 10.3 | Стек вызовов | ✅ | Полная поддержка |
+| 10.4 | Активные анимации | ✅ | Полная поддержка |
+| 10.5 | Аудиоканалы | ✅ | Полная поддержка |
+| 10.6 | Информация о времени кадра | ✅ | Полная поддержка |
+| 10.7 | Режимы отображения | ❌ | **TODO** |
 
-**Completion: 5/7 features (71%) ⚠️**
+**Завершено: 5/7 функций (71%) ⚠️**
 
-**Missing:**
-- Current instruction display
-- Minimal/Extended display modes
+**Отсутствует:**
+- Отображение текущей инструкции
+- Режимы отображения Minimal/Extended
 
 ---
 
-## 11. Console Panel - 85% ✅
+## 11. Панель Console - 85% ✅
 
-| ID | Feature | Status | Notes |
+| ID | Функция | Статус | Примечания |
 |----|---------|--------|-------|
-| 11.1 | Log output | ✅ | Editor + runtime |
-| 11.2 | Sort by time | ✅ | Chronological |
-| 11.3 | Filter by level | ✅ | Info/Debug/Warning/Error |
-| 11.4 | Auto-scroll | ✅ | Full support |
-| 11.5 | Copy text | ❌ | **TODO** |
-| 11.6 | Clear console | ❌ | **TODO** |
+| 11.1 | Вывод логов | ✅ | Редактор + рантайм |
+| 11.2 | Сортировка по времени | ✅ | Хронологически |
+| 11.3 | Фильтр по уровню | ✅ | Info/Debug/Warning/Error |
+| 11.4 | Автопрокрутка | ✅ | Полная поддержка |
+| 11.5 | Копирование текста | ❌ | **TODO** |
+| 11.6 | Очистка консоли | ❌ | **TODO** |
 
-**Completion: 4/6 features (67%) ⚠️**
+**Завершено: 4/6 функций (67%) ⚠️**
 
-**Missing:**
-- Copy selected text to clipboard
-- Clear console button/action
+**Отсутствует:**
+- Копирование выбранного текста в буфер обмена
+- Кнопка/действие очистки консоли
 
 ---
 
-## 12. Diagnostics Panel - 50% ⚠️
+## 12. Панель Diagnostics - 50% ⚠️
 
-| ID | Feature | Status | Notes |
+| ID | Функция | Статус | Примечания |
 |----|---------|--------|-------|
-| 12.1 | List errors/warnings | ✅ | Full support |
-| 12.2 | Categories | ✅ | Script/Graph/Assets/Voice/Localization/Build |
-| 12.3 | Severity highlighting | ✅ | Color-coded |
-| 12.4 | Jump to source | ❌ | **TODO** |
-| 12.5 | Auto-update | ❌ | **TODO** |
-| 12.6 | Quick Fixes | ❌ | **TODO** |
+| 12.1 | Список ошибок/предупреждений | ✅ | Полная поддержка |
+| 12.2 | Категории | ✅ | Script/Graph/Assets/Voice/Localization/Build |
+| 12.3 | Подсветка серьезности | ✅ | С цветовой кодировкой |
+| 12.4 | Навигация к источнику | ❌ | **TODO** |
+| 12.5 | Автообновление | ❌ | **TODO** |
+| 12.6 | Быстрые исправления | ❌ | **TODO** |
 
-**Completion: 3/6 features (50%) ⚠️**
+**Завершено: 3/6 функций (50%) ⚠️**
 
-**Missing:**
-- Jump-to-source navigation
-- Auto-update during play mode
-- Quick Fix recommendations
+**Отсутствует:**
+- Навигация к источнику
+- Автообновление во время режима play
+- Рекомендации быстрых исправлений
 
 ---
 
 ## 13. Build Settings - 60% ⚠️
 
-| ID | Feature | Status | Notes |
+| ID | Функция | Статус | Примечания |
 |----|---------|--------|-------|
-| 13.1 | Platform selection | ✅ | Win/Linux/macOS/Web/Android/iOS |
-| 13.2 | Build preset | ✅ | Development/Release/Encrypted |
-| 13.3 | Encryption settings | ✅ | Checkbox + key |
-| 13.4 | Compression settings | ✅ | Checkbox + level |
-| 13.5 | Build size preview | ❌ | **TODO** |
-| 13.6 | Missing resource warnings | ❌ | **TODO** |
-| 13.7 | Build execution | ❌ | **TODO** |
+| 13.1 | Выбор платформы | ✅ | Win/Linux/macOS/Web/Android/iOS |
+| 13.2 | Пресет сборки | ✅ | Development/Release/Encrypted |
+| 13.3 | Настройки шифрования | ✅ | Чекбокс + ключ |
+| 13.4 | Настройки сжатия | ✅ | Чекбокс + уровень |
+| 13.5 | Предпросмотр размера сборки | ❌ | **TODO** |
+| 13.6 | Предупреждения об отсутствующих ресурсах | ❌ | **TODO** |
+| 13.7 | Выполнение сборки | ❌ | **TODO** |
 
-**Completion: 4/7 features (57%) ⚠️**
+**Завершено: 4/7 функций (57%) ⚠️**
 
-**Missing:**
-- Build size calculation/preview
-- Resource validation warnings
-- Build execution + progress tracking
+**Отсутствует:**
+- Расчет/предпросмотр размера сборки
+- Предупреждения валидации ресурсов
+- Выполнение сборки + отслеживание прогресса
 
 ---
 
-## 14. Play-In-Editor Interface - 85% ✅
+## 14. UI Play-In-Editor - 85% ✅
 
-| ID | Feature | Status | Notes |
+| ID | Функция | Статус | Примечания |
 |----|---------|--------|-------|
-| 14.1 | Play/Pause/Stop controls | ✅ | Full toolbar |
-| 14.2 | Status indicators | ✅ | Running/Paused/Waiting |
-| 14.3 | Jump to active node | ✅ | Auto-centering |
-| 14.4 | Display active dialogue | ❌ | **TODO** |
-| 14.5 | Timeline time control | ❌ | **TODO** |
-| 14.6 | Show script variables | ✅ | Debug Overlay |
-| 14.7 | Edit variables | ✅ | Full support |
-| 14.8 | Breakpoints | ✅ | Visual + toggle |
+| 14.1 | Элементы управления Play/Pause/Stop | ✅ | Полная панель инструментов |
+| 14.2 | Индикаторы статуса | ✅ | Running/Paused/Waiting |
+| 14.3 | Навигация к активному узлу | ✅ | Автоцентрирование |
+| 14.4 | Отображение активного диалога | ❌ | **TODO** |
+| 14.5 | Управление временем таймлайна | ❌ | **TODO** |
+| 14.6 | Показ переменных скрипта | ✅ | Debug Overlay |
+| 14.7 | Редактирование переменных | ✅ | Полная поддержка |
+| 14.8 | Точки останова | ✅ | Визуальные + переключение |
 
-**Completion: 6/8 features (75%) ⚠️**
+**Завершено: 6/8 функций (75%) ⚠️**
 
-**Missing:**
-- Active dialogue display panel
-- Timeline scrubbing during play
+**Отсутствует:**
+- Панель отображения активного диалога
+- Скроббинг таймлайна во время воспроизведения
 
 ---
 
-## 15. Hotkey System - 50% ⚠️
+## 15. Система горячих клавиш - 50% ⚠️
 
-| ID | Feature | Status | Notes |
+| ID | Функция | Статус | Примечания |
 |----|---------|--------|-------|
-| 15.1 | Ctrl+S (Save) | ✅ | Full support |
-| 15.2 | Ctrl+Z/Y (Undo/Redo) | ✅ | Full support |
-| 15.3 | F5 (Play) | ✅ | Full support |
-| 15.4 | Delete | ⚠️ | StoryGraph only, needs global |
-| 15.5 | F2 (Rename) | ❌ | **TODO** |
-| 15.6 | Customizable keymap | ❌ | **TODO** |
+| 15.1 | Ctrl+S (Сохранить) | ✅ | Полная поддержка |
+| 15.2 | Ctrl+Z/Y (Undo/Redo) | ✅ | Полная поддержка |
+| 15.3 | F5 (Play) | ✅ | Полная поддержка |
+| 15.4 | Delete | ⚠️ | Только StoryGraph, требуется глобальная |
+| 15.5 | F2 (Переименовать) | ❌ | **TODO** |
+| 15.6 | Настраиваемая раскладка клавиш | ❌ | **TODO** |
 
-**Completion: 3/6 features (50%) ⚠️**
+**Завершено: 3/6 функций (50%) ⚠️**
 
-**Missing:**
-- Global Delete key handling
-- F2 rename functionality
-- Customizable keymap system
+**Отсутствует:**
+- Глобальная обработка клавиши Delete
+- Функциональность переименования F2
+- Система настраиваемой раскладки клавиш
 
 ---
 
-## 16. Undo/Redo System - 70% ⚠️
+## 16. Система Undo/Redo - 70% ⚠️
 
-| ID | Feature | Status | Notes |
+| ID | Функция | Статус | Примечания |
 |----|---------|--------|-------|
-| 16.1 | Unified command stack | ✅ | QUndoStack |
-| 16.2 | StoryGraph undo | ⚠️ | Framework ready, needs wiring |
-| 16.3 | Timeline undo | ⚠️ | Framework ready, needs wiring |
-| 16.4 | Inspector undo | ⚠️ | Framework ready, needs wiring |
-| 16.5 | Asset operation undo | ❌ | **TODO** |
+| 16.1 | Единый стек команд | ✅ | QUndoStack |
+| 16.2 | Undo StoryGraph | ⚠️ | Фреймворк готов, требуется подключение |
+| 16.3 | Undo Timeline | ⚠️ | Фреймворк готов, требуется подключение |
+| 16.4 | Undo Inspector | ⚠️ | Фреймворк готов, требуется подключение |
+| 16.5 | Undo операций с ассетами | ❌ | **TODO** |
 
-**Completion: 1/5 features (20%) ❌**
+**Завершено: 1/5 функций (20%) ❌**
 
-**Missing:**
-- Undo/Redo integration for all panels
-- Asset operation undo commands
+**Отсутствует:**
+- Интеграция Undo/Redo для всех панелей
+- Команды undo операций с ассетами
 
 ---
 
 ## 17. Event Bus - 80% ✅
 
-| ID | Feature | Status | Notes |
+| ID | Функция | Статус | Примечания |
 |----|---------|--------|-------|
-| 17.1 | Event handlers | ✅ | All event types |
-| 17.2 | Panel subscriptions | ✅ | Full support |
-| 17.3 | Backend event generation | ⚠️ | Partial |
+| 17.1 | Обработчики событий | ✅ | Все типы событий |
+| 17.2 | Подписки панелей | ✅ | Полная поддержка |
+| 17.3 | Генерация событий бэкендом | ⚠️ | Частично |
 
-**Completion: 2/3 features (67%) ⚠️**
+**Завершено: 2/3 функций (67%) ⚠️**
 
-**Missing:**
-- Full backend integration
+**Отсутствует:**
+- Полная интеграция бэкенда
 
 ---
 
-## 18. Selection System - 60% ⚠️
+## 18. Система выбора - 60% ⚠️
 
-| ID | Feature | Status | Notes |
+| ID | Функция | Статус | Примечания |
 |----|---------|--------|-------|
-| 18.1 | Single source of truth | ✅ | NMSelectionManager |
-| 18.2 | Multi-selection support | ⚠️ | Framework ready |
-| 18.3 | Panel synchronization | ✅ | Full support |
-| 18.4 | Selection history | ❌ | **TODO** |
+| 18.1 | Единый источник истины | ✅ | NMSelectionManager |
+| 18.2 | Поддержка множественного выбора | ⚠️ | Фреймворк готов |
+| 18.3 | Синхронизация панелей | ✅ | Полная поддержка |
+| 18.4 | История выбора | ❌ | **TODO** |
 
-**Completion: 2/4 features (50%) ⚠️**
+**Завершено: 2/4 функций (50%) ⚠️**
 
-**Missing:**
-- Multi-selection implementation
-- Navigate back/forward in selection history
+**Отсутствует:**
+- Реализация множественного выбора
+- Навигация вперед/назад в истории выбора
 
 ---
 
-## 19. Style Guide - 100% ✅
+## 19. Руководство по стилю - 100% ✅
 
-| ID | Feature | Status | Notes |
+| ID | Функция | Статус | Примечания |
 |----|---------|--------|-------|
-| 19.1 | Color palette | ✅ | Full palette |
-| 19.2 | Button/panel styling | ✅ | Complete QSS |
-| 19.3 | Spacing/sizing | ✅ | Consistent |
-| 19.4 | Typography | ✅ | Professional |
-| 19.5 | Icon rules | ✅ | 40+ SVG icons |
-| 19.6 | Accessibility | ✅ | Contrast ratios |
+| 19.1 | Цветовая палитра | ✅ | Полная палитра |
+| 19.2 | Стилизация кнопок/панелей | ✅ | Полный QSS |
+| 19.3 | Отступы/размеры | ✅ | Согласованные |
+| 19.4 | Типография | ✅ | Профессиональная |
+| 19.5 | Правила иконок | ✅ | 40+ SVG-иконок |
+| 19.6 | Доступность | ✅ | Контрастные соотношения |
 
-**Completion: 6/6 features (100%) ✅**
+**Завершено: 6/6 функций (100%) ✅**
 
 ---
 
-## 20. Documentation - 5% ❌
+## 20. Документация - 5% ❌
 
-| ID | Feature | Status | Notes |
+| ID | Функция | Статус | Примечания |
 |----|---------|--------|-------|
-| 20.1 | User manual | ❌ | **TODO** |
-| 20.2 | Panel documentation | ❌ | **TODO** |
-| 20.3 | Hotkey guide | ❌ | **TODO** |
-| 20.4 | StoryGraph guide | ❌ | **TODO** |
-| 20.5 | Timeline guide | ❌ | **TODO** |
-| 20.6 | Project structure | ❌ | **TODO** |
-| 20.7 | Plugin dev guide | ❌ | **TODO** |
+| 20.1 | Руководство пользователя | ❌ | **TODO** |
+| 20.2 | Документация панелей | ❌ | **TODO** |
+| 20.3 | Руководство по горячим клавишам | ❌ | **TODO** |
+| 20.4 | Руководство по StoryGraph | ❌ | **TODO** |
+| 20.5 | Руководство по таймлайну | ❌ | **TODO** |
+| 20.6 | Структура проекта | ❌ | **TODO** |
+| 20.7 | Руководство разработчика плагинов | ❌ | **TODO** |
 
-**Completion: 0/7 features (0%) ❌**
+**Завершено: 0/7 функций (0%) ❌**
 
-**Missing:**
-- All documentation
+**Отсутствует:**
+- Вся документация
 
 ---
 
-## Overall Summary
+## Общее резюме
 
-| Category | Features Complete | Total Features | Percentage | Status |
+| Категория | Завершенные функции | Всего функций | Процент | Статус |
 |----------|------------------|----------------|------------|--------|
 | 1. Main Window | 7 | 7 | 100% | ✅ |
 | 2. SceneView | 8 | 10 | 80% | ⚠️ |
@@ -451,130 +451,130 @@ This document compares the user's comprehensive feature checklist against the cu
 | 19. Style Guide | 6 | 6 | 100% | ✅ |
 | 20. Documentation | 0 | 7 | 0% | ❌ |
 
-**Grand Total: 79/140 features (56%)**
+**Общий итог: 79/140 функций (56%)**
 
 ---
 
-## Priority Implementation Plan
+## План реализации по приоритетам
 
-### Phase 1: Critical Gaps (20 features) - ~15 hours
-**Goal: Bring all panels to 70%+**
+### Фаза 1: Критические пробелы (20 функций) - ~15 часов
+**Цель: Привести все панели к 70%+**
 
-1. **Console** (2 features - 30 min)
-   - 11.5: Copy text functionality
-   - 11.6: Clear console button
+1. **Console** (2 функции - 30 мин)
+   - 11.5: Функциональность копирования текста
+   - 11.6: Кнопка очистки консоли
 
-2. **Hotkeys** (2 features - 2 hours)
-   - 15.4: Global Delete key
-   - 15.6: Basic customizable keymap
+2. **Hotkeys** (2 функции - 2 часа)
+   - 15.4: Глобальная клавиша Delete
+   - 15.6: Базовая настраиваемая раскладка клавиш
 
-3. **Undo/Redo Integration** (4 features - 3 hours)
-   - 16.2: StoryGraph undo
-   - 16.3: Timeline undo
-   - 16.4: Inspector undo
-   - 16.5: Asset operation undo
+3. **Интеграция Undo/Redo** (4 функции - 3 часа)
+   - 16.2: Undo StoryGraph
+   - 16.3: Undo Timeline
+   - 16.4: Undo Inspector
+   - 16.5: Undo операций с ассетами
 
-4. **Timeline Editing** (4 features - 4 hours)
-   - 4.3: Add/remove keyframes backend
-   - 4.4: Draggable keyframes
-   - 4.7: Snap to grid
-   - 4.10: PIE sync
+4. **Редактирование Timeline** (4 функции - 4 часа)
+   - 4.3: Бэкенд добавления/удаления ключевых кадров
+   - 4.4: Перетаскиваемые ключевые кадры
+   - 4.7: Привязка к сетке
+   - 4.10: Синхронизация PIE
 
-5. **Debug Overlay** (2 features - 1.5 hours)
-   - 10.2: Current instruction display
-   - 10.7: Minimal/Extended modes
+5. **Debug Overlay** (2 функции - 1.5 часа)
+   - 10.2: Отображение текущей инструкции
+   - 10.7: Режимы Minimal/Extended
 
-6. **Diagnostics** (3 features - 2 hours)
-   - 12.4: Jump to source
-   - 12.5: Auto-update
-   - 12.6: Quick Fixes
+6. **Diagnostics** (3 функции - 2 часа)
+   - 12.4: Навигация к источнику
+   - 12.5: Автообновление
+   - 12.6: Быстрые исправления
 
-7. **Selection System** (2 features - 2 hours)
-   - 18.2: Multi-selection implementation
-   - 18.4: Selection history
+7. **Система выбора** (2 функции - 2 часа)
+   - 18.2: Реализация множественного выбора
+   - 18.4: История выбора
 
-### Phase 2: Asset Management (12 features) - ~12 hours
-**Goal: Complete Asset Browser + related features**
+### Фаза 2: Управление ассетами (12 функций) - ~12 часов
+**Цель: Завершить Asset Browser + связанные функции**
 
-1. **Asset Browser** (7 features - 8 hours)
-   - 6.2: Grid/List toggle
-   - 6.3: Image thumbnails
-   - 6.4: Audio waveforms
-   - 6.5: Metadata display
-   - 6.8: Drag-drop MIME
-   - 6.9: Context menu
-   - 6.10: Importer framework
+1. **Asset Browser** (7 функций - 8 часов)
+   - 6.2: Переключение Grid/List
+   - 6.3: Миниатюры изображений
+   - 6.4: Формы волн аудио
+   - 6.5: Отображение метаданных
+   - 6.8: MIME для перетаскивания
+   - 6.9: Контекстное меню
+   - 6.10: Фреймворк импортера
 
-2. **SceneView Integration** (2 features - 2 hours)
-   - 2.5: Layer highlighting
-   - 2.9: Drag-drop from Asset Browser
+2. **Интеграция SceneView** (2 функции - 2 часа)
+   - 2.5: Подсветка слоев
+   - 2.9: Перетаскивание из Asset Browser
 
-3. **Hierarchy** (3 features - 2 hours)
-   - 7.2: Multi-selection
-   - 7.3: Drag-drop reparenting
-   - 7.4: Context menu
+3. **Hierarchy** (3 функции - 2 часа)
+   - 7.2: Множественный выбор
+   - 7.3: Перетаскивание для изменения родителя
+   - 7.4: Контекстное меню
 
-### Phase 3: StoryGraph & Inspector (9 features) - ~10 hours
+### Фаза 3: StoryGraph & Inspector (9 функций) - ~10 часов
 
-1. **StoryGraph** (4 features - 6 hours)
-   - 3.5: Node resizing
-   - 3.9: Error highlighting
-   - 3.10: Minimap
-   - 3.12: Jump from Diagnostics
+1. **StoryGraph** (4 функции - 6 часов)
+   - 3.5: Изменение размера узлов
+   - 3.9: Подсветка ошибок
+   - 3.10: Мини-карта
+   - 3.12: Навигация из Diagnostics
 
-2. **Inspector** (4 features - 3 hours)
-   - 5.1: Auto-generation from introspection
-   - 5.8: Asset picker dialog
-   - 5.9: CurveRef widget
-   - 5.11: Undo/Redo wiring
+2. **Inspector** (4 функции - 3 часа)
+   - 5.1: Автогенерация из интроспекции
+   - 5.8: Диалог выбора ассета
+   - 5.9: Виджет CurveRef
+   - 5.11: Подключение Undo/Redo
 
-3. **Timeline** (1 feature - 1 hour)
-   - 4.8: Easing curve selection
+3. **Timeline** (1 функция - 1 час)
+   - 4.8: Выбор кривой смягчения
 
-### Phase 4: Production Tools (20 features) - ~12 hours
+### Фаза 4: Продакшн-инструменты (20 функций) - ~12 часов
 
-1. **Voice Manager** (6 features - 5 hours)
-   - 8.2: Status indicators
-   - 8.4: Auto-linking
-   - 8.5: Manual linking
-   - 8.6: Search
-   - 8.7: Import/export
-   - 8.8: Jump to StoryGraph
+1. **Voice Manager** (6 функций - 5 часов)
+   - 8.2: Индикаторы статуса
+   - 8.4: Автосвязывание
+   - 8.5: Ручное связывание
+   - 8.6: Поиск
+   - 8.7: Импорт/экспорт
+   - 8.8: Навигация к StoryGraph
 
-2. **Localization** (4 features - 4 hours)
-   - 9.4: Search/filters
-   - 9.5: Import/export
-   - 9.6: Highlight missing
-   - 9.7: Jump to usage
+2. **Localization** (4 функции - 4 часа)
+   - 9.4: Поиск/фильтры
+   - 9.5: Импорт/экспорт
+   - 9.6: Подсветка отсутствующих
+   - 9.7: Навигация к использованию
 
-3. **Build Settings** (3 features - 3 hours)
-   - 13.5: Size preview
-   - 13.6: Resource warnings
-   - 13.7: Build execution
+3. **Build Settings** (3 функции - 3 часа)
+   - 13.5: Предпросмотр размера
+   - 13.6: Предупреждения о ресурсах
+   - 13.7: Выполнение сборки
 
-### Phase 5: Documentation (7 features) - ~15 hours
+### Фаза 5: Документация (7 функций) - ~15 часов
 
-1. **All Documentation** (7 features - 15 hours)
-   - 20.1-20.7: Complete user and developer documentation
-
----
-
-## Total Estimated Effort
-
-- **Phase 1 (Critical)**: ~15 hours
-- **Phase 2 (Assets)**: ~12 hours
-- **Phase 3 (Editing)**: ~10 hours
-- **Phase 4 (Production)**: ~12 hours
-- **Phase 5 (Docs)**: ~15 hours
-
-**Grand Total: ~64 hours to 100% completion**
+1. **Вся документация** (7 функций - 15 часов)
+   - 20.1-20.7: Полная пользовательская и разработческая документация
 
 ---
 
-## Recommended Execution Order
+## Общие оценочные усилия
 
-1. ✅ Start with **Phase 1** (Critical Gaps) - most impact
-2. ✅ Then **Phase 2** (Asset Management) - high user value
-3. ✅ Then **Phase 3** (Advanced Editing) - polish core features
-4. ⏸️ Defer **Phase 4** (Production Tools) - lower priority
-5. ⏸️ Defer **Phase 5** (Documentation) - can be done incrementally
+- **Фаза 1 (Критическая)**: ~15 часов
+- **Фаза 2 (Ассеты)**: ~12 часов
+- **Фаза 3 (Редактирование)**: ~10 часов
+- **Фаза 4 (Продакшн)**: ~12 часов
+- **Фаза 5 (Документация)**: ~15 часов
+
+**Общий итог: ~64 часа до 100% завершения**
+
+---
+
+## Рекомендуемый порядок выполнения
+
+1. ✅ Начать с **Фазы 1** (Критические пробелы) - наибольшее влияние
+2. ✅ Затем **Фаза 2** (Управление ассетами) - высокая ценность для пользователя
+3. ✅ Затем **Фаза 3** (Продвинутое редактирование) - полировка основных функций
+4. ⏸️ Отложить **Фазу 4** (Продакшн-инструменты) - меньший приоритет
+5. ⏸️ Отложить **Фазу 5** (Документация) - может быть выполнена инкрементно

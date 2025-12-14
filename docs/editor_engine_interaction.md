@@ -1,35 +1,35 @@
-# Editor-Engine Interaction
+# Взаимодействие редактора и движка
 
-This document describes the data exchange protocols and formats between the NovelMind visual editor and the runtime engine.
+Этот документ описывает протоколы обмена данными и форматы между визуальным редактором NovelMind и runtime-движком.
 
-## Overview
+## Обзор
 
-The editor and engine share data through well-defined formats:
+Редактор и движок обмениваются данными через чётко определённые форматы:
 
 ```
 +----------------+                      +----------------+
-|                |   Project Files      |                |
-|    Editor      | ------------------> |    Compiler    |
+|                |   Файлы проекта      |                |
+|   Редактор     | ------------------> |   Компилятор   |
 |                |   (JSON, NMScript)   |                |
 +----------------+                      +----------------+
        |                                       |
-       | Preview                               | Build
+       | Превью                                | Сборка
        v                                       v
 +----------------+                      +----------------+
-|   Embedded     |                      |   Pack Files   |
-|   Runtime      |                      |   (.nmres)     |
+|   Встроенный   |                      |  Файлы пака    |
+|    Runtime     |                      |   (.nmres)     |
 +----------------+                      +----------------+
                                                |
                                                v
                                         +----------------+
                                         |    Runtime     |
-                                        |    Engine      |
+                                        |     движок     |
                                         +----------------+
 ```
 
-## Project File Format
+## Формат файлов проекта
 
-### Project Manifest (project.nmproj)
+### Манифест проекта (project.nmproj)
 
 ```json
 {
@@ -58,7 +58,7 @@ The editor and engine share data through well-defined formats:
 }
 ```
 
-### Character Definition (characters/*.json)
+### Определение персонажа (characters/*.json)
 
 ```json
 {
@@ -81,7 +81,7 @@ The editor and engine share data through well-defined formats:
 }
 ```
 
-### Scene Definition (scenes/*.json)
+### Определение сцены (scenes/*.json)
 
 ```json
 {
@@ -124,7 +124,7 @@ The editor and engine share data through well-defined formats:
 }
 ```
 
-### Story Graph (scenes/*.graph.json)
+### Граф сюжета (scenes/*.graph.json)
 
 ```json
 {
@@ -185,63 +185,63 @@ The editor and engine share data through well-defined formats:
 }
 ```
 
-### Node Types
+### Типы узлов
 
-| Type | Description |
+| Тип | Описание |
 |------|-------------|
-| `dialogue` | Character speaking with text |
-| `narration` | Narrator text without character |
-| `choice` | Player choice branching |
-| `condition` | Conditional branching |
-| `transition` | Scene transition |
-| `action` | Execute commands without text |
-| `wait` | Pause execution |
+| `dialogue` | Персонаж говорит с текстом |
+| `narration` | Текст рассказчика без персонажа |
+| `choice` | Разветвление выбора игрока |
+| `condition` | Условное разветвление |
+| `transition` | Переход между сценами |
+| `action` | Выполнение команд без текста |
+| `wait` | Приостановка выполнения |
 
-### Action Types
+### Типы действий
 
-| Type | Parameters | Description |
+| Тип | Параметры | Описание |
 |------|------------|-------------|
-| `show_character` | character, sprite, position | Show character sprite |
-| `hide_character` | character | Hide character |
-| `set_sprite` | character, sprite | Change character sprite |
-| `move_character` | character, position, duration | Animate character position |
-| `set_flag` | flag, value | Set boolean flag |
-| `set_variable` | variable, value | Set variable value |
-| `play_sound` | sound | Play sound effect |
-| `play_music` | music, fadeIn | Play/change music |
-| `stop_music` | fadeOut | Stop music |
-| `set_background` | background, transition | Change background |
-| `screen_effect` | effect, params | Apply screen effect |
-| `wait` | duration | Wait for time |
-| `call_script` | script | Execute NM Script |
+| `show_character` | character, sprite, position | Показать спрайт персонажа |
+| `hide_character` | character | Скрыть персонажа |
+| `set_sprite` | character, sprite | Изменить спрайт персонажа |
+| `move_character` | character, position, duration | Анимировать позицию персонажа |
+| `set_flag` | flag, value | Установить логический флаг |
+| `set_variable` | variable, value | Установить значение переменной |
+| `play_sound` | sound | Воспроизвести звуковой эффект |
+| `play_music` | music, fadeIn | Воспроизвести/сменить музыку |
+| `stop_music` | fadeOut | Остановить музыку |
+| `set_background` | background, transition | Сменить фон |
+| `screen_effect` | effect, params | Применить эффект экрана |
+| `wait` | duration | Ожидание в течение времени |
+| `call_script` | script | Выполнить NM Script |
 
-## NM Script Format
+## Формат NM Script
 
-### Basic Syntax
+### Базовый синтаксис
 
 ```
-# Character definitions
+# Определение персонажей
 character Hero(name="Alex", color="#FFCC00")
 character Sidekick(name="Sam", color="#00CCFF")
 
-# Variable declarations
+# Объявление переменных
 var relationship = 0
 flag has_key = false
 
-# Scene definition
+# Определение сцены
 scene cafe_intro {
-    # Commands
+    # Команды
     background "cafe_interior"
     music "peaceful_afternoon" fade 2.0
 
     show Hero at center
     show Sidekick at right
 
-    # Dialogue
+    # Диалог
     Hero: "Welcome!"
     Sidekick: "Thanks for having us."
 
-    # Choice
+    # Выбор
     choice "What would you like?" {
         "Coffee" {
             Hero: "Good choice!"
@@ -252,7 +252,7 @@ scene cafe_intro {
         }
     }
 
-    # Conditional
+    # Условие
     if has_key {
         Hero: "Let's go!"
         goto secret_room
@@ -262,27 +262,27 @@ scene cafe_intro {
 }
 ```
 
-### Command Reference
+### Справка по командам
 
 ```
-# Display commands
+# Команды отображения
 background <resource> [transition <type> <duration>]
 show <character> [<sprite>] at <position> [with <animation>]
 hide <character> [with <animation>]
 sprite <character> <sprite>
 move <character> to <position> [over <duration>]
 
-# Audio commands
+# Аудио команды
 music <resource> [fade <duration>] [loop]
 sound <resource> [volume <level>]
 stop music [fade <duration>]
 
-# Text commands
+# Текстовые команды
 <character>: "<text>"
 <character> (<sprite>): "<text>"
 narrate: "<text>"
 
-# Control flow
+# Управление потоком
 choice [<prompt>] { ... }
 if <condition> { ... } [else { ... }]
 goto <scene>
@@ -290,60 +290,60 @@ call <script>
 return
 wait <duration>
 
-# Variables
+# Переменные
 var <name> = <value>
 flag <name> = <true|false>
 set <name> = <value>
 
-# Effects
+# Эффекты
 fade <in|out> [<duration>] [<color>]
 shake [<intensity>] [<duration>]
 flash [<color>] [<duration>]
 ```
 
-## Compiled Script Format
+## Формат скомпилированного скрипта
 
-NM Script is compiled to bytecode for efficient runtime execution.
+NM Script компилируется в байткод для эффективного выполнения в runtime.
 
-### Bytecode Header
-
-```
-Offset  Size  Description
-0x00    4     Magic: "NMSC"
-0x04    2     Version
-0x06    2     Flags
-0x08    4     Instruction count
-0x0C    4     Constant pool size
-0x10    4     String table size
-0x14    4     Symbol table size
-```
-
-### Instruction Format
+### Заголовок байткода
 
 ```
-Byte 0: Opcode (8 bits)
-Bytes 1-4: Operand (32 bits, varies by opcode)
+Смещение  Размер  Описание
+0x00      4       Magic: "NMSC"
+0x04      2       Версия
+0x06      2       Флаги
+0x08      4       Количество инструкций
+0x0C      4       Размер пула констант
+0x10      4       Размер таблицы строк
+0x14      4       Размер таблицы символов
 ```
 
-### Constant Pool
+### Формат инструкции
 
-Contains literals used in the script:
-- Integer constants
-- Float constants
-- String references (offset into string table)
+```
+Байт 0: Опкод (8 бит)
+Байты 1-4: Операнд (32 бита, зависит от опкода)
+```
 
-### String Table
+### Пул констант
 
-Null-terminated UTF-8 strings for:
-- Character names
-- Dialogue text
-- Resource identifiers
+Содержит литералы, используемые в скрипте:
+- Целочисленные константы
+- Константы с плавающей точкой
+- Ссылки на строки (смещение в таблице строк)
 
-## Preview Protocol
+### Таблица строк
 
-The editor contains an embedded runtime for live preview. Communication uses a simple command protocol.
+UTF-8 строки с нулевым окончанием для:
+- Имён персонажей
+- Текста диалогов
+- Идентификаторов ресурсов
 
-### Preview Commands (Editor -> Runtime)
+## Протокол превью
+
+Редактор содержит встроенный runtime для превью в реальном времени. Связь использует простой командный протокол.
+
+### Команды превью (Редактор -> Runtime)
 
 ```json
 {"cmd": "load_scene", "scene": "cafe_meeting"}
@@ -356,7 +356,7 @@ The editor contains an embedded runtime for live preview. Communication uses a s
 {"cmd": "reset"}
 ```
 
-### Preview Events (Runtime -> Editor)
+### События превью (Runtime -> Редактор)
 
 ```json
 {"event": "scene_loaded", "scene": "cafe_meeting"}
@@ -367,42 +367,42 @@ The editor contains an embedded runtime for live preview. Communication uses a s
 {"event": "error", "message": "Resource not found: missing.png"}
 ```
 
-## Asset Pipeline
+## Конвейер ресурсов
 
-### Supported Source Formats
+### Поддерживаемые исходные форматы
 
-| Type | Formats | Notes |
+| Тип | Форматы | Примечания |
 |------|---------|-------|
-| Images | PNG, JPG, WebP | PNG preferred for transparency |
-| Audio | OGG, WAV, MP3 | OGG preferred for music |
-| Fonts | TTF, OTF | |
-| Scripts | .nms | NM Script source |
+| Изображения | PNG, JPG, WebP | PNG предпочтительнее для прозрачности |
+| Аудио | OGG, WAV, MP3 | OGG предпочтительнее для музыки |
+| Шрифты | TTF, OTF | |
+| Скрипты | .nms | Исходный код NM Script |
 
-### Asset Processing
+### Обработка ресурсов
 
-1. **Images**
-   - Convert to optimal format
-   - Generate mipmaps (optional)
-   - Pack into texture atlases (sprites)
-   - Preserve as-is (backgrounds)
+1. **Изображения**
+   - Преобразовать в оптимальный формат
+   - Генерировать mipmap-уровни (опционально)
+   - Упаковать в текстурные атласы (спрайты)
+   - Сохранить как есть (фоны)
 
-2. **Audio**
-   - Convert to OGG Vorbis
-   - Normalize volume levels
-   - Prepare for streaming (music)
+2. **Аудио**
+   - Преобразовать в OGG Vorbis
+   - Нормализовать уровни громкости
+   - Подготовить для потоковой передачи (музыка)
 
-3. **Fonts**
-   - Rasterize to bitmap fonts
-   - Generate SDF for scalable text
+3. **Шрифты**
+   - Растеризовать в растровые шрифты
+   - Генерировать SDF для масштабируемого текста
 
-4. **Scripts**
-   - Parse and validate
-   - Compile to bytecode
-   - Link references
+4. **Скрипты**
+   - Разобрать и проверить
+   - Скомпилировать в байткод
+   - Связать ссылки
 
-## Localization Data
+## Данные локализации
 
-### String Table Format (localization/*.json)
+### Формат таблицы строк (localization/*.json)
 
 ```json
 {
@@ -419,29 +419,29 @@ The editor contains an embedded runtime for live preview. Communication uses a s
 }
 ```
 
-### String ID Convention
+### Соглашение об идентификаторах строк
 
 ```
-dialogue.<scene>.<node>         - Dialogue text
-choice.<scene>.<choice_id>      - Choice text
-narration.<scene>.<node>        - Narration text
-ui.<element>                    - UI text
-character.<id>.name             - Character display name
-menu.<menu>.<item>              - Menu items
+dialogue.<scene>.<node>         - Текст диалога
+choice.<scene>.<choice_id>      - Текст выбора
+narration.<scene>.<node>        - Текст повествования
+ui.<element>                    - Текст UI
+character.<id>.name             - Отображаемое имя персонажа
+menu.<menu>.<item>              - Элементы меню
 ```
 
-## Build Output Structure
+## Структура выходных файлов сборки
 
 ```
 build/
 ├── windows/
-│   ├── MyVisualNovel.exe       # Executable
-│   └── data.nmres              # Resource pack
+│   ├── MyVisualNovel.exe       # Исполняемый файл
+│   └── data.nmres              # Пакет ресурсов
 ├── linux/
-│   ├── MyVisualNovel           # Executable
-│   └── data.nmres              # Resource pack
+│   ├── MyVisualNovel           # Исполняемый файл
+│   └── data.nmres              # Пакет ресурсов
 └── macos/
-    └── MyVisualNovel.app/      # Application bundle
+    └── MyVisualNovel.app/      # Пакет приложения
         └── Contents/
             ├── MacOS/
             │   └── MyVisualNovel
@@ -449,27 +449,27 @@ build/
                 └── data.nmres
 ```
 
-## Debug Mode
+## Режим отладки
 
-In debug builds, the engine can:
+В отладочных сборках движок может:
 
-1. Load unpackaged resources directly from disk
-2. Hot-reload modified resources
-3. Execute script commands from console
-4. Display debug overlays (FPS, memory, etc.)
-5. Log detailed execution traces
+1. Загружать неупакованные ресурсы напрямую с диска
+2. Горячо перезагружать изменённые ресурсы
+3. Выполнять команды скриптов из консоли
+4. Отображать отладочные оверлеи (FPS, память и т.д.)
+5. Записывать детальные трассировки выполнения
 
-### Debug Console Commands
+### Команды отладочной консоли
 
 ```
-reload scene              - Reload current scene
-reload script <name>      - Reload specific script
-goto <scene> [node]       - Jump to scene/node
-set <var> <value>         - Set variable
-flag <name> <true|false>  - Set flag
-dump vars                 - Print all variables
-dump flags                - Print all flags
-screenshot                - Save screenshot
-profile start/stop        - CPU profiling
-memory                    - Memory statistics
+reload scene              - Перезагрузить текущую сцену
+reload script <name>      - Перезагрузить конкретный скрипт
+goto <scene> [node]       - Перейти к сцене/узлу
+set <var> <value>         - Установить переменную
+flag <name> <true|false>  - Установить флаг
+dump vars                 - Вывести все переменные
+dump flags                - Вывести все флаги
+screenshot                - Сохранить скриншот
+profile start/stop        - Профилирование CPU
+memory                    - Статистика памяти
 ```

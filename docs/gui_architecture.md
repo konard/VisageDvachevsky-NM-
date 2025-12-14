@@ -1,23 +1,23 @@
-# NovelMind Editor GUI Architecture
+# Архитектура GUI редактора NovelMind
 
-## Overview
+## Обзор
 
-This document describes the comprehensive GUI architecture for the NovelMind Editor, rebuilt from scratch using Qt 6 Widgets. The architecture follows a modular, event-driven design inspired by professional editors like Unreal Engine, Unity, and Godot.
+Данный документ описывает комплексную архитектуру GUI для редактора NovelMind, полностью перестроенного с использованием Qt 6 Widgets. Архитектура следует модульному, событийно-ориентированному дизайну, вдохновленному профессиональными редакторами, такими как Unreal Engine, Unity и Godot.
 
-## Technology Stack
+## Технологический стек
 
 - **C++20**
 - **Qt 6.x**
-- **Qt Widgets** (primary UI framework)
-- **QDockWidget / QMainWindow** (docking system)
-- **QGraphicsView / QGraphicsScene** (graphs, timeline)
-- **Qt Model/View** (tables, trees)
-- **CMake** (build system)
-- **Platforms**: Windows / Linux
-- **High-DPI awareness**
-- **Dark theme by default**
+- **Qt Widgets** (основная UI-фреймворк)
+- **QDockWidget / QMainWindow** (система докинга)
+- **QGraphicsView / QGraphicsScene** (графы, временная шкала)
+- **Qt Model/View** (таблицы, деревья)
+- **CMake** (система сборки)
+- **Платформы**: Windows / Linux
+- **Поддержка High-DPI**
+- **Темная тема по умолчанию**
 
-## Architecture Layers
+## Уровни архитектуры
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -41,33 +41,33 @@ This document describes the comprehensive GUI architecture for the NovelMind Edi
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Welcome/Startup Screen
+## Экран приветствия/запуска
 
-The editor features a modern welcome screen inspired by Unreal Engine and Unity Hub:
+Редактор имеет современный экран приветствия, вдохновленный Unreal Engine и Unity Hub:
 
-**Features:**
-- Recent projects list with timestamps and quick access
-- Project templates (Blank, Visual Novel, Dating Sim, Mystery, RPG, Horror)
-- Quick action buttons (New Project, Open Project, Browse Examples)
-- Learning resources panel with documentation links
-- Search functionality for projects and templates
-- "Don't show again" option with persistent settings
-- Command-line `--no-welcome` flag to skip
+**Возможности:**
+- Список последних проектов с временными метками и быстрым доступом
+- Шаблоны проектов (Пустой, Визуальная новелла, Симулятор свиданий, Детектив, RPG, Хоррор)
+- Кнопки быстрых действий (Новый проект, Открыть проект, Просмотреть примеры)
+- Панель обучающих ресурсов со ссылками на документацию
+- Функциональность поиска для проектов и шаблонов
+- Опция "Не показывать снова" с постоянными настройками
+- Флаг командной строки `--no-welcome` для пропуска
 
-**Implementation:**
-- `NMWelcomeDialog` - Modal dialog shown on startup
-- Integrated into `main.cpp` startup flow
-- Uses QSettings for persistence
-- Unreal-like dark theme styling
+**Реализация:**
+- `NMWelcomeDialog` - Модальное диалоговое окно, показываемое при запуске
+- Интегрировано в поток запуска `main.cpp`
+- Использует QSettings для сохранения настроек
+- Стилизация в стиле темной темы Unreal
 
-## Core Components
+## Основные компоненты
 
-### 1. Event Bus (`QtEventBus`)
+### 1. Шина событий (`QtEventBus`)
 
-Central messaging system for loose coupling between components.
+Центральная система обмена сообщениями для слабой связи между компонентами.
 
 ```cpp
-// Event types
+// Типы событий
 enum class EditorEventType {
     SelectionChanged,
     PropertyChanged,
@@ -78,42 +78,42 @@ enum class EditorEventType {
     // ...
 };
 
-// Usage example
+// Пример использования
 QtEventBus::instance().publish(SelectionChangedEvent{selectedIds});
 QtEventBus::instance().subscribe<SelectionChangedEvent>([](const auto& e) {
-    // Handle event
+    // Обработка события
 });
 ```
 
-### 2. Selection System (`QtSelectionManager`)
+### 2. Система выбора (`QtSelectionManager`)
 
-Centralized selection management across all panels.
+Централизованное управление выбором во всех панелях.
 
-- Tracks selected objects (scene objects, graph nodes, timeline items, assets)
-- Supports multi-selection
-- Notifies listeners via Event Bus
-- Provides selection history for navigation
+- Отслеживает выбранные объекты (объекты сцены, узлы графа, элементы временной шкалы, ассеты)
+- Поддерживает множественный выбор
+- Уведомляет слушателей через шину событий
+- Предоставляет историю выбора для навигации
 
-### 3. Undo/Redo Command System (`NMUndoManager`)
+### 3. Система команд отмены/повтора (`NMUndoManager`)
 
-Centralized undo/redo management using Qt's `QUndoStack`.
+Централизованное управление отменой/повтором с использованием `QUndoStack` Qt.
 
-**Features:**
-- Global undo/redo stack for all editor operations
-- Command pattern for reversible actions
-- Command merging for smooth operations (e.g., continuous transforms)
-- Undo limit configuration (default: 100 operations)
-- Clean state tracking for unsaved changes
-- Macro support for grouping operations
-- Integration with Main Window menu/toolbar
-- Dynamic menu text updates
+**Возможности:**
+- Глобальный стек отмены/повтора для всех операций редактора
+- Паттерн команды для обратимых действий
+- Объединение команд для плавных операций (например, непрерывные трансформации)
+- Настройка лимита отмены (по умолчанию: 100 операций)
+- Отслеживание чистого состояния для несохраненных изменений
+- Поддержка макросов для группировки операций
+- Интеграция с меню/панелью инструментов главного окна
+- Динамическое обновление текста меню
 
-**Base Command Classes:**
-- `PropertyChangeCommand` - Property value modifications
-- `AddObjectCommand` / `DeleteObjectCommand` - Object lifecycle
-- `TransformObjectCommand` - Position/rotation/scale (with merging)
-- `CreateGraphNodeCommand` / `DeleteGraphNodeCommand` - Story graph nodes
-- `ConnectGraphNodesCommand` - Node connections
+**Базовые классы команд:**
+- `PropertyChangeCommand` - Изменения значений свойств
+- `AddObjectCommand` / `DeleteObjectCommand` - Жизненный цикл объектов
+- `TransformObjectCommand` - Позиция/вращение/масштаб (с объединением)
+- `CreateGraphNodeCommand` / `DeleteGraphNodeCommand` - Узлы графа истории
+- `ConnectGraphNodesCommand` - Соединения узлов
 
 ```cpp
 class MoveNodeCommand : public QUndoCommand {
@@ -124,206 +124,206 @@ public:
     int id() const override { return 1; }
 };
 
-// Usage
+// Использование
 NMUndoManager::instance().pushCommand(new PropertyChangeCommand(...));
 ```
 
-### 4. Play-In-Editor Bridge
+### 4. Мост Play-In-Editor
 
-Manages runtime embedding for previewing visual novels in the editor.
+Управляет встраиванием среды выполнения для предварительного просмотра визуальных новелл в редакторе.
 
-## Phased Implementation Roadmap
+## Дорожная карта поэтапной реализации
 
-### Phase 0 - Foundation
+### Фаза 0 - Фундамент
 
-**Goals:**
-- Application skeleton with Qt6
-- Main window with docking
-- Theme/Style system (Unreal-like dark theme)
-- Event Bus (basic)
-- Selection System (basic)
+**Цели:**
+- Каркас приложения с Qt6
+- Главное окно с докингом
+- Система темы/стиля (темная тема в стиле Unreal)
+- Шина событий (базовая)
+- Система выбора (базовая)
 
-**Key Classes:**
+**Ключевые классы:**
 - `NMMainWindow : QMainWindow`
 - `NMDockManager`
 - `NMStyleManager`
 - `QtEventBus`
 - `QtSelectionManager`
 
-**Qt Components:**
+**Компоненты Qt:**
 - `QMainWindow`
 - `QDockWidget`
 - `QApplication`
-- Qt Style Sheets (QSS)
+- Таблицы стилей Qt (QSS)
 
-**Definition of Done:**
-- [x] Editor launches with empty main window
-- [x] Docking framework functional
-- [x] Dark theme applied
-- [x] Event Bus can publish/subscribe events
-- [x] Selection System tracks basic selection
-- [x] Welcome/Startup screen with recent projects and templates
+**Критерии завершения:**
+- [x] Редактор запускается с пустым главным окном
+- [x] Функциональный фреймворк докинга
+- [x] Применена темная тема
+- [x] Шина событий может публиковать/подписываться на события
+- [x] Система выбора отслеживает базовый выбор
+- [x] Экран приветствия/запуска с последними проектами и шаблонами
 
-### Phase 1 - Core Panels (Read-Only)
+### Фаза 1 - Основные панели (только чтение)
 
-**Goals:**
-- SceneView panel (display only)
-- StoryGraph panel (display only)
-- Inspector panel (read-only properties)
-- Console panel (log display)
+**Цели:**
+- Панель SceneView (только отображение)
+- Панель StoryGraph (только отображение)
+- Панель Inspector (свойства только для чтения)
+- Панель Console (отображение лога)
 
-**Key Classes:**
+**Ключевые классы:**
 - `NMSceneViewPanel : NMDockPanel`
 - `NMStoryGraphPanel : NMDockPanel`
 - `NMInspectorPanel : NMDockPanel`
 - `NMConsolePanel : NMDockPanel`
 
-**Qt Components:**
+**Компоненты Qt:**
 - `QGraphicsView` / `QGraphicsScene`
 - `QTreeView` / `QTreeWidget`
 - `QListWidget`
 - `QTextEdit`
 
-**Definition of Done:**
-- [x] SceneView displays scene objects (no interaction)
-- [x] StoryGraph displays nodes and connections (no editing)
-- [x] Inspector shows properties of selected object
-- [x] Console displays log messages
-- [x] Asset Browser with tree/list split view
-- [x] Hierarchy panel with expand/collapse
+**Критерии завершения:**
+- [x] SceneView отображает объекты сцены (без взаимодействия)
+- [x] StoryGraph отображает узлы и соединения (без редактирования)
+- [x] Inspector показывает свойства выбранного объекта
+- [x] Console отображает сообщения лога
+- [x] Asset Browser с разделенным представлением дерева/списка
+- [x] Панель Hierarchy с разворачиванием/сворачиванием
 
-### Phase 2 - Editable Core
+### Фаза 2 - Редактируемое ядро
 
-**Goals:**
-- Object selection in all panels
-- Inspector property editing
-- Undo/Redo system
-- Basic drag-and-drop
-- Asset Browser (basic)
+**Цели:**
+- Выбор объектов во всех панелях
+- Редактирование свойств в Inspector
+- Система отмены/повтора
+- Базовое перетаскивание
+- Браузер ассетов (базовый)
 
-**Key Classes:**
+**Ключевые классы:**
 - `NMAssetBrowserPanel : NMDockPanel`
 - `NMPropertyEditor`
 - `NMUndoManager`
-- Various `QUndoCommand` subclasses
+- Различные подклассы `QUndoCommand`
 
-**Qt Components:**
+**Компоненты Qt:**
 - `QUndoStack`
-- `QMimeData` (drag-and-drop)
-- Custom property widgets
+- `QMimeData` (перетаскивание)
+- Пользовательские виджеты свойств
 
-**Definition of Done:**
-- [x] Undo/Redo system with QUndoStack
-- [x] Command pattern for all editor operations
-- [x] Undo/Redo integrated with Main Window
-- [ ] Click to select objects (framework ready)
-- [ ] Multi-select with Ctrl+Click (framework ready)
-- [ ] Inspector edits properties (Phase 2.2 - future work)
-- [x] Assets can be browsed
+**Критерии завершения:**
+- [x] Система отмены/повтора с QUndoStack
+- [x] Паттерн команды для всех операций редактора
+- [x] Отмена/повтор интегрированы с главным окном
+- [ ] Клик для выбора объектов (фреймворк готов)
+- [ ] Множественный выбор с Ctrl+Click (фреймворк готов)
+- [ ] Inspector редактирует свойства (Фаза 2.2 - будущая работа)
+- [x] Ассеты можно просматривать
 
-### Phase 3 - Advanced Editors
+### Фаза 3 - Продвинутые редакторы
 
-**Goals:**
-- StoryGraph node editing
-- Timeline Editor
-- Curve Editor
-- Hierarchy panel
+**Цели:**
+- Редактирование узлов StoryGraph
+- Редактор временной шкалы
+- Редактор кривых
+- Панель иерархии
 
-**Key Classes:**
+**Ключевые классы:**
 - `NMTimelinePanel : NMDockPanel`
 - `NMCurveEditorPanel : NMDockPanel`
 - `NMHierarchyPanel : NMDockPanel`
 - `NMGraphNodeItem : QGraphicsItem`
 - `NMGraphConnectionItem : QGraphicsItem`
 
-**Qt Components:**
-- Custom `QGraphicsItem` subclasses
-- `QTimeLine` (for animations)
-- Custom painting
+**Компоненты Qt:**
+- Пользовательские подклассы `QGraphicsItem`
+- `QTimeLine` (для анимаций)
+- Пользовательское рисование
 
-**Definition of Done:**
-- [x] Timeline Editor with multiple tracks
-- [x] Timeline playback controls and frame scrubbing
-- [x] Keyframe visualization
-- [x] Curve Editor with interpolation types
-- [x] Grid visualization and curve path rendering
-- [ ] Create/delete/connect nodes in StoryGraph (Phase 3.3 - future work)
-- [ ] Hierarchy drag-drop reordering (Phase 3.3 - future work)
+**Критерии завершения:**
+- [x] Редактор временной шкалы с множественными дорожками
+- [x] Управление воспроизведением временной шкалы и прокрутка кадров
+- [x] Визуализация ключевых кадров
+- [x] Редактор кривых с типами интерполяции
+- [x] Визуализация сетки и отрисовка пути кривой
+- [ ] Создание/удаление/соединение узлов в StoryGraph (Фаза 3.3 - будущая работа)
+- [ ] Перетаскивание для переупорядочивания в Hierarchy (Фаза 3.3 - будущая работа)
 
-### Phase 4 - Production Tools
+### Фаза 4 - Производственные инструменты
 
-**Goals:**
-- Voice Manager
-- Localization Manager
-- Diagnostics panel
-- Build Settings
+**Цели:**
+- Менеджер голоса
+- Менеджер локализации
+- Панель диагностики
+- Настройки сборки
 
-**Key Classes:**
+**Ключевые классы:**
 - `NMVoiceManagerPanel : NMDockPanel`
 - `NMLocalizationPanel : NMDockPanel`
 - `NMDiagnosticsPanel : NMDockPanel`
 - `NMBuildSettingsPanel : NMDockPanel`
 
-**Definition of Done:**
-- [x] Voice Manager panel with import/playback controls
-- [x] Voice file list and preview
-- [x] Localization Manager panel with language selector
-- [x] String table editor for translations
-- [x] Diagnostics panel with error/warning display
-- [x] Diagnostics filtering by type
-- [x] Build Settings panel with platform selector
-- [x] Build configuration options and output settings
+**Критерии завершения:**
+- [x] Панель Voice Manager с элементами управления импортом/воспроизведением
+- [x] Список голосовых файлов и предварительный просмотр
+- [x] Панель Localization Manager с выбором языка
+- [x] Редактор таблицы строк для переводов
+- [x] Панель Diagnostics с отображением ошибок/предупреждений
+- [x] Фильтрация диагностики по типу
+- [x] Панель Build Settings с выбором платформы
+- [x] Опции конфигурации сборки и настройки вывода
 
-### Phase 5 - Play-In-Editor
+### Фаза 5 - Play-In-Editor
 
-**Goals:**
-- Runtime embedding
-- Debug overlay
-- Breakpoints
-- Live variable inspection
+**Цели:**
+- Встраивание среды выполнения
+- Оверлей отладки
+- Точки останова
+- Живой инспектор переменных
 
-**Key Classes:**
-- `NMPlayModeController` - Central play/pause/stop coordinator
-- `NMPlayToolbarPanel` - Playback control UI
-- `NMDebugOverlayPanel` - Runtime variable inspection
-- Breakpoint integration in `NMGraphNodeItem`
+**Ключевые классы:**
+- `NMPlayModeController` - Центральный координатор воспроизведения/паузы/остановки
+- `NMPlayToolbarPanel` - UI управления воспроизведением
+- `NMDebugOverlayPanel` - Инспектор переменных среды выполнения
+- Интеграция точек останова в `NMGraphNodeItem`
 
-**Implementation Status (Phase 5.0 - Mock Runtime): ✅ COMPLETE**
-- [x] Play Mode Controller with state machine (Stopped/Playing/Paused)
-- [x] Mock runtime simulation (1 node/second, demo data)
-- [x] Play toolbar panel with Play/Pause/Stop/Step buttons
-- [x] Keyboard shortcuts (F5=Play, F6=Pause, F7=Stop, F10=Step)
-- [x] Debug overlay panel with 6 tabs (Variables/CallStack/Instruction/Animations/Audio/Performance)
-- [x] Variable editing when paused (double-click to edit)
-- [x] Breakpoint management system (add/remove/toggle/persist)
-- [x] Qt signals/slots for all state changes
-- [x] **Visual breakpoint indicators in StoryGraph (red circle with 3D effect)**
-- [x] **Current node highlighting during playback (pulsing green glow + execution arrow)**
-- [x] **Context menu for breakpoint toggle (right-click on node)**
-- [x] **Integration into main window (panels docked and registered)**
-- [x] **Auto-centering on currently executing node**
+**Статус реализации (Фаза 5.0 - Макет среды выполнения): ✅ ЗАВЕРШЕНО**
+- [x] Контроллер режима воспроизведения с конечным автоматом (Stopped/Playing/Paused)
+- [x] Симуляция макета среды выполнения (1 узел/секунду, демо-данные)
+- [x] Панель инструментов воспроизведения с кнопками Play/Pause/Stop/Step
+- [x] Горячие клавиши (F5=Play, F6=Pause, F7=Stop, F10=Step)
+- [x] Панель оверлея отладки с 6 вкладками (Variables/CallStack/Instruction/Animations/Audio/Performance)
+- [x] Редактирование переменных при паузе (двойной клик для редактирования)
+- [x] Система управления точками останова (добавление/удаление/переключение/сохранение)
+- [x] Qt сигналы/слоты для всех изменений состояния
+- [x] **Визуальные индикаторы точек останова в StoryGraph (красный круг с 3D эффектом)**
+- [x] **Подсветка текущего узла во время воспроизведения (пульсирующее зеленое свечение + стрелка выполнения)**
+- [x] **Контекстное меню для переключения точки останова (правый клик на узле)**
+- [x] **Интеграция в главное окно (панели прикреплены и зарегистрированы)**
+- [x] **Автоцентрирование на текущем выполняемом узле**
 
-**Definition of Done (Phase 5.0): ✅ ALL COMPLETE**
-- [x] Can play through demo nodes in mock runtime
-- [x] Debug overlay shows runtime variables and call stack
-- [x] Can add/remove breakpoints programmatically
-- [x] Can toggle breakpoints via UI (context menu)
-- [x] Live variables visible and editable during pause
-- [x] Visual feedback for breakpoints and execution state
-- [x] Professional keyboard shortcuts matching industry tools
+**Критерии завершения (Фаза 5.0): ✅ ВСЕ ЗАВЕРШЕНО**
+- [x] Можно воспроизводить демо-узлы в макете среды выполнения
+- [x] Оверлей отладки показывает переменные среды выполнения и стек вызовов
+- [x] Можно добавлять/удалять точки останова программно
+- [x] Можно переключать точки останова через UI (контекстное меню)
+- [x] Живые переменные видимы и редактируемы во время паузы
+- [x] Визуальная обратная связь для точек останова и состояния выполнения
+- [x] Профессиональные горячие клавиши, соответствующие отраслевым инструментам
 
-**Future Work (Phase 5.1+):**
-- [ ] Real runtime integration (replace mock with ScriptVM)
-- [ ] Runtime scene rendering in SceneView
-- [ ] Timeline playback synchronization
-- [ ] Hot reload during play mode
-- [ ] Advanced debugging (conditional breakpoints, watch expressions)
+**Будущая работа (Фаза 5.1+):**
+- [ ] Реальная интеграция среды выполнения (замена макета на ScriptVM)
+- [ ] Отрисовка сцены среды выполнения в SceneView
+- [ ] Синхронизация воспроизведения временной шкалы
+- [ ] Горячая перезагрузка во время режима воспроизведения
+- [ ] Продвинутая отладка (условные точки останова, выражения отслеживания)
 
-## Panel Specifications
+## Спецификации панелей
 
-### Main Window + Docking
+### Главное окно + Докинг
 
-The main window uses `QMainWindow` with `QDockWidget` for all panels. Layout is saved/restored via `QSettings`.
+Главное окно использует `QMainWindow` с `QDockWidget` для всех панелей. Макет сохраняется/восстанавливается через `QSettings`.
 
 ```cpp
 class NMMainWindow : public QMainWindow {
@@ -337,129 +337,129 @@ private:
     QMenuBar* m_menuBar;
     QToolBar* m_mainToolBar;
     QStatusBar* m_statusBar;
-    // Dock panels
+    // Панели докинга
     NMSceneViewPanel* m_sceneView;
     NMStoryGraphPanel* m_storyGraph;
     // ...
 };
 ```
 
-### SceneView Panel
+### Панель SceneView
 
-Displays the visual novel scene with objects, backgrounds, and characters.
+Отображает сцену визуальной новеллы с объектами, фонами и персонажами.
 
-- Uses `QGraphicsView` with custom `QGraphicsScene`
-- Supports pan (middle-mouse) and zoom (scroll wheel)
-- Grid overlay (optional)
-- Object selection rectangles
-- Transform gizmos (Phase 2+)
+- Использует `QGraphicsView` с пользовательской `QGraphicsScene`
+- Поддерживает панорамирование (средняя кнопка мыши) и масштабирование (колесико прокрутки)
+- Наложение сетки (опционально)
+- Прямоугольники выбора объектов
+- Гизмо трансформации (Фаза 2+)
 
-### StoryGraph Panel
+### Панель StoryGraph
 
-Node-based visual script editor.
+Редактор визуальных скриптов на основе узлов.
 
-- Uses `QGraphicsView` with custom node items
-- Custom `QGraphicsItem` for nodes
-- Bezier curve connections
-- Mini-map (optional)
-- Node palette for creating new nodes
+- Использует `QGraphicsView` с пользовательскими элементами узлов
+- Пользовательские `QGraphicsItem` для узлов
+- Соединения кривыми Безье
+- Мини-карта (опционально)
+- Палитра узлов для создания новых узлов
 
-### Inspector Panel
+### Панель Inspector
 
-Property editor for selected objects.
+Редактор свойств для выбранных объектов.
 
-- Uses `QScrollArea` with property widgets
-- Property groups (collapsible)
-- Various editors: text, number, color, dropdown, file picker
-- Multi-object editing (common properties)
+- Использует `QScrollArea` с виджетами свойств
+- Группы свойств (сворачиваемые)
+- Различные редакторы: текст, число, цвет, выпадающий список, выбор файла
+- Редактирование нескольких объектов (общие свойства)
 
-### Console Panel
+### Панель Console
 
-Log output and command input.
+Вывод лога и ввод команд.
 
-- Uses `QTextEdit` (read-only) for log display
-- Filter buttons (Info, Warning, Error)
-- Clear button
-- Auto-scroll option
-- Search/filter text input
+- Использует `QTextEdit` (только чтение) для отображения лога
+- Кнопки фильтра (Info, Warning, Error)
+- Кнопка очистки
+- Опция автопрокрутки
+- Поле ввода поиска/фильтра
 
-## Style Guide
+## Руководство по стилю
 
-### Color Palette (Unreal-like Dark Theme)
+### Цветовая палитра (темная тема в стиле Unreal)
 
 ```css
-/* Background colors */
---bg-darkest:     #1a1a1a;   /* Main background */
---bg-dark:        #232323;   /* Panel backgrounds */
---bg-medium:      #2d2d2d;   /* Widget backgrounds */
---bg-light:       #383838;   /* Hover states */
+/* Цвета фона */
+--bg-darkest:     #1a1a1a;   /* Основной фон */
+--bg-dark:        #232323;   /* Фон панелей */
+--bg-medium:      #2d2d2d;   /* Фон виджетов */
+--bg-light:       #383838;   /* Состояния при наведении */
 
-/* Text colors */
---text-primary:   #e0e0e0;   /* Primary text */
---text-secondary: #a0a0a0;   /* Secondary text */
---text-disabled:  #606060;   /* Disabled text */
+/* Цвета текста */
+--text-primary:   #e0e0e0;   /* Основной текст */
+--text-secondary: #a0a0a0;   /* Вторичный текст */
+--text-disabled:  #606060;   /* Отключенный текст */
 
-/* Accent colors */
---accent-primary: #0078d4;   /* Selection, focus */
---accent-hover:   #1a88e0;   /* Hover state */
---accent-active:  #006cbd;   /* Active state */
+/* Акцентные цвета */
+--accent-primary: #0078d4;   /* Выбор, фокус */
+--accent-hover:   #1a88e0;   /* Состояние при наведении */
+--accent-active:  #006cbd;   /* Активное состояние */
 
-/* Status colors */
+/* Цвета статуса */
 --error:          #f44336;
 --warning:        #ff9800;
 --success:        #4caf50;
 --info:           #2196f3;
 
-/* Border colors */
+/* Цвета границ */
 --border-dark:    #1a1a1a;
 --border-light:   #404040;
 ```
 
-### Typography
+### Типографика
 
-- **Font Family**: Segoe UI (Windows), Ubuntu (Linux), System default
-- **Base Size**: 9pt (11px at 96 DPI)
-- **Headers**: 10-12pt, semi-bold
-- **Monospace**: Consolas, Ubuntu Mono (for code/console)
+- **Семейство шрифтов**: Segoe UI (Windows), Ubuntu (Linux), системный по умолчанию
+- **Базовый размер**: 9pt (11px при 96 DPI)
+- **Заголовки**: 10-12pt, полужирный
+- **Моноширинный**: Consolas, Ubuntu Mono (для кода/консоли)
 
-### Spacing
+### Отступы
 
-- **Panel Padding**: 4px
-- **Widget Spacing**: 4px
-- **Group Spacing**: 8px
-- **Section Spacing**: 16px
+- **Отступы панелей**: 4px
+- **Расстояние между виджетами**: 4px
+- **Расстояние между группами**: 8px
+- **Расстояние между секциями**: 16px
 
-### Panel Behavior
+### Поведение панелей
 
-- Panels can be docked to any edge
-- Panels can be tabbed with other panels
-- Panels can float as separate windows
-- Panels remember their size and position
-- Double-click title bar to float/dock
+- Панели можно прикрепить к любому краю
+- Панели можно группировать вкладками с другими панелями
+- Панели могут быть отделены как отдельные окна
+- Панели запоминают свой размер и позицию
+- Двойной клик на заголовке для отделения/прикрепления
 
-### Widget States
+### Состояния виджетов
 
-All interactive widgets have distinct visual states:
+Все интерактивные виджеты имеют различимые визуальные состояния:
 
-- **Normal**: Default appearance
-- **Hover**: Slightly lighter background
-- **Pressed/Active**: Accent color highlight
-- **Focused**: Accent border
-- **Disabled**: Reduced opacity, gray text
-- **Selected**: Accent background
+- **Нормальное**: Внешний вид по умолчанию
+- **Наведение**: Слегка светлее фон
+- **Нажато/Активно**: Подсветка акцентным цветом
+- **Фокус**: Граница акцентного цвета
+- **Отключено**: Уменьшенная непрозрачность, серый текст
+- **Выбрано**: Фон акцентного цвета
 
-### Icons
+### Иконки
 
-- Use SVG icons for scalability
-- Icon size: 16x16 (toolbar), 24x24 (large actions)
-- Monochrome icons with accent color for active state
+- Использовать SVG иконки для масштабируемости
+- Размер иконок: 16x16 (панель инструментов), 24x24 (крупные действия)
+- Монохромные иконки с акцентным цветом для активного состояния
 
-## File Structure
+## Структура файлов
 
 ```
 editor/
 ├── include/NovelMind/editor/
-│   ├── qt/                         # Qt-specific implementations
+│   ├── qt/                         # Qt-специфичные реализации
 │   │   ├── nm_main_window.hpp
 │   │   ├── nm_dock_panel.hpp
 │   │   ├── nm_style_manager.hpp
@@ -482,7 +482,7 @@ editor/
 │   │       ├── nm_property_editor.hpp
 │   │       ├── nm_graph_node_item.hpp
 │   │       └── nm_timeline_track.hpp
-│   └── editor_app.hpp              # Main application (Qt version)
+│   └── editor_app.hpp              # Основное приложение (версия Qt)
 ├── src/
 │   ├── qt/
 │   │   ├── nm_main_window.cpp
@@ -491,37 +491,37 @@ editor/
 │   │   ├── qt_event_bus.cpp
 │   │   ├── qt_selection_manager.cpp
 │   │   ├── panels/
-│   │   │   └── ... (panel implementations)
+│   │   │   └── ... (реализации панелей)
 │   │   └── widgets/
-│   │       └── ... (widget implementations)
-│   └── main.cpp                    # Qt application entry point
+│   │       └── ... (реализации виджетов)
+│   └── main.cpp                    # Точка входа приложения Qt
 └── resources/
     ├── styles/
     │   └── dark_theme.qss
     └── icons/
-        └── ... (SVG icons)
+        └── ... (SVG иконки)
 ```
 
-## Scalability Principles
+## Принципы масштабируемости
 
-1. **Panel Registration**: Panels are registered with a factory, allowing new panels to be added without modifying core code.
+1. **Регистрация панелей**: Панели регистрируются с помощью фабрики, что позволяет добавлять новые панели без изменения основного кода.
 
-2. **Event-Driven Communication**: All panels communicate through Event Bus, preventing tight coupling.
+2. **Событийно-ориентированная коммуникация**: Все панели общаются через шину событий, предотвращая тесную связь.
 
-3. **Command Pattern**: All modifications go through the Undo/Redo system as commands.
+3. **Паттерн команды**: Все изменения проходят через систему отмены/повтора в виде команд.
 
-4. **Settings Persistence**: All user preferences saved via `QSettings`.
+4. **Сохранение настроек**: Все пользовательские настройки сохраняются через `QSettings`.
 
-5. **Plugin Architecture** (Future): Support for loadable panel plugins.
+5. **Архитектура плагинов** (Будущее): Поддержка загружаемых плагинов панелей.
 
-## Integration with Engine Core
+## Интеграция с ядром движка
 
-The GUI layer interfaces with the existing engine core through:
+Слой GUI взаимодействует с существующим ядром движка через:
 
-1. **SceneGraph**: Direct access to scene objects for display and manipulation
-2. **VisualGraph (IR)**: Story graph node data
-3. **VFS**: Asset loading and management
-4. **Logger**: Console output
-5. **PropertySystem**: Object property reflection
+1. **SceneGraph**: Прямой доступ к объектам сцены для отображения и манипулирования
+2. **VisualGraph (IR)**: Данные узлов графа истории
+3. **VFS**: Загрузка и управление ассетами
+4. **Logger**: Вывод консоли
+5. **PropertySystem**: Отражение свойств объектов
 
-The existing backend implementations (Event Bus, Selection System, etc.) are preserved and wrapped with Qt-compatible interfaces.
+Существующие бэкенд-реализации (шина событий, система выбора и т. д.) сохраняются и обернуты Qt-совместимыми интерфейсами.
