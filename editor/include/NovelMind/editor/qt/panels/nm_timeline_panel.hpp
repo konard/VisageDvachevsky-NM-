@@ -94,19 +94,14 @@ public:
     ~NMTimelinePanel() override;
 
     /**
-     * @brief Get panel name
-     */
-    [[nodiscard]] QString panelName() const override { return "Timeline"; }
-
-    /**
      * @brief Initialize the panel
      */
-    bool initialize() override;
+    void onInitialize() override;
 
     /**
      * @brief Shutdown the panel
      */
-    void shutdown() override;
+    void onShutdown() override;
 
     /**
      * @brief Update panel (called every frame)
@@ -205,7 +200,7 @@ private:
     // Timeline view
     QGraphicsView* m_timelineView = nullptr;
     QGraphicsScene* m_timelineScene = nullptr;
-    QGraphicsItem* m_playheadItem = nullptr;
+    QGraphicsLineItem* m_playheadItem = nullptr;
 
     // State
     QMap<QString, TimelineTrack*> m_tracks;

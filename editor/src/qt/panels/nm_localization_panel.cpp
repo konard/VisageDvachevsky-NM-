@@ -17,17 +17,13 @@ NMLocalizationPanel::NMLocalizationPanel(QWidget* parent)
 
 NMLocalizationPanel::~NMLocalizationPanel() = default;
 
-bool NMLocalizationPanel::initialize()
+void NMLocalizationPanel::onInitialize()
 {
-    if (m_initialized) return true;
     setupUI();
-    m_initialized = true;
-    return true;
 }
 
-void NMLocalizationPanel::shutdown()
+void NMLocalizationPanel::onShutdown()
 {
-    m_initialized = false;
 }
 
 void NMLocalizationPanel::setupUI()

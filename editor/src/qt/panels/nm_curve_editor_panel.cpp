@@ -6,6 +6,7 @@
 #include <QComboBox>
 #include <QGraphicsView>
 #include <QGraphicsScene>
+#include <QPainterPath>
 
 namespace NovelMind::editor::qt {
 
@@ -16,19 +17,13 @@ NMCurveEditorPanel::NMCurveEditorPanel(QWidget* parent)
 
 NMCurveEditorPanel::~NMCurveEditorPanel() = default;
 
-bool NMCurveEditorPanel::initialize()
+void NMCurveEditorPanel::onInitialize()
 {
-    if (m_initialized) return true;
-
     setupUI();
-
-    m_initialized = true;
-    return true;
 }
 
-void NMCurveEditorPanel::shutdown()
+void NMCurveEditorPanel::onShutdown()
 {
-    m_initialized = false;
 }
 
 void NMCurveEditorPanel::setupUI()

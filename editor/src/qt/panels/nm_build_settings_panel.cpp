@@ -18,17 +18,13 @@ NMBuildSettingsPanel::NMBuildSettingsPanel(QWidget* parent)
 
 NMBuildSettingsPanel::~NMBuildSettingsPanel() = default;
 
-bool NMBuildSettingsPanel::initialize()
+void NMBuildSettingsPanel::onInitialize()
 {
-    if (m_initialized) return true;
     setupUI();
-    m_initialized = true;
-    return true;
 }
 
-void NMBuildSettingsPanel::shutdown()
+void NMBuildSettingsPanel::onShutdown()
 {
-    m_initialized = false;
 }
 
 void NMBuildSettingsPanel::setupUI()

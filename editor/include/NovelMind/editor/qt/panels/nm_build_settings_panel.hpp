@@ -25,9 +25,8 @@ public:
     explicit NMBuildSettingsPanel(QWidget* parent = nullptr);
     ~NMBuildSettingsPanel() override;
 
-    [[nodiscard]] QString panelName() const override { return "Build Settings"; }
-    bool initialize() override;
-    void shutdown() override;
+    void onInitialize() override;
+    void onShutdown() override;
     void onUpdate(double deltaTime) override;
 
 private:

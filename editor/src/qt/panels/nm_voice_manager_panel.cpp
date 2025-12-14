@@ -14,17 +14,13 @@ NMVoiceManagerPanel::NMVoiceManagerPanel(QWidget* parent)
 
 NMVoiceManagerPanel::~NMVoiceManagerPanel() = default;
 
-bool NMVoiceManagerPanel::initialize()
+void NMVoiceManagerPanel::onInitialize()
 {
-    if (m_initialized) return true;
     setupUI();
-    m_initialized = true;
-    return true;
 }
 
-void NMVoiceManagerPanel::shutdown()
+void NMVoiceManagerPanel::onShutdown()
 {
-    m_initialized = false;
 }
 
 void NMVoiceManagerPanel::setupUI()

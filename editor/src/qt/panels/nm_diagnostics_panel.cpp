@@ -14,17 +14,13 @@ NMDiagnosticsPanel::NMDiagnosticsPanel(QWidget* parent)
 
 NMDiagnosticsPanel::~NMDiagnosticsPanel() = default;
 
-bool NMDiagnosticsPanel::initialize()
+void NMDiagnosticsPanel::onInitialize()
 {
-    if (m_initialized) return true;
     setupUI();
-    m_initialized = true;
-    return true;
 }
 
-void NMDiagnosticsPanel::shutdown()
+void NMDiagnosticsPanel::onShutdown()
 {
-    m_initialized = false;
 }
 
 void NMDiagnosticsPanel::setupUI()

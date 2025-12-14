@@ -24,9 +24,8 @@ public:
     explicit NMDiagnosticsPanel(QWidget* parent = nullptr);
     ~NMDiagnosticsPanel() override;
 
-    [[nodiscard]] QString panelName() const override { return "Diagnostics"; }
-    bool initialize() override;
-    void shutdown() override;
+    void onInitialize() override;
+    void onShutdown() override;
     void onUpdate(double deltaTime) override;
 
 private:

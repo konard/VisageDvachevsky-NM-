@@ -76,28 +76,21 @@ NMTimelinePanel::NMTimelinePanel(QWidget* parent)
 
 NMTimelinePanel::~NMTimelinePanel() = default;
 
-bool NMTimelinePanel::initialize()
+void NMTimelinePanel::onInitialize()
 {
-    if (m_initialized) return true;
-
     setupUI();
 
     // Create default tracks
     addTrack(TimelineTrackType::Audio, "Background Music");
     addTrack(TimelineTrackType::Animation, "Character Animation");
     addTrack(TimelineTrackType::Event, "Story Events");
-
-    m_initialized = true;
-    return true;
 }
 
-void NMTimelinePanel::shutdown()
+void NMTimelinePanel::onShutdown()
 {
     // Clean up tracks
     qDeleteAll(m_tracks);
     m_tracks.clear();
-
-    m_initialized = false;
 }
 
 void NMTimelinePanel::setupUI()

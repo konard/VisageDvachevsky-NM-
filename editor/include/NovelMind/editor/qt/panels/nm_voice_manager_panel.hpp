@@ -25,9 +25,8 @@ public:
     explicit NMVoiceManagerPanel(QWidget* parent = nullptr);
     ~NMVoiceManagerPanel() override;
 
-    [[nodiscard]] QString panelName() const override { return "Voice Manager"; }
-    bool initialize() override;
-    void shutdown() override;
+    void onInitialize() override;
+    void onShutdown() override;
     void onUpdate(double deltaTime) override;
 
 private:

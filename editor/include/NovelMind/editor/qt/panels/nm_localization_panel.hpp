@@ -23,9 +23,8 @@ public:
     explicit NMLocalizationPanel(QWidget* parent = nullptr);
     ~NMLocalizationPanel() override;
 
-    [[nodiscard]] QString panelName() const override { return "Localization Manager"; }
-    bool initialize() override;
-    void shutdown() override;
+    void onInitialize() override;
+    void onShutdown() override;
     void onUpdate(double deltaTime) override;
 
 private:
