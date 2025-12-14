@@ -371,6 +371,55 @@ void NMMainWindow::setupConnections() {
           &NMMainWindow::saveProjectRequested);
   connect(m_actionExit, &QAction::triggered, this, &QMainWindow::close);
 
+  // Connect scene view selection to inspector panel
+  connect(m_sceneViewPanel, &NMSceneViewPanel::objectSelected, this,
+          [this](const QString &objectId) {
+            if (objectId.isEmpty()) {
+              m_inspectorPanel->showNoSelection();
+            } else {
+              // Get object type from scene
+              auto *obj =
+                  m_sceneViewPanel->graphicsScene()->findSceneObject(objectId);
+              QString objectType = "SceneObject";
+              if (obj) {
+                switch (obj->objectType()) {
+                case NMSceneObjectType::Background:
+                  objectType = "Background";
+                  break;
+                case NMSceneObjectType::Character:
+                  objectType = "Character";
+                  break;
+                case NMSceneObjectType::UI:
+                  objectType = "UI Element";
+                  break;
+                case NMSceneObjectType::Effect:
+                  objectType = "Effect";
+                  break;
+                }
+              }
+              m_inspectorPanel->inspectObject(objectType, objectId);
+            }
+          });
+
+  // Connect story graph node selection to inspector panel
+  connect(m_storyGraphPanel, &NMStoryGraphPanel::nodeSelected, this,
+          [this](uint64_t nodeId) {
+            if (nodeId == 0) {
+              m_inspectorPanel->showNoSelection();
+            } else {
+              // Find the node to get its type
+              auto *node = m_storyGraphPanel->findNodeByIdString(
+                  QString("node_%1").arg(nodeId));
+              QString nodeType = "Node";
+              QString nodeIdStr = QString::number(nodeId);
+              if (node) {
+                nodeType = node->nodeType();
+                nodeIdStr = node->nodeIdString();
+              }
+              m_inspectorPanel->inspectObject(nodeType, nodeIdStr);
+            }
+          });
+
   // Edit menu - connect to undo manager
   connect(m_actionUndo, &QAction::triggered, &NMUndoManager::instance(),
           &NMUndoManager::undo);

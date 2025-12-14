@@ -264,6 +264,120 @@ void NMTransformGizmo::clearGizmo() {
   }
 }
 
+GizmoHandle NMTransformGizmo::hitTest(const QPointF &localPos) const {
+  const qreal hitRadius = 15.0;
+
+  switch (m_mode) {
+  case GizmoMode::Move: {
+    // Check X axis
+    if (localPos.y() > -hitRadius && localPos.y() < hitRadius &&
+        localPos.x() > 0 && localPos.x() < 70) {
+      return GizmoHandle::AxisX;
+    }
+    // Check Y axis
+    if (localPos.x() > -hitRadius && localPos.x() < hitRadius &&
+        localPos.y() > 0 && localPos.y() < 70) {
+      return GizmoHandle::AxisY;
+    }
+    // Check center
+    if (QLineF(QPointF(0, 0), localPos).length() < hitRadius) {
+      return GizmoHandle::Center;
+    }
+    break;
+  }
+  case GizmoMode::Rotate: {
+    // Check rotation handles on the circle
+    const qreal radius = 60.0;
+    qreal dist = QLineF(QPointF(0, 0), localPos).length();
+    if (dist > radius - hitRadius && dist < radius + hitRadius) {
+      return GizmoHandle::RotateHandle;
+    }
+    break;
+  }
+  case GizmoMode::Scale: {
+    // Check corner handles
+    const qreal size = 50.0;
+    QList<QPointF> corners = {QPointF(-size, -size), QPointF(size, -size),
+                              QPointF(-size, size), QPointF(size, size)};
+    for (const auto &corner : corners) {
+      if (QLineF(corner, localPos).length() < hitRadius) {
+        return GizmoHandle::ScaleCorner;
+      }
+    }
+    break;
+  }
+  }
+  return GizmoHandle::None;
+}
+
+void NMTransformGizmo::startDrag(const QPointF &scenePos, GizmoHandle handle) {
+  if (!m_targetObject || handle == GizmoHandle::None)
+    return;
+
+  m_isDragging = true;
+  m_activeHandle = handle;
+  m_dragStartPos = scenePos;
+  m_targetStartPos = m_targetObject->pos();
+  m_targetStartRotation = m_targetObject->rotation();
+  m_targetStartScaleX = m_targetObject->scale();
+  m_targetStartScaleY = m_targetObject->scale();
+}
+
+void NMTransformGizmo::updateDrag(const QPointF &scenePos) {
+  if (!m_isDragging || !m_targetObject)
+    return;
+
+  QPointF delta = scenePos - m_dragStartPos;
+
+  switch (m_activeHandle) {
+  case GizmoHandle::AxisX:
+    // Constrain movement to X axis
+    m_targetObject->setPos(m_targetStartPos.x() + delta.x(),
+                           m_targetStartPos.y());
+    break;
+  case GizmoHandle::AxisY:
+    // Constrain movement to Y axis
+    m_targetObject->setPos(m_targetStartPos.x(),
+                           m_targetStartPos.y() + delta.y());
+    break;
+  case GizmoHandle::Center:
+    // Free movement
+    m_targetObject->setPos(m_targetStartPos + delta);
+    break;
+  case GizmoHandle::RotateHandle: {
+    // Calculate rotation based on angle from center
+    QPointF center = pos();
+    qreal startAngle =
+        qAtan2(m_dragStartPos.y() - center.y(), m_dragStartPos.x() - center.x());
+    qreal currentAngle =
+        qAtan2(scenePos.y() - center.y(), scenePos.x() - center.x());
+    qreal angleDelta = qRadiansToDegrees(currentAngle - startAngle);
+    m_targetObject->setRotation(m_targetStartRotation + angleDelta);
+    break;
+  }
+  case GizmoHandle::ScaleCorner: {
+    // Calculate scale based on distance from center
+    QPointF center = pos();
+    qreal startDist = QLineF(center, m_dragStartPos).length();
+    qreal currentDist = QLineF(center, scenePos).length();
+    if (startDist > 1.0) {
+      qreal scaleFactor = currentDist / startDist;
+      m_targetObject->setScale(m_targetStartScaleX * scaleFactor);
+    }
+    break;
+  }
+  default:
+    break;
+  }
+
+  updatePosition();
+}
+
+void NMTransformGizmo::endDrag() {
+  m_isDragging = false;
+  m_activeHandle = GizmoHandle::None;
+}
+
 // ============================================================================
 // NMSceneGraphicsScene
 // ============================================================================
@@ -413,17 +527,29 @@ void NMSceneGraphicsScene::drawBackground(QPainter *painter,
 
 void NMSceneGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   if (event->button() == Qt::LeftButton) {
+    // First, check if we clicked on the gizmo
+    if (m_gizmo && m_gizmo->isVisible()) {
+      QPointF gizmoLocal = m_gizmo->mapFromScene(event->scenePos());
+      GizmoHandle handle = m_gizmo->hitTest(gizmoLocal);
+      if (handle != GizmoHandle::None) {
+        m_gizmo->startDrag(event->scenePos(), handle);
+        event->accept();
+        return;
+      }
+    }
+
     // Check if we clicked on a scene object
     QGraphicsItem *item = itemAt(event->scenePos(), QTransform());
 
-    // Skip gizmo items
-    while (item && item->parentItem()) {
-      if (item->parentItem() == m_gizmo) {
-        // Clicked on gizmo, let default handling work
+    // Skip gizmo items - check if the item is part of the gizmo
+    QGraphicsItem *checkItem = item;
+    while (checkItem) {
+      if (checkItem == m_gizmo) {
+        // Clicked on gizmo visual but not on a handle, ignore
         QGraphicsScene::mousePressEvent(event);
         return;
       }
-      item = item->parentItem();
+      checkItem = checkItem->parentItem();
     }
 
     // Check if it's a scene object
@@ -437,6 +563,36 @@ void NMSceneGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   }
 
   QGraphicsScene::mousePressEvent(event);
+}
+
+void NMSceneGraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
+  // Handle gizmo dragging
+  if (m_gizmo && m_gizmo->isDragging()) {
+    m_gizmo->updateDrag(event->scenePos());
+    if (m_selectedObject) {
+      emit objectPositionChanged(m_selectedObject->id(), m_selectedObject->pos());
+    }
+    event->accept();
+    return;
+  }
+
+  QGraphicsScene::mouseMoveEvent(event);
+}
+
+void NMSceneGraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
+  if (event->button() == Qt::LeftButton) {
+    // End gizmo dragging
+    if (m_gizmo && m_gizmo->isDragging()) {
+      m_gizmo->endDrag();
+      if (m_selectedObject) {
+        emit objectTransformChanged(m_selectedObject->id());
+      }
+      event->accept();
+      return;
+    }
+  }
+
+  QGraphicsScene::mouseReleaseEvent(event);
 }
 
 void NMSceneGraphicsScene::updateGizmo() {

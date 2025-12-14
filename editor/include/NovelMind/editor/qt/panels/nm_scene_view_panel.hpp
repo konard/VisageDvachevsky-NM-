@@ -61,7 +61,12 @@ private:
 };
 
 /**
- * @brief Transform gizmo for moving objects
+ * @brief Transform gizmo handle types for interaction
+ */
+enum class GizmoHandle { None, AxisX, AxisY, Center, RotateHandle, ScaleCorner };
+
+/**
+ * @brief Transform gizmo for moving, rotating, and scaling objects
  */
 class NMTransformGizmo : public QGraphicsItemGroup {
 public:
@@ -77,6 +82,13 @@ public:
 
   void updatePosition();
 
+  // Interaction methods
+  [[nodiscard]] bool isDragging() const { return m_isDragging; }
+  void startDrag(const QPointF &scenePos, GizmoHandle handle);
+  void updateDrag(const QPointF &scenePos);
+  void endDrag();
+  [[nodiscard]] GizmoHandle hitTest(const QPointF &localPos) const;
+
 private:
   void createMoveGizmo();
   void createRotateGizmo();
@@ -85,6 +97,15 @@ private:
 
   GizmoMode m_mode = GizmoMode::Move;
   NMSceneObject *m_targetObject = nullptr;
+
+  // Dragging state
+  bool m_isDragging = false;
+  GizmoHandle m_activeHandle = GizmoHandle::None;
+  QPointF m_dragStartPos;
+  QPointF m_targetStartPos;
+  qreal m_targetStartRotation = 0.0;
+  qreal m_targetStartScaleX = 1.0;
+  qreal m_targetStartScaleY = 1.0;
 };
 
 /**
@@ -121,10 +142,13 @@ public:
 signals:
   void objectSelected(const QString &objectId);
   void objectPositionChanged(const QString &objectId, const QPointF &position);
+  void objectTransformChanged(const QString &objectId);
 
 protected:
   void drawBackground(QPainter *painter, const QRectF &rect) override;
   void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+  void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+  void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
   void updateGizmo();

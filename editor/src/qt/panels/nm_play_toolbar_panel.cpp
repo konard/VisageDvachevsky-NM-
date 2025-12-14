@@ -107,7 +107,11 @@ void NMPlayToolbarPanel::setupUI() {
   layout->addWidget(toolbar);
   layout->addStretch();
 
-  setLayout(layout);
+  // Create a container widget and use setContentWidget instead of setLayout
+  // to avoid "QWidget::setLayout: Attempting to set QLayout" warning
+  auto *container = new QWidget(this);
+  container->setLayout(layout);
+  setContentWidget(container);
 }
 
 void NMPlayToolbarPanel::updateButtonStates() {

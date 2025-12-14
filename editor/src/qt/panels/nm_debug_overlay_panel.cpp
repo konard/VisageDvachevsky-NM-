@@ -219,7 +219,12 @@ void NMDebugOverlayPanel::setupUI() {
   }
 
   layout->addWidget(m_tabWidget);
-  setLayout(layout);
+
+  // Create a container widget and use setContentWidget instead of setLayout
+  // to avoid "QWidget::setLayout: Attempting to set QLayout" warning
+  auto *container = new QWidget(this);
+  container->setLayout(layout);
+  setContentWidget(container);
 }
 
 void NMDebugOverlayPanel::updateVariablesTab(const QVariantMap &variables) {

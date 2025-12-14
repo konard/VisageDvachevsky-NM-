@@ -383,6 +383,194 @@ void NMIconManager::initializeIcons() {
       "<svg viewBox='0 0 16 16'>"
       "<path fill='%COLOR%' d='M11 8L5 2 4 3l5 5-5 5 1 1z'/>"
       "</svg>";
+
+  // =========================================================================
+  // GIZMO/TRANSFORM ICONS
+  // =========================================================================
+  m_iconSvgData["gizmo-move"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<path fill='%COLOR%' d='M8 1l3 3H9v3h3V5l3 3-3 3V9H9v3h2l-3 3-3-3h2V9H4v2l-3-3 3-3v2h3V4H5l3-3z'/>"
+      "</svg>";
+
+  m_iconSvgData["gizmo-rotate"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<path fill='%COLOR%' d='M8 1c3.9 0 7 3.1 7 7h-2c0-2.8-2.2-5-5-5S3 5.2 3 8s2.2 5 5 5v2c-3.9 0-7-3.1-7-7s3.1-7 7-7z'/>"
+      "<path fill='%COLOR%' d='M11 8l3-3v6z'/>"
+      "</svg>";
+
+  m_iconSvgData["gizmo-scale"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<rect fill='%COLOR%' x='2' y='2' width='4' height='4'/>"
+      "<rect fill='%COLOR%' x='10' y='2' width='4' height='4'/>"
+      "<rect fill='%COLOR%' x='2' y='10' width='4' height='4'/>"
+      "<rect fill='%COLOR%' x='10' y='10' width='4' height='4'/>"
+      "<path fill='%COLOR%' d='M7 4h2v8H7zM4 7h8v2H4z'/>"
+      "</svg>";
+
+  // =========================================================================
+  // NODE TYPE ICONS
+  // =========================================================================
+  m_iconSvgData["node-entry"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<path fill='%COLOR%' d='M3 2v12l10-6z'/>"
+      "</svg>";
+
+  m_iconSvgData["node-dialogue"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<path fill='%COLOR%' d='M2 2h12c.6 0 1 .4 1 1v8c0 .6-.4 1-1 1h-3l-3 3v-3H2c-.6 0-1-.4-1-1V3c0-.6.4-1 1-1z'/>"
+      "<rect fill='#2d2d2d' x='4' y='5' width='8' height='1'/>"
+      "<rect fill='#2d2d2d' x='4' y='7' width='5' height='1'/>"
+      "</svg>";
+
+  m_iconSvgData["node-choice"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<path fill='%COLOR%' d='M8 1l7 7-7 7-7-7z'/>"
+      "<path fill='#2d2d2d' d='M8 5v2h2v2H8v2l-3-3z'/>"
+      "</svg>";
+
+  m_iconSvgData["node-scene"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<rect fill='%COLOR%' x='1' y='2' width='14' height='10' rx='1'/>"
+      "<rect fill='#2d2d2d' x='2' y='3' width='12' height='8'/>"
+      "<circle fill='%COLOR%' cx='5' cy='6' r='2'/>"
+      "<path fill='%COLOR%' d='M3 11l3-3 2 1 3-4 3 3v3z'/>"
+      "</svg>";
+
+  m_iconSvgData["node-label"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<path fill='%COLOR%' d='M14 2H2c-.6 0-1 .4-1 1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V3c0-.6-.4-1-1-1zM2 13V3h12v10H2z'/>"
+      "<rect fill='%COLOR%' x='4' y='6' width='8' height='1'/>"
+      "<rect fill='%COLOR%' x='4' y='9' width='5' height='1'/>"
+      "</svg>";
+
+  m_iconSvgData["node-script"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<path fill='%COLOR%' d='M4 2L1 5v9h9l3-3V2H4zM3 5l2-2h7v7l-2 2H3V5z'/>"
+      "<rect fill='%COLOR%' x='4' y='5' width='5' height='1'/>"
+      "<rect fill='%COLOR%' x='4' y='7' width='6' height='1'/>"
+      "<rect fill='%COLOR%' x='4' y='9' width='4' height='1'/>"
+      "</svg>";
+
+  // =========================================================================
+  // OBJECT TYPE ICONS
+  // =========================================================================
+  m_iconSvgData["object-background"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<rect fill='%COLOR%' x='1' y='2' width='14' height='12' rx='1'/>"
+      "<circle fill='%COLOR%' cx='12' cy='5' r='1.5' opacity='0.6'/>"
+      "<path fill='%COLOR%' d='M1 11l4-4 2 2 4-5 4 5v5H1z' opacity='0.6'/>"
+      "</svg>";
+
+  m_iconSvgData["object-character"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<circle fill='%COLOR%' cx='8' cy='4' r='3'/>"
+      "<path fill='%COLOR%' d='M8 8c-3 0-5 2-5 4v2h10v-2c0-2-2-4-5-4z'/>"
+      "</svg>";
+
+  m_iconSvgData["object-ui"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<rect fill='%COLOR%' x='1' y='1' width='14' height='14' rx='1' fill='none' stroke='%COLOR%' stroke-width='1.5'/>"
+      "<rect fill='%COLOR%' x='3' y='10' width='10' height='3' rx='0.5'/>"
+      "</svg>";
+
+  m_iconSvgData["object-effect"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<path fill='%COLOR%' d='M8 1l1.5 4H14l-3.5 3 1.5 5L8 10l-4 3 1.5-5L2 5h4.5z'/>"
+      "</svg>";
+
+  // =========================================================================
+  // FOLDER AND ASSET ICONS
+  // =========================================================================
+  m_iconSvgData["folder"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<path fill='%COLOR%' d='M14 4h-4.38l-1.3-1.3c-.2-.2-.45-.3-.7-.3H2c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V5c0-.55-.45-1-1-1z'/>"
+      "</svg>";
+
+  m_iconSvgData["folder-open"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<path fill='%COLOR%' d='M14 4h-4.38l-1.3-1.3c-.2-.2-.45-.3-.7-.3H2c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V5c0-.55-.45-1-1-1zm0 9H2V6h12v7z'/>"
+      "</svg>";
+
+  m_iconSvgData["asset-image"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<rect fill='%COLOR%' x='1' y='2' width='14' height='12' rx='1'/>"
+      "<circle fill='#2d2d2d' cx='4' cy='5' r='1.5'/>"
+      "<path fill='#2d2d2d' d='M1 11l3-3 2 1 4-4 5 4v5H1z'/>"
+      "</svg>";
+
+  m_iconSvgData["asset-audio"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<path fill='%COLOR%' d='M11 1v12.7c-.3-.2-.7-.3-1.1-.3-1.3 0-2.4.9-2.4 2.1s1.1 2.1 2.4 2.1 2.4-.9 2.4-2.1V4h3V1h-4.3z'/>"
+      "</svg>";
+
+  m_iconSvgData["asset-script"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<path fill='%COLOR%' d='M10 0H3c-.55 0-1 .45-1 1v14c0 .55.45 1 1 1h10c.55 0 1-.45 1-1V4l-4-4zM3 15V1h6v4h4v10H3z'/>"
+      "<rect fill='%COLOR%' x='4' y='7' width='6' height='1'/>"
+      "<rect fill='%COLOR%' x='4' y='9' width='8' height='1'/>"
+      "<rect fill='%COLOR%' x='4' y='11' width='5' height='1'/>"
+      "</svg>";
+
+  // =========================================================================
+  // BREAKPOINT AND DEBUG ICONS
+  // =========================================================================
+  m_iconSvgData["breakpoint"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<circle fill='%COLOR%' cx='8' cy='8' r='6'/>"
+      "</svg>";
+
+  m_iconSvgData["breakpoint-disabled"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<circle fill='none' stroke='%COLOR%' stroke-width='2' cx='8' cy='8' r='5'/>"
+      "</svg>";
+
+  m_iconSvgData["debug-continue"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<path fill='%COLOR%' d='M3 2v12l8-6z'/>"
+      "<rect fill='%COLOR%' x='12' y='2' width='2' height='12'/>"
+      "</svg>";
+
+  m_iconSvgData["debug-step-into"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<path fill='%COLOR%' d='M8 2v7l-3-3-1 1 4.5 4.5L13 7l-1-1-3 3V2z'/>"
+      "<rect fill='%COLOR%' x='3' y='13' width='10' height='1'/>"
+      "</svg>";
+
+  m_iconSvgData["debug-step-over"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<path fill='%COLOR%' d='M2 8c0-3.3 2.7-6 6-6v2c-2.2 0-4 1.8-4 4s1.8 4 4 4v-2l4 3-4 3v-2c-3.3 0-6-2.7-6-6z'/>"
+      "</svg>";
+
+  m_iconSvgData["debug-step-out"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<path fill='%COLOR%' d='M8 14V7l3 3 1-1-4.5-4.5L3 9l1 1 3-3v7z'/>"
+      "<rect fill='%COLOR%' x='3' y='2' width='10' height='1'/>"
+      "</svg>";
+
+  // =========================================================================
+  // VISIBILITY AND LOCK ICONS
+  // =========================================================================
+  m_iconSvgData["eye-open"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<path fill='%COLOR%' d='M8 3C3 3 0 8 0 8s3 5 8 5 8-5 8-5-3-5-8-5zm0 8c-1.7 0-3-1.3-3-3s1.3-3 3-3 3 1.3 3 3-1.3 3-3 3z'/>"
+      "<circle fill='%COLOR%' cx='8' cy='8' r='1.5'/>"
+      "</svg>";
+
+  m_iconSvgData["eye-closed"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<path fill='%COLOR%' d='M14.6 2l-1.4-1.4L2 11.8l1.4 1.4L14.6 2z'/>"
+      "<path fill='%COLOR%' d='M8 3C4.5 3 2 5.5 0 8c.6.8 1.5 1.8 2.6 2.6l1.5-1.5C3.4 8.4 3 7.3 3 6c0-1.9 1.6-3.5 3.5-3.5.9 0 1.7.4 2.3 1l1.5-1.5C9.4 2 8.7 2 8 2zM8 11c-.9 0-1.7-.4-2.3-1L4.2 11.5c.8.3 1.6.5 2.3.5 3.5 0 6-2.5 8-5-.6-.8-1.5-1.8-2.6-2.6l-1.5 1.5c.7.7 1.1 1.8 1.1 3 0 1.9-1.6 3.5-3.5 3.5z'/>"
+      "</svg>";
+
+  m_iconSvgData["lock"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<path fill='%COLOR%' d='M12 6V4c0-2.2-1.8-4-4-4S4 1.8 4 4v2c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM6 4c0-1.1.9-2 2-2s2 .9 2 2v2H6V4zm6 10H4V8h8v6z'/>"
+      "</svg>";
+
+  m_iconSvgData["unlock"] =
+      "<svg viewBox='0 0 16 16'>"
+      "<path fill='%COLOR%' d='M12 6H5V4c0-1.1.9-2 2-2s2 .9 2 2h2c0-2.2-1.8-4-4-4S3 1.8 3 4v2c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h9c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 8H3V8h9v6z'/>"
+      "</svg>";
 }
 
 QIcon NMIconManager::getIcon(const QString &iconName, int size,
