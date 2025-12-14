@@ -1,54 +1,54 @@
-# NM Script 1.0 Language Specification
+# Спецификация языка NM Script 1.0
 
-## Overview
+## Обзор
 
-NM Script is a domain-specific language designed for visual novel development in the NovelMind engine. It provides a clean, intuitive syntax for defining characters, scenes, dialogues, choices, and game logic.
+NM Script — это предметно-ориентированный язык, разработанный для создания визуальных новелл в движке NovelMind. Он предоставляет чистый и интуитивный синтаксис для определения персонажей, сцен, диалогов, выборов и игровой логики.
 
-## Version Information
+## Информация о версии
 
-- **Version**: 1.0
-- **Status**: Draft
-- **Last Updated**: 2025-12-10
+- **Версия**: 1.0
+- **Статус**: Черновик
+- **Последнее обновление**: 2025-12-10
 
-## Table of Contents
+## Содержание
 
-1. [Lexical Structure](#lexical-structure)
-2. [Data Types](#data-types)
-3. [Character Declarations](#character-declarations)
-4. [Scene Declarations](#scene-declarations)
-5. [Statements](#statements)
-6. [Expressions](#expressions)
-7. [Control Flow](#control-flow)
-8. [Built-in Commands](#built-in-commands)
-9. [Comments](#comments)
-10. [Reserved Keywords](#reserved-keywords)
-11. [Grammar (EBNF)](#grammar-ebnf)
-12. [Semantic Rules](#semantic-rules)
-13. [Compatibility Policy](#compatibility-policy)
+1. [Лексическая структура](#лексическая-структура)
+2. [Типы данных](#типы-данных)
+3. [Объявление персонажей](#объявление-персонажей)
+4. [Объявление сцен](#объявление-сцен)
+5. [Операторы](#операторы)
+6. [Выражения](#выражения)
+7. [Управление потоком](#управление-потоком)
+8. [Встроенные команды](#встроенные-команды)
+9. [Комментарии](#комментарии)
+10. [Зарезервированные ключевые слова](#зарезервированные-ключевые-слова)
+11. [Грамматика (EBNF)](#грамматика-ebnf)
+12. [Семантические правила](#семантические-правила)
+13. [Политика совместимости](#политика-совместимости)
 
 ---
 
-## 1. Lexical Structure
+## 1. Лексическая структура
 
-### Identifiers
+### Идентификаторы
 
-Identifiers must start with a letter (a-z, A-Z) or underscore (_), followed by any combination of letters, digits (0-9), or underscores.
+Идентификаторы должны начинаться с буквы (a-z, A-Z) или подчёркивания (_), за которым следует любая комбинация букв, цифр (0-9) или подчёркиваний.
 
 ```
 identifier ::= [a-zA-Z_][a-zA-Z0-9_]*
 ```
 
-Valid examples: `hero`, `_private`, `character1`, `MainScene`
+Допустимые примеры: `hero`, `_private`, `character1`, `MainScene`
 
-### String Literals
+### Строковые литералы
 
-String literals are enclosed in double quotes. Escape sequences are supported:
+Строковые литералы заключаются в двойные кавычки. Поддерживаются escape-последовательности:
 
-- `\n` - newline
-- `\t` - tab
-- `\\` - backslash
-- `\"` - double quote
-- `\{` - literal opening brace (escape rich text command)
+- `\n` - новая строка
+- `\t` - табуляция
+- `\\` - обратный слеш
+- `\"` - двойная кавычка
+- `\{` - литеральная открывающая фигурная скобка (экранирование команды форматированного текста)
 
 ```nms
 "Hello, World!"
@@ -56,18 +56,18 @@ String literals are enclosed in double quotes. Escape sequences are supported:
 "He said \"Hello\""
 ```
 
-### Number Literals
+### Числовые литералы
 
-Numbers can be integers or floating-point:
+Числа могут быть целыми или с плавающей точкой:
 
 ```nms
-42          // integer
-3.14        // float
--17         // negative integer
-0.5         // decimal less than 1
+42          // целое число
+3.14        // число с плавающей точкой
+-17         // отрицательное целое число
+0.5         // десятичная дробь меньше 1
 ```
 
-### Boolean Literals
+### Логические литералы
 
 ```nms
 true
@@ -76,64 +76,64 @@ false
 
 ---
 
-## 2. Data Types
+## 2. Типы данных
 
-NM Script supports the following data types:
+NM Script поддерживает следующие типы данных:
 
-| Type | Description | Example |
+| Тип | Описание | Пример |
 |------|-------------|---------|
-| `string` | Text data | `"Hello"` |
-| `int` | Integer numbers | `42` |
-| `float` | Floating-point numbers | `3.14` |
-| `bool` | Boolean values | `true`, `false` |
-| `void` | No value (for commands) | - |
+| `string` | Текстовые данные | `"Hello"` |
+| `int` | Целые числа | `42` |
+| `float` | Числа с плавающей точкой | `3.14` |
+| `bool` | Логические значения | `true`, `false` |
+| `void` | Отсутствие значения (для команд) | - |
 
-Type coercion is automatic in most cases:
-- `int` to `float`: implicit
-- `float` to `int`: implicit (truncates)
-- Any to `string`: implicit in string contexts
-- Any to `bool`: 0, 0.0, "", and false are falsy; all else is truthy
+Приведение типов автоматическое в большинстве случаев:
+- `int` в `float`: неявное
+- `float` в `int`: неявное (усекается)
+- Любой в `string`: неявное в строковых контекстах
+- Любой в `bool`: 0, 0.0, "", и false являются ложными; всё остальное истинно
 
 ---
 
-## 3. Character Declarations
+## 3. Объявление персонажей
 
-Characters must be declared before use. The declaration defines the character's identifier, display name, and optional styling.
+Персонажи должны быть объявлены перед использованием. Объявление определяет идентификатор персонажа, отображаемое имя и необязательное оформление.
 
-### Syntax
+### Синтаксис
 
 ```nms
 character <id>(<properties>)
 ```
 
-### Properties
+### Свойства
 
-| Property | Type | Required | Description |
+| Свойство | Тип | Обязательно | Описание |
 |----------|------|----------|-------------|
-| `name` | string | Yes | Display name shown in dialogue |
-| `color` | string | No | Name color (hex: `"#RRGGBB"`) |
-| `voice` | string | No | Voice track identifier |
+| `name` | string | Да | Отображаемое имя в диалоге |
+| `color` | string | Нет | Цвет имени (hex: `"#RRGGBB"`) |
+| `voice` | string | Нет | Идентификатор озвучки |
 
-### Examples
+### Примеры
 
 ```nms
-// Basic character
+// Базовый персонаж
 character Hero(name="Alex")
 
-// Character with styling
+// Персонаж с оформлением
 character Villain(name="Lord Darkness", color="#FF0000")
 
-// Character with voice
+// Персонаж с озвучкой
 character Narrator(name="Narrator", voice="narrator_voice")
 ```
 
 ---
 
-## 4. Scene Declarations
+## 4. Объявление сцен
 
-Scenes are the primary organizational unit in NM Script. Each scene contains a sequence of statements.
+Сцены являются основной организационной единицей в NM Script. Каждая сцена содержит последовательность операторов.
 
-### Syntax
+### Синтаксис
 
 ```nms
 scene <id> {
@@ -141,13 +141,13 @@ scene <id> {
 }
 ```
 
-### Rules
+### Правила
 
-- Scene IDs must be unique within a script
-- At least one scene must be defined
-- Scenes can reference other scenes via `goto`
+- Идентификаторы сцен должны быть уникальными в пределах скрипта
+- Должна быть определена хотя бы одна сцена
+- Сцены могут ссылаться на другие сцены через `goto`
 
-### Example
+### Пример
 
 ```nms
 scene intro {
@@ -160,67 +160,67 @@ scene intro {
 }
 
 scene chapter1 {
-    // Chapter 1 content
+    // Содержимое главы 1
 }
 ```
 
 ---
 
-## 5. Statements
+## 5. Операторы
 
-### Show Statement
+### Оператор Show
 
-Displays visual elements on screen.
+Отображает визуальные элементы на экране.
 
 ```nms
-// Show background
+// Показать фон
 show background "<texture_id>"
 
-// Show character
+// Показать персонажа
 show <character_id> at <position>
 show <character_id> at <position> with <expression>
 
-// Positions: left, center, right, or custom coordinates
+// Позиции: left, center, right, или пользовательские координаты
 show Hero at left
 show Hero at center with "happy"
 show Hero at (100, 200)
 ```
 
-### Hide Statement
+### Оператор Hide
 
-Removes visual elements from screen.
+Удаляет визуальные элементы с экрана.
 
 ```nms
 hide <character_id>
 hide background
 ```
 
-### Say Statement
+### Оператор Say
 
-Displays dialogue text.
+Отображает текст диалога.
 
 ```nms
 say <character_id> "<text>"
 
-// Examples
+// Примеры
 say Hero "Hello!"
 say Narrator "The story begins..."
 ```
 
-Rich text commands can be embedded in dialogue:
+Команды форматированного текста могут быть встроены в диалоги:
 
-| Command | Description | Example |
+| Команда | Описание | Пример |
 |---------|-------------|---------|
-| `{w=N}` | Wait N seconds | `"Hello...{w=0.5}world"` |
-| `{speed=N}` | Set typing speed | `{speed=50}` |
-| `{color=#RRGGBB}` | Change text color | `{color=#FF0000}Red` |
-| `{/color}` | Reset color | `{/color}` |
-| `{shake}` | Shake effect | `{shake}Scary!{/shake}` |
-| `{wave}` | Wave effect | `{wave}Hello~{/wave}` |
+| `{w=N}` | Ждать N секунд | `"Hello...{w=0.5}world"` |
+| `{speed=N}` | Установить скорость набора | `{speed=50}` |
+| `{color=#RRGGBB}` | Изменить цвет текста | `{color=#FF0000}Red` |
+| `{/color}` | Сбросить цвет | `{/color}` |
+| `{shake}` | Эффект тряски | `{shake}Scary!{/shake}` |
+| `{wave}` | Эффект волны | `{wave}Hello~{/wave}` |
 
-### Choice Statement
+### Оператор Choice
 
-Presents options to the player.
+Представляет варианты выбора игроку.
 
 ```nms
 choice {
@@ -230,11 +230,11 @@ choice {
 }
 ```
 
-Actions can be:
-- `goto <scene_id>` - Jump to scene
-- Block of statements `{ ... }`
+Действия могут быть:
+- `goto <scene_id>` - Переход к сцене
+- Блок операторов `{ ... }`
 
-### Example
+### Пример
 
 ```nms
 say Hero "What should I do?"
@@ -250,73 +250,73 @@ choice {
 }
 ```
 
-### Set Statement
+### Оператор Set
 
-Assigns values to variables or flags.
+Присваивает значения переменным или флагам.
 
 ```nms
-// Set variable
+// Установить переменную
 set <variable> = <expression>
 
-// Set flag
+// Установить флаг
 set flag <flag_name> = <bool>
 
-// Examples
+// Примеры
 set points = 10
 set player_name = "Alex"
 set flag visited_shop = true
 ```
 
-### Wait Statement
+### Оператор Wait
 
-Pauses execution.
+Приостанавливает выполнение.
 
 ```nms
 wait <seconds>
 
-// Example
+// Пример
 wait 1.5
 ```
 
-### Goto Statement
+### Оператор Goto
 
-Jumps to another scene.
+Переходит к другой сцене.
 
 ```nms
 goto <scene_id>
 ```
 
-### Transition Statement
+### Оператор Transition
 
-Applies a visual transition.
+Применяет визуальный переход.
 
 ```nms
 transition <type> <duration>
 
-// Types: fade, dissolve, slide_left, slide_right, slide_up, slide_down
+// Типы: fade, dissolve, slide_left, slide_right, slide_up, slide_down
 transition fade 0.5
 transition dissolve 1.0
 ```
 
-### Play Statement
+### Оператор Play
 
-Plays audio.
+Воспроизводит аудио.
 
 ```nms
-// Play music (loops by default)
+// Воспроизвести музыку (по умолчанию зацикленная)
 play music "<track_id>"
 play music "<track_id>" loop=false
 
-// Play sound effect
+// Воспроизвести звуковой эффект
 play sound "<sound_id>"
 
-// Play voice
+// Воспроизвести озвучку
 play voice "<voice_id>"
 ```
 
-### Stop Statement
+### Оператор Stop
 
-Stops audio.
+Останавливает аудио.
 
 ```nms
 stop music
@@ -327,42 +327,42 @@ stop voice
 
 ---
 
-## 6. Expressions
+## 6. Выражения
 
-### Operators
+### Операторы
 
-#### Arithmetic
+#### Арифметические
 
-| Operator | Description | Example |
+| Оператор | Описание | Пример |
 |----------|-------------|---------|
-| `+` | Addition | `a + b` |
-| `-` | Subtraction | `a - b` |
-| `*` | Multiplication | `a * b` |
-| `/` | Division | `a / b` |
-| `%` | Modulo | `a % b` |
+| `+` | Сложение | `a + b` |
+| `-` | Вычитание | `a - b` |
+| `*` | Умножение | `a * b` |
+| `/` | Деление | `a / b` |
+| `%` | Остаток от деления | `a % b` |
 
-#### Comparison
+#### Сравнения
 
-| Operator | Description | Example |
+| Оператор | Описание | Пример |
 |----------|-------------|---------|
-| `==` | Equal | `a == b` |
-| `!=` | Not equal | `a != b` |
-| `<` | Less than | `a < b` |
-| `<=` | Less or equal | `a <= b` |
-| `>` | Greater than | `a > b` |
-| `>=` | Greater or equal | `a >= b` |
+| `==` | Равно | `a == b` |
+| `!=` | Не равно | `a != b` |
+| `<` | Меньше | `a < b` |
+| `<=` | Меньше или равно | `a <= b` |
+| `>` | Больше | `a > b` |
+| `>=` | Больше или равно | `a >= b` |
 
-#### Logical
+#### Логические
 
-| Operator | Description | Example |
+| Оператор | Описание | Пример |
 |----------|-------------|---------|
-| `&&` | Logical AND | `a && b` |
-| `\|\|` | Logical OR | `a \|\| b` |
-| `!` | Logical NOT | `!a` |
+| `&&` | Логическое И | `a && b` |
+| `\|\|` | Логическое ИЛИ | `a \|\| b` |
+| `!` | Логическое НЕ | `!a` |
 
-### Precedence (highest to lowest)
+### Приоритет (от высшего к низшему)
 
-1. `!` (unary NOT)
+1. `!` (унарное НЕ)
 2. `*`, `/`, `%`
 3. `+`, `-`
 4. `<`, `<=`, `>`, `>=`
@@ -370,7 +370,7 @@ stop voice
 6. `&&`
 7. `||`
 
-### Examples
+### Примеры
 
 ```nms
 set total = price * quantity
@@ -380,11 +380,11 @@ set should_buy = can_afford && wants_item
 
 ---
 
-## 7. Control Flow
+## 7. Управление потоком
 
-### If Statement
+### Оператор If
 
-Conditional execution.
+Условное выполнение.
 
 ```nms
 if <condition> {
@@ -406,7 +406,7 @@ if <condition> {
 }
 ```
 
-### Example
+### Пример
 
 ```nms
 if points >= 100 {
@@ -421,7 +421,7 @@ if points >= 100 {
 }
 ```
 
-### Flag Checks
+### Проверка флагов
 
 ```nms
 if flag visited_shop {
@@ -435,70 +435,70 @@ if !flag has_key {
 
 ---
 
-## 8. Built-in Commands
+## 8. Встроенные команды
 
-### Screen Effects
+### Эффекты экрана
 
 ```nms
-// Screen shake
+// Тряска экрана
 shake intensity=5 duration=0.5
 
-// Screen flash
+// Вспышка экрана
 flash color="#FFFFFF" duration=0.3
 
-// Fade to color
+// Затемнение до цвета
 fade_to color="#000000" duration=1.0
 fade_from color="#000000" duration=1.0
 ```
 
-### Character Animation
+### Анимация персонажа
 
 ```nms
-// Move character
+// Переместить персонажа
 move <character_id> to <position> duration=<seconds>
 
-// Scale character
+// Масштабировать персонажа
 scale <character_id> to <factor> duration=<seconds>
 
-// Rotate character
+// Повернуть персонажа
 rotate <character_id> to <angle> duration=<seconds>
 ```
 
-### UI Commands
+### Команды UI
 
 ```nms
-// Show/hide dialogue box
+// Показать/скрыть диалоговое окно
 show textbox
 hide textbox
 
-// Set text speed
+// Установить скорость текста
 set_speed <chars_per_second>
 
-// Enable/disable skip mode
+// Включить/отключить режим пропуска
 allow_skip true
 allow_skip false
 ```
 
 ---
 
-## 9. Comments
+## 9. Комментарии
 
 ```nms
-// Single-line comment
+// Однострочный комментарий
 
 /*
- * Multi-line
- * comment
+ * Многострочный
+ * комментарий
  */
 
-character Hero(name="Alex")  // Inline comment
+character Hero(name="Alex")  // Встроенный комментарий
 ```
 
 ---
 
-## 10. Reserved Keywords
+## 10. Зарезервированные ключевые слова
 
-The following identifiers are reserved and cannot be used as variable, character, or scene names:
+Следующие идентификаторы зарезервированы и не могут использоваться в качестве имён переменных, персонажей или сцен:
 
 ```
 and         character   choice      else        false
@@ -510,7 +510,7 @@ transition  true        voice       wait        with
 
 ---
 
-## 11. Grammar (EBNF)
+## 11. Грамматика (EBNF)
 
 ```ebnf
 program         = { character_decl | scene_decl } ;
@@ -568,80 +568,80 @@ string          = '"' { character } '"' ;
 
 ---
 
-## 12. Semantic Rules
+## 12. Семантические правила
 
-### Character Rules
+### Правила для персонажей
 
-1. Characters must be declared before use in `say` or `show` statements
-2. Character IDs must be unique
-3. Character names can contain any UTF-8 characters
+1. Персонажи должны быть объявлены перед использованием в операторах `say` или `show`
+2. Идентификаторы персонажей должны быть уникальными
+3. Имена персонажей могут содержать любые символы UTF-8
 
-### Scene Rules
+### Правила для сцен
 
-1. Scene IDs must be unique
-2. At least one scene must be defined
-3. All `goto` targets must reference existing scenes
-4. Empty scenes generate a warning
+1. Идентификаторы сцен должны быть уникальными
+2. Должна быть определена хотя бы одна сцена
+3. Все цели `goto` должны ссылаться на существующие сцены
+4. Пустые сцены генерируют предупреждение
 
-### Variable Rules
+### Правила для переменных
 
-1. Variables are dynamically created on first assignment
-2. Variable names follow identifier rules
-3. Variables have global scope within a script
+1. Переменные динамически создаются при первом присваивании
+2. Имена переменных следуют правилам идентификаторов
+3. Переменные имеют глобальную область видимости в пределах скрипта
 
-### Flag Rules
+### Правила для флагов
 
-1. Flags are boolean-only variables
-2. Flags are accessed with `flag` prefix in conditions
-3. Flags default to `false` if not set
+1. Флаги — это переменные только логического типа
+2. К флагам обращаются с префиксом `flag` в условиях
+3. Флаги по умолчанию имеют значение `false`, если не установлены
 
-### Choice Rules
+### Правила для выборов
 
-1. Choices must have at least one option
-2. Each option must have a destination (`goto` or block)
-3. Conditional options use `if` syntax
-
----
-
-## 13. Compatibility Policy
-
-### Versioning
-
-NM Script uses semantic versioning:
-- **Major** (1.x.x): Breaking changes
-- **Minor** (x.1.x): New features, backward compatible
-- **Patch** (x.x.1): Bug fixes
-
-### Forward Compatibility
-
-Scripts written for NM Script 1.0 will work with:
-- All 1.x versions
-- Higher versions may require migration tools
-
-### Deprecation Policy
-
-1. Features are marked deprecated in minor versions
-2. Deprecated features generate compiler warnings
-3. Deprecated features are removed in next major version
-
-### Migration Path
-
-When breaking changes occur:
-1. Migration guide provided in release notes
-2. Automated migration tool available
-3. Grace period of at least one major version
+1. Выборы должны иметь хотя бы один вариант
+2. Каждый вариант должен иметь пункт назначения (`goto` или блок)
+3. Условные варианты используют синтаксис `if`
 
 ---
 
-## Appendix A: Complete Example
+## 13. Политика совместимости
+
+### Версионирование
+
+NM Script использует семантическое версионирование:
+- **Мажорная** (1.x.x): Ломающие изменения
+- **Минорная** (x.1.x): Новые возможности, обратная совместимость
+- **Патч** (x.x.1): Исправления ошибок
+
+### Прямая совместимость
+
+Скрипты, написанные для NM Script 1.0, будут работать с:
+- Всеми версиями 1.x
+- Более высокие версии могут требовать инструменты миграции
+
+### Политика устаревания
+
+1. Функции помечаются как устаревшие в минорных версиях
+2. Устаревшие функции генерируют предупреждения компилятора
+3. Устаревшие функции удаляются в следующей мажорной версии
+
+### Путь миграции
+
+При возникновении ломающих изменений:
+1. Руководство по миграции предоставляется в примечаниях к выпуску
+2. Доступен автоматизированный инструмент миграции
+3. Льготный период не менее одной мажорной версии
+
+---
+
+## Приложение A: Полный пример
 
 ```nms
-// Character definitions
+// Определение персонажей
 character Hero(name="Alex", color="#00AAFF")
 character Sage(name="Elder Sage", color="#FFD700")
 character Narrator(name="", color="#AAAAAA")
 
-// Opening scene
+// Вступительная сцена
 scene intro {
     transition fade 1.0
     show background "bg_forest_dawn"
@@ -724,29 +724,29 @@ scene trial_begin {
 
     say Narrator "And so, the trial began..."
 
-    // Trial content would continue here
+    // Содержимое испытания продолжается здесь
 }
 ```
 
 ---
 
-## Appendix B: Error Codes
+## Приложение B: Коды ошибок
 
-| Code | Severity | Description |
+| Код | Серьёзность | Описание |
 |------|----------|-------------|
-| E3001 | Error | Undefined character |
-| E3002 | Error | Duplicate character definition |
-| E3003 | Warning | Unused character |
-| E3101 | Error | Undefined scene |
-| E3102 | Error | Duplicate scene definition |
-| E3103 | Warning | Unused scene |
-| E3104 | Warning | Empty scene |
-| E3105 | Warning | Unreachable scene |
-| E3201 | Error | Undefined variable |
-| E3202 | Warning | Unused variable |
-| E3301 | Warning | Dead code detected |
-| E3601 | Error | Empty choice block |
+| E3001 | Ошибка | Неопределённый персонаж |
+| E3002 | Ошибка | Дублирование определения персонажа |
+| E3003 | Предупреждение | Неиспользуемый персонаж |
+| E3101 | Ошибка | Неопределённая сцена |
+| E3102 | Ошибка | Дублирование определения сцены |
+| E3103 | Предупреждение | Неиспользуемая сцена |
+| E3104 | Предупреждение | Пустая сцена |
+| E3105 | Предупреждение | Недостижимая сцена |
+| E3201 | Ошибка | Неопределённая переменная |
+| E3202 | Предупреждение | Неиспользуемая переменная |
+| E3301 | Предупреждение | Обнаружен недостижимый код |
+| E3601 | Ошибка | Пустой блок выбора |
 
 ---
 
-*End of NM Script 1.0 Specification*
+*Конец спецификации NM Script 1.0*

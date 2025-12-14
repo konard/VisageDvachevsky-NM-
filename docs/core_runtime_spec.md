@@ -1,10 +1,10 @@
-# Core Runtime Specification
+# Спецификация ядра runtime
 
-This document specifies the core runtime API and interfaces for the NovelMind engine.
+Этот документ определяет API и интерфейсы ядра runtime для движка NovelMind.
 
-## Platform Abstraction Layer
+## Слой абстракции платформы
 
-### Window Interface
+### Интерфейс окна
 
 ```cpp
 namespace nm::platform
@@ -46,7 +46,7 @@ public:
 } // namespace nm::platform
 ```
 
-### Timer Interface
+### Интерфейс таймера
 
 ```cpp
 namespace nm::platform
@@ -70,7 +70,7 @@ public:
 } // namespace nm::platform
 ```
 
-### File System Interface
+### Интерфейс файловой системы
 
 ```cpp
 namespace nm::platform
@@ -99,9 +99,9 @@ public:
 } // namespace nm::platform
 ```
 
-## Virtual File System
+## Виртуальная файловая система
 
-### VFS Interface
+### Интерфейс VFS
 
 ```cpp
 namespace nm::vfs
@@ -150,7 +150,7 @@ public:
 } // namespace nm::vfs
 ```
 
-### Resource Handle
+### Дескриптор ресурса
 
 ```cpp
 namespace nm::vfs
@@ -177,9 +177,9 @@ private:
 } // namespace nm::vfs
 ```
 
-## Resource Manager
+## Менеджер ресурсов
 
-### Resource Manager Interface
+### Интерфейс менеджера ресурсов
 
 ```cpp
 namespace nm::resource
@@ -194,25 +194,25 @@ public:
     Result<void> initialize();
     void shutdown();
 
-    // Texture loading
+    // Загрузка текстур
     [[nodiscard]] Result<TextureHandle> loadTexture(const std::string& id);
     void unloadTexture(const std::string& id);
 
-    // Font loading
+    // Загрузка шрифтов
     [[nodiscard]] Result<FontHandle> loadFont(const std::string& id, int size);
     void unloadFont(const std::string& id);
 
-    // Audio loading
+    // Загрузка аудио
     [[nodiscard]] Result<SoundHandle> loadSound(const std::string& id);
     [[nodiscard]] Result<MusicHandle> loadMusic(const std::string& id);
     void unloadSound(const std::string& id);
     void unloadMusic(const std::string& id);
 
-    // Script loading
+    // Загрузка скриптов
     [[nodiscard]] Result<ScriptHandle> loadScript(const std::string& id);
     void unloadScript(const std::string& id);
 
-    // Cache management
+    // Управление кешем
     void clearCache();
     void preload(const std::vector<std::string>& resourceIds);
 
@@ -221,15 +221,15 @@ public:
 
 private:
     nm::vfs::IVirtualFileSystem& m_vfs;
-    // Internal caches...
+    // Внутренние кеши...
 };
 
 } // namespace nm::resource
 ```
 
-## Renderer
+## Рендерер
 
-### Renderer Interface
+### Интерфейс рендерера
 
 ```cpp
 namespace nm::renderer
@@ -283,7 +283,7 @@ public:
 
     virtual void setBlendMode(BlendMode mode) = 0;
 
-    // Sprite rendering
+    // Рендеринг спрайтов
     virtual void drawSprite(
         const Texture& texture,
         const Transform2D& transform,
@@ -295,18 +295,18 @@ public:
         const Transform2D& transform,
         const Color& tint = Color::White) = 0;
 
-    // Text rendering
+    // Рендеринг текста
     virtual void drawText(
         const Font& font,
         const std::string& text,
         float x, float y,
         const Color& color = Color::White) = 0;
 
-    // Primitive rendering
+    // Рендеринг примитивов
     virtual void drawRect(const Rect& rect, const Color& color) = 0;
     virtual void fillRect(const Rect& rect, const Color& color) = 0;
 
-    // Screen effects
+    // Эффекты экрана
     virtual void setFade(float alpha, const Color& color = Color::Black) = 0;
 
     [[nodiscard]] virtual int getWidth() const = 0;
@@ -316,7 +316,7 @@ public:
 } // namespace nm::renderer
 ```
 
-### Texture
+### Текстура
 
 ```cpp
 namespace nm::renderer
@@ -350,9 +350,9 @@ private:
 } // namespace nm::renderer
 ```
 
-## Scripting Engine
+## Движок скриптов
 
-### Script Types
+### Типы скриптов
 
 ```cpp
 namespace nm::scripting
@@ -360,7 +360,7 @@ namespace nm::scripting
 
 enum class OpCode : uint8_t
 {
-    // Control flow
+    // Управление потоком
     NOP,
     HALT,
     JUMP,
@@ -369,7 +369,7 @@ enum class OpCode : uint8_t
     CALL,
     RETURN,
 
-    // Stack operations
+    // Операции со стеком
     PUSH_INT,
     PUSH_FLOAT,
     PUSH_STRING,
@@ -378,13 +378,13 @@ enum class OpCode : uint8_t
     POP,
     DUP,
 
-    // Variables
+    // Переменные
     LOAD_VAR,
     STORE_VAR,
     LOAD_GLOBAL,
     STORE_GLOBAL,
 
-    // Arithmetic
+    // Арифметика
     ADD,
     SUB,
     MUL,
@@ -392,7 +392,7 @@ enum class OpCode : uint8_t
     MOD,
     NEG,
 
-    // Comparison
+    // Сравнение
     EQ,
     NE,
     LT,
@@ -400,12 +400,12 @@ enum class OpCode : uint8_t
     GT,
     GE,
 
-    // Logical
+    // Логика
     AND,
     OR,
     NOT,
 
-    // Visual novel commands
+    // Команды визуальной новеллы
     SHOW_BACKGROUND,
     SHOW_CHARACTER,
     HIDE_CHARACTER,
@@ -430,7 +430,7 @@ struct Instruction
 } // namespace nm::scripting
 ```
 
-### Script Interpreter
+### Интерпретатор скриптов
 
 ```cpp
 namespace nm::scripting
@@ -467,15 +467,15 @@ public:
     [[nodiscard]] std::optional<bool> getBoolVariable(const std::string& name) const;
 
 private:
-    // Implementation details
+    // Детали реализации
 };
 
 } // namespace nm::scripting
 ```
 
-## Scene System
+## Система сцен
 
-### Scene Manager
+### Менеджер сцен
 
 ```cpp
 namespace nm::scene
@@ -501,26 +501,26 @@ public:
     void update(float deltaTime);
     void render(nm::renderer::IRenderer& renderer);
 
-    // Layer management
+    // Управление слоями
     void addToLayer(LayerType layer, std::unique_ptr<SceneObject> object);
     void removeFromLayer(LayerType layer, const std::string& objectId);
     void clearLayer(LayerType layer);
 
-    // Object access
+    // Доступ к объектам
     SceneObject* findObject(const std::string& id);
 
-    // Transitions
+    // Переходы
     void startTransition(TransitionType type, float duration);
     [[nodiscard]] bool isTransitioning() const;
 
 private:
-    // Implementation details
+    // Детали реализации
 };
 
 } // namespace nm::scene
 ```
 
-### Scene Object
+### Объект сцены
 
 ```cpp
 namespace nm::scene
@@ -557,9 +557,9 @@ protected:
 } // namespace nm::scene
 ```
 
-## Input System
+## Система ввода
 
-### Input Manager
+### Менеджер ввода
 
 ```cpp
 namespace nm::input
@@ -593,33 +593,33 @@ public:
 
     void update();
 
-    // Keyboard
+    // Клавиатура
     [[nodiscard]] bool isKeyDown(Key key) const;
     [[nodiscard]] bool isKeyPressed(Key key) const;
     [[nodiscard]] bool isKeyReleased(Key key) const;
 
-    // Mouse
+    // Мышь
     [[nodiscard]] bool isMouseButtonDown(MouseButton button) const;
     [[nodiscard]] bool isMouseButtonPressed(MouseButton button) const;
     [[nodiscard]] bool isMouseButtonReleased(MouseButton button) const;
     [[nodiscard]] int getMouseX() const;
     [[nodiscard]] int getMouseY() const;
 
-    // Text input
+    // Текстовый ввод
     void startTextInput();
     void stopTextInput();
     [[nodiscard]] const std::string& getTextInput() const;
 
 private:
-    // Implementation details
+    // Детали реализации
 };
 
 } // namespace nm::input
 ```
 
-## Audio System
+## Аудио система
 
-### Audio Manager
+### Менеджер аудио
 
 ```cpp
 namespace nm::audio
@@ -634,11 +634,11 @@ public:
     Result<void> initialize();
     void shutdown();
 
-    // Sound effects
+    // Звуковые эффекты
     void playSound(const Sound& sound, float volume = 1.0f);
     void stopAllSounds();
 
-    // Music
+    // Музыка
     void playMusic(const Music& music, bool loop = true);
     void stopMusic();
     void pauseMusic();
@@ -646,20 +646,20 @@ public:
     void setMusicVolume(float volume);
     [[nodiscard]] bool isMusicPlaying() const;
 
-    // Master volume
+    // Общая громкость
     void setMasterVolume(float volume);
     [[nodiscard]] float getMasterVolume() const;
 
 private:
-    // Implementation details
+    // Детали реализации
 };
 
 } // namespace nm::audio
 ```
 
-## Save System
+## Система сохранений
 
-### Save Manager
+### Менеджер сохранений
 
 ```cpp
 namespace nm::save
@@ -699,9 +699,9 @@ private:
 } // namespace nm::save
 ```
 
-## Core Application
+## Основное приложение
 
-### Application Class
+### Класс приложения
 
 ```cpp
 namespace nm::core
@@ -747,7 +747,7 @@ private:
     bool m_running = false;
     EngineConfig m_config;
 
-    // Subsystems
+    // Подсистемы
     std::unique_ptr<platform::IWindow> m_window;
     std::unique_ptr<platform::ITimer> m_timer;
     std::unique_ptr<platform::IFileSystem> m_fileSystem;
@@ -764,9 +764,9 @@ private:
 } // namespace nm::core
 ```
 
-## Logging System
+## Система логирования
 
-### Logger Interface
+### Интерфейс логгера
 
 ```cpp
 namespace nm::core
@@ -813,7 +813,7 @@ private:
     void log(LogLevel level, const std::string& message);
 };
 
-// Convenience macros
+// Удобные макросы
 #define NM_LOG_TRACE(...) nm::core::Logger::instance().trace(__VA_ARGS__)
 #define NM_LOG_DEBUG(...) nm::core::Logger::instance().debug(__VA_ARGS__)
 #define NM_LOG_INFO(...)  nm::core::Logger::instance().info(__VA_ARGS__)
