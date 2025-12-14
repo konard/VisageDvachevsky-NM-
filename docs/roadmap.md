@@ -189,37 +189,54 @@ This document outlines the development phases for the NovelMind engine and edito
 - Plural forms
 - RTL text support
 
-## Phase 10: Visual Editor
+## Phase 10: Visual Editor ✅ (Phases 0-5.0 Complete)
 
 **Goal**: Build the visual authoring tool.
 
-### 10.1 Editor Framework
-- Qt or ImGui-based UI
-- Project management
-- Asset browser
+**Status**: Qt 6 Widgets-based GUI implemented with professional UX/DX.
+See `docs/gui_architecture.md` and `docs/gui-assessment.md` for details.
 
-### 10.2 Scene Editor
-- WYSIWYG scene view
-- Object placement and properties
-- Layer management
-- Preview playback
+### 10.1 Editor Framework ✅ **COMPLETE**
+- ✅ Qt 6 Widgets-based UI (dark theme, Unreal-like)
+- ✅ Project management (welcome screen, recent projects)
+- ✅ Asset browser (tree/list view, search, filters)
+- ✅ 12 fully functional panels
+- ✅ Event Bus, Selection System, Undo/Redo
+- ✅ Play-In-Editor with debugging (Phase 5.0)
 
-### 10.3 Story Flow Editor
-- Node graph visualization
-- Dialogue node editing
-- Choice and condition nodes
-- Variable inspector
+### 10.2 Scene Editor ⚠️ **PARTIAL**
+- ✅ SceneView panel with QGraphicsView
+- ✅ Pan (middle-mouse) and zoom (scroll wheel)
+- ✅ Grid overlay
+- ✅ Inspector with full property editing (Phase 2.2 complete - String, Int, Float, Bool, Color, Enum)
+- ⏳ WYSIWYG preview (pending real renderer integration)
+- ⏳ Object placement (pending real scene objects)
+- ⏳ Layer management (pending scene architecture)
+- ⏳ Preview playback (pending Phase 5.1 runtime)
 
-### 10.4 Script Editor
-- NM Script code editing
-- Syntax highlighting
-- Auto-completion
-- Error checking
+### 10.3 Story Flow Editor ✅ **COMPLETE** (Phase 3.3)
+- ✅ Node graph visualization (QGraphicsView/Scene)
+- ✅ Pan and zoom
+- ✅ Breakpoint indicators (red circles)
+- ✅ Execution highlighting (green glow)
+- ✅ Context menu (breakpoint toggle, edit, delete)
+- ✅ Node creation/deletion (Phase 3.3 complete)
+- ✅ Node palette with 6 node types (Entry, Dialogue, Choice, Scene, Label, Script)
+- ✅ Connection drawing (Ctrl+Click drag)
+- ✅ Connection deletion (Delete/Backspace)
+- ✅ Variable inspector (Debug Overlay panel)
 
-### 10.5 Localization Editor
-- Translation table editor
-- Import/export (CSV, PO)
-- Translation preview
+### 10.4 Script Editor ⏳ **PENDING** (Phase 6+)
+- ⏳ NM Script code editing
+- ⏳ Syntax highlighting
+- ⏳ Auto-completion
+- ⏳ Error checking
+
+### 10.5 Localization Editor ⚠️ **PARTIAL**
+- ✅ Translation table editor (ID/Source/Translation)
+- ✅ Language selector
+- ⚠️ Import/export (buttons exist, I/O pending)
+- ⏳ Translation preview (pending Phase 4+)
 
 ## Phase 11: Build System
 

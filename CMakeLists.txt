@@ -77,15 +77,15 @@ endif()
 # Engine core library
 add_subdirectory(engine_core)
 
-# Tests
+# Editor (optional) - process before tests so tests know if editor is available
+if(NOVELMIND_BUILD_EDITOR)
+    add_subdirectory(editor)
+endif()
+
+# Tests - processed after editor so NOVELMIND_BUILD_EDITOR reflects actual state
 if(NOVELMIND_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
-endif()
-
-# Editor (optional)
-if(NOVELMIND_BUILD_EDITOR)
-    add_subdirectory(editor)
 endif()
 
 # Compiler (nmc - NovelMind Script Compiler)
