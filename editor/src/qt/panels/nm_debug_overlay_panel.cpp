@@ -5,6 +5,10 @@
 #include <QHeaderView>
 #include <QPushButton>
 #include <QHBoxLayout>
+#include <QButtonGroup>
+#include <QToolButton>
+#include <QFrame>
+#include <QGridLayout>
 
 namespace NovelMind::editor::qt {
 
@@ -42,6 +46,10 @@ void NMDebugOverlayPanel::setupUI() {
     auto* layout = new QVBoxLayout;
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
+
+    // Add toolbar
+    setupToolBar();
+    layout->addWidget(m_toolBar);
 
     m_tabWidget = new QTabWidget;
 
@@ -86,6 +94,58 @@ void NMDebugOverlayPanel::setupUI() {
         stackLayout->addWidget(m_callStackList);
 
         m_tabWidget->addTab(stackWidget, "Call Stack");
+    }
+
+    // === Current Instruction Tab ===
+    {
+        m_instructionWidget = new QWidget;
+        auto* instrLayout = new QGridLayout(m_instructionWidget);
+        instrLayout->setContentsMargins(8, 8, 8, 8);
+        instrLayout->setSpacing(8);
+
+        // Current Node
+        auto* nodeHeaderLabel = new QLabel("<b>Current Node:</b>");
+        instrLayout->addWidget(nodeHeaderLabel, 0, 0, Qt::AlignTop);
+
+        m_currentNodeLabel = new QLabel("DialogueNode_003");
+        m_currentNodeLabel->setStyleSheet("QLabel { color: #0078d4; font-family: monospace; }");
+        instrLayout->addWidget(m_currentNodeLabel, 0, 1);
+
+        // Instruction Index
+        auto* indexHeaderLabel = new QLabel("<b>Instruction Index:</b>");
+        instrLayout->addWidget(indexHeaderLabel, 1, 0, Qt::AlignTop);
+
+        m_instructionIndexLabel = new QLabel("5 / 12");
+        m_instructionIndexLabel->setStyleSheet("QLabel { color: #4caf50; font-family: monospace; }");
+        instrLayout->addWidget(m_instructionIndexLabel, 1, 1);
+
+        // Separator
+        auto* separator = new QFrame;
+        separator->setFrameShape(QFrame::HLine);
+        separator->setFrameShadow(QFrame::Sunken);
+        instrLayout->addWidget(separator, 2, 0, 1, 2);
+
+        // Current Instruction Code
+        auto* codeHeaderLabel = new QLabel("<b>Current Instruction:</b>");
+        instrLayout->addWidget(codeHeaderLabel, 3, 0, Qt::AlignTop);
+
+        m_instructionCodeLabel = new QLabel("SHOW_TEXT \"Hello, world!\"");
+        m_instructionCodeLabel->setStyleSheet(
+            "QLabel { "
+            "  background-color: #1e1e1e; "
+            "  color: #e0e0e0; "
+            "  font-family: monospace; "
+            "  padding: 8px; "
+            "  border: 1px solid #3d3d3d; "
+            "  border-radius: 3px; "
+            "}"
+        );
+        m_instructionCodeLabel->setWordWrap(true);
+        instrLayout->addWidget(m_instructionCodeLabel, 3, 1);
+
+        instrLayout->setRowStretch(4, 1);  // Push content to top
+
+        m_tabWidget->addTab(m_instructionWidget, "Current Instruction");
     }
 
     // === Animations Tab ===
@@ -311,6 +371,91 @@ void NMDebugOverlayPanel::editVariable(const QString& name, const QVariant& curr
 
     if (ok) {
         NMPlayModeController::instance().setVariable(name, newValue);
+    }
+}
+
+void NMDebugOverlayPanel::setupToolBar() {
+    m_toolBar = new QToolBar;
+    m_toolBar->setObjectName("DebugOverlayToolBar");
+    m_toolBar->setIconSize(QSize(16, 16));
+
+    auto& iconMgr = NMIconManager::instance();
+
+    // Display mode toggle
+    auto* minimalBtn = new QToolButton;
+    minimalBtn->setText("Minimal");
+    minimalBtn->setCheckable(true);
+    minimalBtn->setToolTip("Show only essential debugging info");
+
+    auto* extendedBtn = new QToolButton;
+    extendedBtn->setText("Extended");
+    extendedBtn->setCheckable(true);
+    extendedBtn->setChecked(true);
+    extendedBtn->setToolTip("Show all debugging information");
+
+    auto* modeGroup = new QButtonGroup(this);
+    modeGroup->addButton(minimalBtn, static_cast<int>(DebugDisplayMode::Minimal));
+    modeGroup->addButton(extendedBtn, static_cast<int>(DebugDisplayMode::Extended));
+
+    connect(modeGroup, QOverload<int>::of(&QButtonGroup::idClicked),
+            this, &NMDebugOverlayPanel::onDisplayModeChanged);
+
+    m_toolBar->addWidget(new QLabel("Display Mode: "));
+    m_toolBar->addWidget(minimalBtn);
+    m_toolBar->addWidget(extendedBtn);
+}
+
+void NMDebugOverlayPanel::setDisplayMode(DebugDisplayMode mode) {
+    if (m_displayMode == mode) return;
+
+    m_displayMode = mode;
+    updateTabsVisibility();
+}
+
+void NMDebugOverlayPanel::updateTabsVisibility() {
+    if (!m_tabWidget) return;
+
+    switch (m_displayMode) {
+        case DebugDisplayMode::Minimal:
+            // Show only Variables and Current Instruction
+            m_tabWidget->setTabVisible(0, true);   // Variables
+            m_tabWidget->setTabVisible(1, false);  // Call Stack
+            m_tabWidget->setTabVisible(2, true);   // Current Instruction
+            m_tabWidget->setTabVisible(3, false);  // Animations
+            m_tabWidget->setTabVisible(4, false);  // Audio
+            m_tabWidget->setTabVisible(5, false);  // Performance
+            break;
+
+        case DebugDisplayMode::Extended:
+            // Show all tabs
+            for (int i = 0; i < m_tabWidget->count(); ++i) {
+                m_tabWidget->setTabVisible(i, true);
+            }
+            break;
+    }
+}
+
+void NMDebugOverlayPanel::onDisplayModeChanged() {
+    auto* sender = qobject_cast<QButtonGroup*>(this->sender());
+    if (!sender) return;
+
+    int modeId = sender->checkedId();
+    setDisplayMode(static_cast<DebugDisplayMode>(modeId));
+}
+
+void NMDebugOverlayPanel::updateCurrentInstructionTab() {
+    // This would be updated from the PlayModeController
+    // For now, using mock data
+    auto& controller = NMPlayModeController::instance();
+
+    if (controller.isPlaying() || controller.isPaused()) {
+        m_currentNodeLabel->setText("DialogueNode_003");
+        m_instructionIndexLabel->setText("5 / 12");
+        m_instructionCodeLabel->setText("SHOW_TEXT \"Hello, world!\"");
+    } else {
+        m_currentNodeLabel->setText("(Not running)");
+        m_instructionIndexLabel->setText("- / -");
+        m_instructionCodeLabel->setText("(No active instruction)");
     }
 }
 

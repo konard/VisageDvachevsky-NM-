@@ -7,8 +7,18 @@
 #include <QListWidget>
 #include <QVBoxLayout>
 #include <QVariantMap>
+#include <QLabel>
+#include <QToolBar>
 
 namespace NovelMind::editor::qt {
+
+/**
+ * @brief Display mode for the debug overlay
+ */
+enum class DebugDisplayMode {
+    Minimal,    ///< Show only essential info
+    Extended    ///< Show all debugging information
+};
 
 /**
  * @brief Debug overlay panel for runtime inspection
@@ -16,6 +26,7 @@ namespace NovelMind::editor::qt {
  * Provides tabs for:
  * - Variables (editable during pause)
  * - Call Stack
+ * - Current Instruction
  * - Active Animations
  * - Audio Channels
  * - Performance Metrics
@@ -31,19 +42,27 @@ public:
     void shutdown() override;
     void onUpdate(float deltaTime) override;
 
+    void setDisplayMode(DebugDisplayMode mode);
+    DebugDisplayMode displayMode() const { return m_displayMode; }
+
 private slots:
     void onVariablesChanged(const QVariantMap& variables);
     void onCallStackChanged(const QStringList& stack);
     void onPlayModeChanged(int mode);
     void onVariableItemDoubleClicked(QTreeWidgetItem* item, int column);
+    void onDisplayModeChanged();
 
 private:
     void setupUI();
+    void setupToolBar();
     void updateVariablesTab(const QVariantMap& variables);
     void updateCallStackTab(const QStringList& stack);
+    void updateCurrentInstructionTab();
     void editVariable(const QString& name, const QVariant& currentValue);
+    void updateTabsVisibility();
 
     // UI Elements
+    QToolBar* m_toolBar = nullptr;
     QTabWidget* m_tabWidget = nullptr;
 
     // Variables Tab
@@ -51,6 +70,12 @@ private:
 
     // Call Stack Tab
     QListWidget* m_callStackList = nullptr;
+
+    // Current Instruction Tab
+    QWidget* m_instructionWidget = nullptr;
+    QLabel* m_currentNodeLabel = nullptr;
+    QLabel* m_instructionIndexLabel = nullptr;
+    QLabel* m_instructionCodeLabel = nullptr;
 
     // Animations Tab
     QTreeWidget* m_animationsTree = nullptr;
@@ -62,6 +87,7 @@ private:
     QTreeWidget* m_performanceTree = nullptr;
 
     // State
+    DebugDisplayMode m_displayMode = DebugDisplayMode::Extended;
     QVariantMap m_currentVariables;
     QStringList m_currentCallStack;
 };

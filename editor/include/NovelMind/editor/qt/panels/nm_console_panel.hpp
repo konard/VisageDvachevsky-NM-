@@ -103,11 +103,17 @@ public:
      */
     void clear();
 
+    /**
+     * @brief Copy selected text to clipboard
+     */
+    void copySelection();
+
 signals:
     void logAdded(const LogEntry& entry);
 
 private slots:
     void onClear();
+    void onCopy();
     void onToggleDebug(bool checked);
     void onToggleInfo(bool checked);
     void onToggleWarning(bool checked);

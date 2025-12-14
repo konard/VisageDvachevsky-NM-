@@ -1,11 +1,14 @@
 #include "NovelMind/editor/qt/panels/nm_console_panel.hpp"
 #include "NovelMind/editor/qt/nm_style_manager.hpp"
+#include "NovelMind/editor/qt/nm_icon_manager.hpp"
 
 #include <QVBoxLayout>
 #include <QToolBar>
 #include <QAction>
 #include <QScrollBar>
 #include <QTextCharFormat>
+#include <QClipboard>
+#include <QApplication>
 
 namespace NovelMind::editor::qt {
 
@@ -223,13 +226,31 @@ void NMConsolePanel::clear()
     }
 }
 
+void NMConsolePanel::copySelection()
+{
+    if (m_output && m_output->textCursor().hasSelection())
+    {
+        m_output->copy();
+    }
+}
+
 void NMConsolePanel::setupToolBar()
 {
     m_toolBar = new QToolBar(this);
     m_toolBar->setObjectName("ConsoleToolBar");
     m_toolBar->setIconSize(QSize(16, 16));
 
-    QAction* actionClear = m_toolBar->addAction(tr("Clear"));
+    // Get icon manager
+    auto& iconMgr = NMIconManager::instance();
+
+    // Copy action
+    QAction* actionCopy = m_toolBar->addAction(iconMgr.getIcon("copy"), tr("Copy"));
+    actionCopy->setToolTip(tr("Copy Selected Text (Ctrl+C)"));
+    actionCopy->setShortcut(QKeySequence::Copy);
+    connect(actionCopy, &QAction::triggered, this, &NMConsolePanel::onCopy);
+
+    // Clear action
+    QAction* actionClear = m_toolBar->addAction(iconMgr.getIcon("delete"), tr("Clear"));
     actionClear->setToolTip(tr("Clear Console"));
     connect(actionClear, &QAction::triggered, this, &NMConsolePanel::onClear);
 
@@ -290,6 +311,11 @@ void NMConsolePanel::setupContent()
 void NMConsolePanel::onClear()
 {
     clear();
+}
+
+void NMConsolePanel::onCopy()
+{
+    copySelection();
 }
 
 void NMConsolePanel::onToggleDebug(bool checked)
