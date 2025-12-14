@@ -1,261 +1,261 @@
-# NovelMind Quick Start Guide
+# Руководство по быстрому старту NovelMind
 
-This guide will help you create your first visual novel using NovelMind in just a few minutes.
+Это руководство поможет вам создать вашу первую визуальную новеллу с помощью NovelMind всего за несколько минут.
 
-## Prerequisites
+## Предварительные требования
 
-Before you begin, ensure you have:
+Перед началом работы убедитесь, что у вас есть:
 
-- NovelMind Editor installed (download from Releases or build from source)
-- Basic understanding of visual novel concepts (characters, scenes, dialogue, choices)
+- Установленный NovelMind Editor (скачайте из раздела Releases или соберите из исходного кода)
+- Базовое понимание концепций визуальных новелл (персонажи, сцены, диалоги, выборы)
 
-## Step 1: Create a New Project
+## Шаг 1: Создание нового проекта
 
-1. Launch the NovelMind Editor
-2. Click **File > New Project** or press `Ctrl+N`
-3. Enter your project name (e.g., "MyFirstNovel")
-4. Choose a project location
-5. Select a template:
-   - **Visual Novel** - Standard branching narrative with choices
-   - **Kinetic Novel** - Linear story without player choices
-   - **Dating Sim** - Character-focused with affection tracking
+1. Запустите NovelMind Editor
+2. Нажмите **File > New Project** или нажмите `Ctrl+N`
+3. Введите название проекта (например, "MyFirstNovel")
+4. Выберите расположение проекта
+5. Выберите шаблон:
+   - **Visual Novel** - Стандартная ветвящаяся история с выборами
+   - **Kinetic Novel** - Линейная история без выборов игрока
+   - **Dating Sim** - Ориентированная на персонажей с отслеживанием привязанности
 
-Click **Create** to generate your project.
+Нажмите **Create**, чтобы создать проект.
 
-## Step 2: Understand the Editor Layout
+## Шаг 2: Понимание интерфейса редактора
 
-The editor has several panels:
+Редактор содержит несколько панелей:
 
-| Panel | Purpose |
-|-------|---------|
-| **Scene View** | Visual preview of your current scene |
-| **StoryGraph** | Node-based narrative flow editor |
-| **Assets** | Manage images, audio, and other resources |
-| **Inspector** | Edit properties of selected objects |
-| **Timeline** | Animation and timing control |
-| **Console** | View logs and debug messages |
+| Панель | Назначение |
+|--------|------------|
+| **Scene View** | Визуальный предпросмотр текущей сцены |
+| **StoryGraph** | Редактор потока повествования на основе узлов |
+| **Assets** | Управление изображениями, аудио и другими ресурсами |
+| **Inspector** | Редактирование свойств выбранных объектов |
+| **Timeline** | Управление анимацией и временем |
+| **Console** | Просмотр логов и отладочных сообщений |
 
-You can drag panels to rearrange them or use **Window** menu to show/hide panels.
+Вы можете перетаскивать панели для изменения их расположения или использовать меню **Window** для отображения/скрытия панелей.
 
-## Step 3: Add Your First Character
+## Шаг 3: Добавление первого персонажа
 
-### Using the Editor
+### Использование редактора
 
-1. Open the **Assets** panel
-2. Right-click in the **Characters** folder
-3. Select **Create > Character**
-4. Fill in the character details:
-   - **ID**: `hero` (internal identifier)
-   - **Display Name**: `Alex` (shown to players)
-   - **Color**: `#4A90D9` (for dialogue name)
-5. Add character sprites by dragging images into the character folder
+1. Откройте панель **Assets**
+2. Щелкните правой кнопкой мыши в папке **Characters**
+3. Выберите **Create > Character**
+4. Заполните данные персонажа:
+   - **ID**: `hero` (внутренний идентификатор)
+   - **Display Name**: `Alex` (отображается игрокам)
+   - **Color**: `#4A90D9` (для имени в диалогах)
+5. Добавьте спрайты персонажа, перетащив изображения в папку персонажа
 
-### Using NM Script
+### Использование NM Script
 
-Alternatively, create characters in code:
+Альтернативно, создайте персонажей в коде:
 
 ```nm
 character hero(name="Alex", color="#4A90D9")
 character friend(name="Sam", color="#D94A4A")
 ```
 
-## Step 4: Create Your First Scene
+## Шаг 4: Создание первой сцены
 
-### Using StoryGraph
+### Использование StoryGraph
 
-1. Open the **StoryGraph** panel
-2. Right-click on the canvas and select **Add > Scene Node**
-3. Name the scene `intro`
-4. Double-click to enter the scene
+1. Откройте панель **StoryGraph**
+2. Щелкните правой кнопкой мыши на холсте и выберите **Add > Scene Node**
+3. Назовите сцену `intro`
+4. Дважды щелкните, чтобы войти в сцену
 
-Inside the scene:
-1. Add a **Dialogue Node** - right-click > **Add > Dialogue**
-2. Set the speaker to `hero`
-3. Enter text: "Welcome to my visual novel!"
-4. Connect nodes by dragging from output port to input port
+Внутри сцены:
+1. Добавьте **Dialogue Node** - правый клик > **Add > Dialogue**
+2. Установите говорящего на `hero`
+3. Введите текст: "Добро пожаловать в мою визуальную новеллу!"
+4. Соедините узлы, перетаскивая от выходного порта к входному
 
-### Using NM Script
+### Использование NM Script
 
 ```nm
 scene intro {
     show hero at center
-    say hero "Welcome to my visual novel!"
-    say hero "This is a demonstration of NovelMind."
+    say hero "Добро пожаловать в мою визуальную новеллу!"
+    say hero "Это демонстрация NovelMind."
 }
 ```
 
-## Step 5: Add a Background
+## Шаг 5: Добавление фона
 
-1. Import a background image:
-   - Drag an image file into **Assets > Backgrounds**
-   - Or use **Assets > Import** button
-2. In Scene View or StoryGraph:
-   - Add a **Background Node**
-   - Select your imported image
-   - The background will display in Scene View
+1. Импортируйте изображение фона:
+   - Перетащите файл изображения в **Assets > Backgrounds**
+   - Или используйте кнопку **Assets > Import**
+2. В Scene View или StoryGraph:
+   - Добавьте **Background Node**
+   - Выберите импортированное изображение
+   - Фон отобразится в Scene View
 
 ```nm
 scene intro {
     background "classroom.png"
     show hero at center
-    say hero "Here we are in the classroom."
+    say hero "Вот мы и в классе."
 }
 ```
 
-## Step 6: Add Player Choices
+## Шаг 6: Добавление выборов игрока
 
-Choices create branching narratives:
+Выборы создают ветвящееся повествование:
 
-### Using StoryGraph
+### Использование StoryGraph
 
-1. Add a **Choice Node** after your dialogue
-2. Add choice options:
-   - "Talk to the friend"
-   - "Explore alone"
-3. Connect each option to different scene nodes
+1. Добавьте **Choice Node** после вашего диалога
+2. Добавьте варианты выбора:
+   - "Поговорить с другом"
+   - "Исследовать в одиночку"
+3. Соедините каждый вариант с различными узлами сцен
 
-### Using NM Script
+### Использование NM Script
 
 ```nm
 scene decision {
-    say hero "What should I do?"
+    say hero "Что мне делать?"
 
     choice {
-        "Talk to Sam" -> talk_to_sam
-        "Explore alone" -> explore
+        "Поговорить с Сэмом" -> talk_to_sam
+        "Исследовать в одиночку" -> explore
     }
 }
 
 scene talk_to_sam {
     show friend at left
-    say friend "Hey! I was hoping you'd come over."
+    say friend "Привет! Я надеялся, что ты подойдёшь."
 }
 
 scene explore {
     hide hero
-    say "You decide to explore the area by yourself..."
+    say "Вы решаете исследовать местность самостоятельно..."
 }
 ```
 
-## Step 7: Test Your Novel
+## Шаг 7: Тестирование вашей новеллы
 
 ### Play-In-Editor
 
-1. Click the **Play** button (or press `F5`)
-2. Your novel will run directly in the editor
-3. Test all dialogue and choices
-4. Click **Stop** to return to editing
+1. Нажмите кнопку **Play** (или нажмите `F5`)
+2. Ваша новелла запустится прямо в редакторе
+3. Протестируйте все диалоги и выборы
+4. Нажмите **Stop**, чтобы вернуться к редактированию
 
-### Quick Test Features
+### Функции быстрого тестирования
 
-- **Jump to Scene**: Right-click a scene node > **Jump Here**
-- **Variable Inspector**: View current state values
-- **Active Node Highlight**: See which node is executing
+- **Jump to Scene**: Правый клик на узел сцены > **Jump Here**
+- **Variable Inspector**: Просмотр текущих значений состояния
+- **Active Node Highlight**: Видите, какой узел выполняется
 
-## Step 8: Add Audio
+## Шаг 8: Добавление аудио
 
-### Background Music
+### Фоновая музыка
 
-1. Import audio files to **Assets > Music**
-2. Add a **Play Music Node** in StoryGraph
-3. Select your music file
+1. Импортируйте аудиофайлы в **Assets > Music**
+2. Добавьте **Play Music Node** в StoryGraph
+3. Выберите ваш музыкальный файл
 
 ```nm
 scene intro {
     music "theme.ogg" fade 2.0
-    say hero "Can you hear the music?"
+    say hero "Слышишь музыку?"
 }
 ```
 
-### Voice Acting
+### Озвучка
 
-1. Import voice files to **Assets > Voice**
-2. Open **Voice Manager** panel
-3. Bind voice files to dialogue lines
-4. NovelMind can auto-bind by naming convention: `scene_speaker_line.ogg`
+1. Импортируйте голосовые файлы в **Assets > Voice**
+2. Откройте панель **Voice Manager**
+3. Свяжите голосовые файлы с репликами диалогов
+4. NovelMind может автоматически связывать по соглашению об именовании: `scene_speaker_line.ogg`
 
 ```nm
-say hero "Hello there!" voice="intro_hero_001.ogg"
+say hero "Привет!" voice="intro_hero_001.ogg"
 ```
 
-## Step 9: Add Effects and Transitions
+## Шаг 9: Добавление эффектов и переходов
 
-### Scene Transitions
+### Переходы между сценами
 
 ```nm
 scene end_of_chapter {
-    say hero "This chapter is over..."
+    say hero "Эта глава окончена..."
     transition fade 1.5
     goto chapter_2
 }
 ```
 
-### Character Animations
+### Анимация персонажей
 
 ```nm
 scene dramatic {
     show hero at left
     animate hero move to center duration 1.0 ease easeOutQuad
-    say hero "Something important is happening!"
+    say hero "Происходит что-то важное!"
     shake screen intensity 5 duration 0.3
 }
 ```
 
-## Step 10: Build Your Novel
+## Шаг 10: Сборка вашей новеллы
 
-1. Go to **Build > Build Settings**
-2. Select target platform(s):
+1. Перейдите в **Build > Build Settings**
+2. Выберите целевую платформу(ы):
    - Windows
    - Linux
    - macOS
-3. Configure build options:
-   - **Pack Resources**: Encrypt and compress assets
-   - **Include Debug**: For testing builds
-4. Click **Build**
-5. Find your executable in the `Build/` folder
+3. Настройте параметры сборки:
+   - **Pack Resources**: Шифрование и сжатие ресурсов
+   - **Include Debug**: Для тестовых сборок
+4. Нажмите **Build**
+5. Найдите ваш исполняемый файл в папке `Build/`
 
-## Project Structure
+## Структура проекта
 
-After creating your project, you'll have:
+После создания проекта у вас будет:
 
 ```
 MyFirstNovel/
 ├── Assets/
-│   ├── Backgrounds/    # Scene backgrounds
-│   ├── Characters/     # Character sprites
-│   ├── Music/          # Background music
-│   ├── Sounds/         # Sound effects
-│   ├── Voice/          # Voice acting files
-│   └── UI/             # Interface elements
+│   ├── Backgrounds/    # Фоны сцен
+│   ├── Characters/     # Спрайты персонажей
+│   ├── Music/          # Фоновая музыка
+│   ├── Sounds/         # Звуковые эффекты
+│   ├── Voice/          # Файлы озвучки
+│   └── UI/             # Элементы интерфейса
 ├── Scripts/
-│   └── main.nms        # Main script file
-├── Scenes/             # Scene data files
-├── Localization/       # Translation files
+│   └── main.nms        # Главный файл скрипта
+├── Scenes/             # Файлы данных сцен
+├── Localization/       # Файлы переводов
 └── ProjectSettings/
-    └── project.json    # Project configuration
+    └── project.json    # Конфигурация проекта
 ```
 
-## Next Steps
+## Следующие шаги
 
-Now that you've created your first novel, explore these features:
+Теперь, когда вы создали свою первую новеллу, изучите эти возможности:
 
-- **[NM Script Specification](nm_script_specification.md)** - Full language reference
-- **[Timeline Editor]** - Create cinematic sequences
-- **[Localization Pipeline]** - Add multiple languages
-- **[Voice Manager]** - Organize voice acting
+- **[Спецификация NM Script](nm_script_specification.md)** - Полный справочник по языку
+- **[Timeline Editor]** - Создание кинематографических последовательностей
+- **[Localization Pipeline]** - Добавление нескольких языков
+- **[Voice Manager]** - Организация озвучки
 
-## Tips for Beginners
+## Советы для начинающих
 
-1. **Start Simple**: Create a short story first before tackling a large project
-2. **Use Templates**: Built-in templates show best practices
-3. **Test Often**: Use Play-In-Editor frequently during development
-4. **Organize Assets**: Keep folders clean from the start
-5. **Save Regularly**: Use `Ctrl+S` and enable auto-save in settings
+1. **Начинайте с простого**: Сначала создайте короткую историю, прежде чем браться за большой проект
+2. **Используйте шаблоны**: Встроенные шаблоны показывают лучшие практики
+3. **Тестируйте часто**: Используйте Play-In-Editor часто во время разработки
+4. **Организуйте ресурсы**: Поддерживайте порядок в папках с самого начала
+5. **Сохраняйте регулярно**: Используйте `Ctrl+S` и включите автосохранение в настройках
 
-## Getting Help
+## Получение помощи
 
-- **[Issue Tracker](https://github.com/VisageDvachevsky/NM-/issues)** - Report bugs or request features
-- **[Documentation](.)** - Full documentation index
-- **Console Panel** - Check for warnings and errors
+- **[Issue Tracker](https://github.com/VisageDvachevsky/NM-/issues)** - Сообщить об ошибках или запросить функции
+- **[Документация](.)** - Полный индекс документации
+- **Console Panel** - Проверьте предупреждения и ошибки
 
-Happy storytelling with NovelMind!
+Приятного создания историй с NovelMind!
