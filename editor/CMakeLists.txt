@@ -1,18 +1,40 @@
-# NovelMind Visual Editor
+# NovelMind Visual Editor - Qt 6 Based GUI
+#
+# This is a complete remake of the GUI using Qt 6 Widgets,
+# replacing the previous ImGui/SDL2 implementation.
 
+# Find Qt6
+find_package(Qt6 COMPONENTS Widgets Core Gui QUIET)
+
+if(NOT Qt6_FOUND)
+    message(STATUS "NovelMind Editor: Qt6 not found - Editor will not be built")
+    message(STATUS "  Install Qt6 development packages to enable the editor:")
+    message(STATUS "    Ubuntu/Debian: sudo apt-get install qt6-base-dev")
+    message(STATUS "    Fedora: sudo dnf install qt6-qtbase-devel")
+    message(STATUS "    macOS: brew install qt@6")
+    message(STATUS "    Windows: Download Qt6 from qt.io")
+
+    # Disable editor build flag so tests know not to link against it
+    set(NOVELMIND_BUILD_EDITOR OFF PARENT_SCOPE)
+    return()
+endif()
+
+message(STATUS "NovelMind Editor: Qt6 found - Building editor with Qt6 GUI")
+
+# Enable Qt MOC, UIC, RCC
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+
+# Qt6 Editor Library
 add_library(novelmind_editor STATIC
-    # Core editor
-    src/editor_app.cpp
+    # Core editor systems (backend - retained from previous implementation)
     src/editor_runtime_host.cpp
-    src/diagnostics_panel.cpp
     src/asset_pipeline.cpp
     src/editor_settings.cpp
     src/voice_manager.cpp
     src/timeline_editor.cpp
     src/curve_editor.cpp
-
-    # v0.2.0 backend systems
-    src/sdl_imgui_backend.cpp
     src/selection_system.cpp
     src/event_bus.cpp
     src/project_manager.cpp
@@ -21,26 +43,20 @@ add_library(novelmind_editor STATIC
     src/timeline_playback.cpp
     src/editor_state.cpp
     src/error_reporter.cpp
-
-    # v0.2.0 GUI systems
-    src/imgui_integration.cpp
-    src/gui_panel_base.cpp
-    src/scene_view_panel.cpp
-    src/story_graph_panel.cpp
-    src/timeline_panel.cpp
-    src/inspector_panel.cpp
-    src/asset_browser_panel.cpp
-    src/hierarchy_panel.cpp
-    src/console_panel.cpp
-    src/build_settings_panel.cpp
-    src/play_mode_controller.cpp
-
-    # v0.2.0 Additional GUI panels
-    src/curve_editor_panel.cpp
-    src/voice_manager_panel.cpp
-    src/localization_panel.cpp
-    src/debug_overlay_panel.cpp
     src/hotkeys_manager.cpp
+
+    # Qt6 GUI implementation
+    src/qt/qt_event_bus.cpp
+    src/qt/qt_selection_manager.cpp
+    src/qt/nm_style_manager.cpp
+    src/qt/nm_main_window.cpp
+    src/qt/nm_dock_panel.cpp
+    src/qt/panels/nm_scene_view_panel.cpp
+    src/qt/panels/nm_story_graph_panel.cpp
+    src/qt/panels/nm_inspector_panel.cpp
+    src/qt/panels/nm_console_panel.cpp
+    src/qt/panels/nm_asset_browser_panel.cpp
+    src/qt/panels/nm_hierarchy_panel.cpp
 )
 
 # Alias for backward compatibility
@@ -52,85 +68,55 @@ target_include_directories(novelmind_editor
         $<INSTALL_INTERFACE:include>
 )
 
-# Optional dependencies for GUI
-find_package(SDL2 QUIET)
-find_package(OpenGL QUIET)
-
-# Check for ImGui (can be provided via FetchContent or system install)
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../external/imgui/imgui.h")
-    set(IMGUI_FOUND TRUE)
-    set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../external/imgui")
-endif()
-
 target_link_libraries(novelmind_editor
     PUBLIC
         engine_core
+        Qt6::Widgets
+        Qt6::Core
+        Qt6::Gui
     PRIVATE
         novelmind_compiler_options
 )
 
-# Configure SDL2 and ImGui if available
-if(SDL2_FOUND AND IMGUI_FOUND AND OPENGL_FOUND)
-    set(IMGUI_SOURCES
-        ${IMGUI_DIR}/imgui.cpp
-        ${IMGUI_DIR}/imgui_draw.cpp
-        ${IMGUI_DIR}/imgui_tables.cpp
-        ${IMGUI_DIR}/imgui_widgets.cpp
-        ${IMGUI_DIR}/imgui_demo.cpp
-        ${IMGUI_DIR}/backends/imgui_impl_sdl2.cpp
-        ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
-    )
+target_compile_definitions(novelmind_editor PRIVATE
+    NOVELMIND_QT6_GUI
+)
 
-    target_compile_definitions(novelmind_editor PRIVATE
-        NOVELMIND_HAS_SDL2
-        NOVELMIND_HAS_IMGUI
-    )
-    target_include_directories(novelmind_editor PRIVATE
-        ${SDL2_INCLUDE_DIRS}
-        ${IMGUI_DIR}
-        ${IMGUI_DIR}/backends
-        ${OPENGL_INCLUDE_DIR}
-    )
-    target_sources(novelmind_editor PRIVATE ${IMGUI_SOURCES})
-    target_link_libraries(novelmind_editor PRIVATE
-        ${SDL2_LIBRARIES}
-        ${OPENGL_LIBRARIES}
-        ${CMAKE_DL_LIBS}
-    )
+# Editor executable
+add_executable(novelmind_editor_app
+    src/qt/main.cpp
+)
 
-    # Silence warnings in third-party ImGui sources to keep NovelMind warnings actionable
-    if(IMGUI_SOURCES)
-        if (MSVC)
-            set_source_files_properties(${IMGUI_SOURCES} PROPERTIES COMPILE_OPTIONS "/w")
-        else()
-            set_source_files_properties(${IMGUI_SOURCES} PROPERTIES COMPILE_OPTIONS "-w")
-        endif()
+target_link_libraries(novelmind_editor_app
+    PRIVATE
+        novelmind_editor
+        engine_core
+        Qt6::Widgets
+        Qt6::Core
+        Qt6::Gui
+        novelmind_compiler_options
+)
+
+# Set output name to novelmind_editor
+set_target_properties(novelmind_editor_app PROPERTIES
+    OUTPUT_NAME "novelmind_editor"
+)
+
+# Copy Qt DLLs on Windows (for development convenience)
+if(WIN32)
+    # Add Qt bin directory to PATH for running
+    get_target_property(_qmake_executable Qt6::qmake IMPORTED_LOCATION)
+    get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
+
+    # Use windeployqt for deployment
+    find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
+    if(WINDEPLOYQT_EXECUTABLE)
+        add_custom_command(TARGET novelmind_editor_app POST_BUILD
+            COMMAND "${WINDEPLOYQT_EXECUTABLE}"
+                --no-translations
+                --no-system-d3d-compiler
+                "$<TARGET_FILE:novelmind_editor_app>"
+            COMMENT "Running windeployqt..."
+        )
     endif()
-    message(STATUS "NovelMind Editor: SDL2 + ImGui GUI enabled")
-elseif(SDL2_FOUND)
-    target_compile_definitions(novelmind_editor PRIVATE NOVELMIND_HAS_SDL2)
-    target_include_directories(novelmind_editor PRIVATE ${SDL2_INCLUDE_DIRS})
-    target_link_libraries(novelmind_editor PRIVATE ${SDL2_LIBRARIES})
-    message(STATUS "NovelMind Editor: SDL2 available but ImGui not found - limited GUI")
-else()
-    message(STATUS "NovelMind Editor: Building without GUI (SDL2/ImGui not found)")
-endif()
-
-# Editor executable (optional, only build if main.cpp exists)
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
-    add_executable(novelmind_editor_app
-        src/main.cpp
-    )
-
-    target_link_libraries(novelmind_editor_app
-        PRIVATE
-            novelmind_editor
-            engine_core
-            novelmind_compiler_options
-    )
-
-    # Set output name to novelmind_editor
-    set_target_properties(novelmind_editor_app PROPERTIES
-        OUTPUT_NAME "novelmind_editor"
-    )
 endif()
