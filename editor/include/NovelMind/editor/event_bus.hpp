@@ -256,14 +256,16 @@ struct TimelineKeyframeEvent : EditorEvent {
   u64 keyframeIndex = 0;
   f64 time = 0.0;
 
-  explicit TimelineKeyframeEvent(EditorEventType eventType) : EditorEvent(eventType) {}
+  explicit TimelineKeyframeEvent(EditorEventType eventType)
+      : EditorEvent(eventType) {}
 };
 
 struct TimelineTrackEvent : EditorEvent {
   std::string trackId;
   std::string trackType;
 
-  explicit TimelineTrackEvent(EditorEventType eventType) : EditorEvent(eventType) {}
+  explicit TimelineTrackEvent(EditorEventType eventType)
+      : EditorEvent(eventType) {}
 };
 
 struct TimelinePlaybackChangedEvent : EditorEvent {
@@ -284,7 +286,8 @@ struct SceneObjectEvent : EditorEvent {
   std::string objectId;
   std::string objectType;
 
-  explicit SceneObjectEvent(EditorEventType eventType) : EditorEvent(eventType) {}
+  explicit SceneObjectEvent(EditorEventType eventType)
+      : EditorEvent(eventType) {}
 };
 
 struct SceneObjectTransformedEvent : EditorEvent {
@@ -395,7 +398,8 @@ struct DiagnosticEvent : EditorEvent {
 
   std::vector<Diagnostic> diagnostics;
 
-  explicit DiagnosticEvent(EditorEventType eventType) : EditorEvent(eventType) {}
+  explicit DiagnosticEvent(EditorEventType eventType)
+      : EditorEvent(eventType) {}
 };
 
 // ============================================================================
@@ -514,7 +518,8 @@ public:
   /**
    * @brief Convenience method to publish typed event
    */
-  template <typename T, typename... Args> void emit(Args &&...args) {
+  template <typename T, typename... Args>
+  void emit([[maybe_unused]] Args &&...args) {
     auto event = std::make_unique<T>();
     // Initialize event with args if needed (via aggregate init or setters)
     publish(std::move(event));

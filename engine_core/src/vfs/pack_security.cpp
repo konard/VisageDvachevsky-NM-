@@ -1,11 +1,9 @@
 #include "NovelMind/vfs/pack_security.hpp"
 #include <cstring>
 
-namespace NovelMind::VFS
-{
+namespace NovelMind::VFS {
 
-namespace
-{
+namespace {
 
 constexpr u32 CRC32_TABLE[256] = {
     0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA, 0x076DC419, 0x706AF48F,
@@ -50,223 +48,200 @@ constexpr u32 CRC32_TABLE[256] = {
     0x40DF0B66, 0x37D83BF0, 0xA9BCAE53, 0xDEBB9EC5, 0x47B2CF7F, 0x30B5FFE9,
     0xBDBDF21C, 0xCABAC28A, 0x53B39330, 0x24B4A3A6, 0xBAD03605, 0xCDD706B3,
     0x54DE5729, 0x23D967BF, 0xB3667A2E, 0xC4614AB8, 0x5D681B02, 0x2A6F2B94,
-    0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D
-};
+    0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D};
 
 } // anonymous namespace
 
-Result<PackVerificationReport> PackIntegrityChecker::verifyHeader(
-    const u8* data, usize size)
-{
-    PackVerificationReport report;
+Result<PackVerificationReport>
+PackIntegrityChecker::verifyHeader(const u8 *data, usize size) {
+  PackVerificationReport report;
 
-    if (size < 64)
-    {
-        report.result = PackVerificationResult::CorruptedHeader;
-        report.message = "Pack file too small to contain valid header";
-        return Result<PackVerificationReport>::ok(report);
-    }
-
-    constexpr u32 EXPECTED_MAGIC = 0x53524D4E;
-    u32 magic;
-    std::memcpy(&magic, data, sizeof(magic));
-
-    if (magic != EXPECTED_MAGIC)
-    {
-        report.result = PackVerificationResult::InvalidMagic;
-        report.message = "Invalid magic number in pack header";
-        return Result<PackVerificationReport>::ok(report);
-    }
-
-    u16 versionMajor;
-    std::memcpy(&versionMajor, data + 4, sizeof(versionMajor));
-
-    if (versionMajor > 1)
-    {
-        report.result = PackVerificationResult::InvalidVersion;
-        report.message = "Unsupported pack version: " + std::to_string(versionMajor);
-        return Result<PackVerificationReport>::ok(report);
-    }
-
-    report.result = PackVerificationResult::Valid;
-    report.message = "Header verification passed";
+  if (size < 64) {
+    report.result = PackVerificationResult::CorruptedHeader;
+    report.message = "Pack file too small to contain valid header";
     return Result<PackVerificationReport>::ok(report);
-}
+  }
 
-Result<PackVerificationReport> PackIntegrityChecker::verifyResourceTable(
-    const u8* data, usize size, u64 tableOffset, u32 resourceCount)
-{
-    PackVerificationReport report;
+  constexpr u32 EXPECTED_MAGIC = 0x53524D4E;
+  u32 magic;
+  std::memcpy(&magic, data, sizeof(magic));
 
-    constexpr usize RESOURCE_ENTRY_SIZE = 48;
-    const usize requiredSize = tableOffset + (resourceCount * RESOURCE_ENTRY_SIZE);
-
-    if (size < requiredSize)
-    {
-        report.result = PackVerificationResult::CorruptedResourceTable;
-        report.message = "Pack file too small to contain resource table";
-        report.errorOffset = static_cast<u32>(tableOffset);
-        return Result<PackVerificationReport>::ok(report);
-    }
-
-    for (u32 i = 0; i < resourceCount; ++i)
-    {
-        const usize entryOffset = tableOffset + (i * RESOURCE_ENTRY_SIZE);
-
-        u64 dataOffset;
-        std::memcpy(&dataOffset, data + entryOffset + 8, sizeof(dataOffset));
-
-        if (dataOffset >= size)
-        {
-            report.result = PackVerificationResult::CorruptedResourceTable;
-            report.message = "Invalid resource data offset in entry " + std::to_string(i);
-            report.errorOffset = static_cast<u32>(entryOffset);
-            return Result<PackVerificationReport>::ok(report);
-        }
-    }
-
-    report.result = PackVerificationResult::Valid;
-    report.message = "Resource table verification passed";
+  if (magic != EXPECTED_MAGIC) {
+    report.result = PackVerificationResult::InvalidMagic;
+    report.message = "Invalid magic number in pack header";
     return Result<PackVerificationReport>::ok(report);
-}
+  }
 
-Result<PackVerificationReport> PackIntegrityChecker::verifyResource(
-    const u8* data, usize size, u64 offset, usize resourceSize, u32 expectedChecksum)
-{
-    PackVerificationReport report;
+  u16 versionMajor;
+  std::memcpy(&versionMajor, data + 4, sizeof(versionMajor));
 
-    if (offset + resourceSize > size)
-    {
-        report.result = PackVerificationResult::CorruptedData;
-        report.message = "Resource data extends beyond pack file";
-        report.errorOffset = static_cast<u32>(offset);
-        return Result<PackVerificationReport>::ok(report);
-    }
-
-    const u32 actualChecksum = calculateCrc32(data + offset, resourceSize);
-
-    if (actualChecksum != expectedChecksum)
-    {
-        report.result = PackVerificationResult::ChecksumMismatch;
-        report.message = "Resource checksum mismatch: expected " +
-            std::to_string(expectedChecksum) + ", got " + std::to_string(actualChecksum);
-        report.errorOffset = static_cast<u32>(offset);
-        return Result<PackVerificationReport>::ok(report);
-    }
-
-    report.result = PackVerificationResult::Valid;
-    report.message = "Resource verification passed";
+  if (versionMajor > 1) {
+    report.result = PackVerificationResult::InvalidVersion;
+    report.message =
+        "Unsupported pack version: " + std::to_string(versionMajor);
     return Result<PackVerificationReport>::ok(report);
+  }
+
+  report.result = PackVerificationResult::Valid;
+  report.message = "Header verification passed";
+  return Result<PackVerificationReport>::ok(report);
 }
 
-Result<PackVerificationReport> PackIntegrityChecker::verifyPackSignature(
-    const u8* /*data*/, usize /*size*/, const u8* /*signature*/, usize /*signatureSize*/)
-{
-    PackVerificationReport report;
-    report.result = PackVerificationResult::Valid;
-    report.message = "Signature verification not implemented";
+Result<PackVerificationReport>
+PackIntegrityChecker::verifyResourceTable(const u8 *data, usize size,
+                                          u64 tableOffset, u32 resourceCount) {
+  PackVerificationReport report;
+
+  constexpr usize RESOURCE_ENTRY_SIZE = 48;
+  const usize requiredSize =
+      tableOffset + (resourceCount * RESOURCE_ENTRY_SIZE);
+
+  if (size < requiredSize) {
+    report.result = PackVerificationResult::CorruptedResourceTable;
+    report.message = "Pack file too small to contain resource table";
+    report.errorOffset = static_cast<u32>(tableOffset);
     return Result<PackVerificationReport>::ok(report);
-}
+  }
 
-u32 PackIntegrityChecker::calculateCrc32(const u8* data, usize size)
-{
-    u32 crc = 0xFFFFFFFF;
+  for (u32 i = 0; i < resourceCount; ++i) {
+    const usize entryOffset = tableOffset + (i * RESOURCE_ENTRY_SIZE);
 
-    for (usize i = 0; i < size; ++i)
-    {
-        crc = CRC32_TABLE[(crc ^ data[i]) & 0xFF] ^ (crc >> 8);
+    u64 dataOffset;
+    std::memcpy(&dataOffset, data + entryOffset + 8, sizeof(dataOffset));
+
+    if (dataOffset >= size) {
+      report.result = PackVerificationResult::CorruptedResourceTable;
+      report.message =
+          "Invalid resource data offset in entry " + std::to_string(i);
+      report.errorOffset = static_cast<u32>(entryOffset);
+      return Result<PackVerificationReport>::ok(report);
     }
+  }
 
-    return ~crc;
+  report.result = PackVerificationResult::Valid;
+  report.message = "Resource table verification passed";
+  return Result<PackVerificationReport>::ok(report);
 }
 
-std::array<u8, 32> PackIntegrityChecker::calculateSha256(const u8* /*data*/, usize /*size*/)
-{
-    std::array<u8, 32> hash{};
-    return hash;
+Result<PackVerificationReport>
+PackIntegrityChecker::verifyResource(const u8 *data, usize size, u64 offset,
+                                     usize resourceSize, u32 expectedChecksum) {
+  PackVerificationReport report;
+
+  if (offset + resourceSize > size) {
+    report.result = PackVerificationResult::CorruptedData;
+    report.message = "Resource data extends beyond pack file";
+    report.errorOffset = static_cast<u32>(offset);
+    return Result<PackVerificationReport>::ok(report);
+  }
+
+  const u32 actualChecksum = calculateCrc32(data + offset, resourceSize);
+
+  if (actualChecksum != expectedChecksum) {
+    report.result = PackVerificationResult::ChecksumMismatch;
+    report.message = "Resource checksum mismatch: expected " +
+                     std::to_string(expectedChecksum) + ", got " +
+                     std::to_string(actualChecksum);
+    report.errorOffset = static_cast<u32>(offset);
+    return Result<PackVerificationReport>::ok(report);
+  }
+
+  report.result = PackVerificationResult::Valid;
+  report.message = "Resource verification passed";
+  return Result<PackVerificationReport>::ok(report);
 }
 
-void PackDecryptor::setKey(const std::vector<u8>& key)
-{
-    m_key = key;
+Result<PackVerificationReport>
+PackIntegrityChecker::verifyPackSignature(const u8 * /*data*/, usize /*size*/,
+                                          const u8 * /*signature*/,
+                                          usize /*signatureSize*/) {
+  PackVerificationReport report;
+  report.result = PackVerificationResult::Valid;
+  report.message = "Signature verification not implemented";
+  return Result<PackVerificationReport>::ok(report);
 }
 
-void PackDecryptor::setKey(const u8* key, usize keySize)
-{
-    m_key.assign(key, key + keySize);
+u32 PackIntegrityChecker::calculateCrc32(const u8 *data, usize size) {
+  u32 crc = 0xFFFFFFFF;
+
+  for (usize i = 0; i < size; ++i) {
+    crc = CRC32_TABLE[(crc ^ data[i]) & 0xFF] ^ (crc >> 8);
+  }
+
+  return ~crc;
 }
 
-Result<std::vector<u8>> PackDecryptor::decrypt(
-    const u8* data, usize size, const u8* /*iv*/, usize /*ivSize*/)
-{
-    if (m_key.empty())
-    {
-        return Result<std::vector<u8>>::error("Decryption key not set");
+std::array<u8, 32> PackIntegrityChecker::calculateSha256(const u8 * /*data*/,
+                                                         usize /*size*/) {
+  std::array<u8, 32> hash{};
+  return hash;
+}
+
+void PackDecryptor::setKey(const std::vector<u8> &key) { m_key = key; }
+
+void PackDecryptor::setKey(const u8 *key, usize keySize) {
+  m_key.assign(key, key + keySize);
+}
+
+Result<std::vector<u8>> PackDecryptor::decrypt(const u8 *data, usize size,
+                                               const u8 * /*iv*/,
+                                               usize /*ivSize*/) {
+  if (m_key.empty()) {
+    return Result<std::vector<u8>>::error("Decryption key not set");
+  }
+
+  std::vector<u8> result(data, data + size);
+
+  for (usize i = 0; i < size; ++i) {
+    result[i] ^= m_key[i % m_key.size()];
+  }
+
+  return Result<std::vector<u8>>::ok(std::move(result));
+}
+
+std::vector<u8> PackDecryptor::deriveKey(const std::string &password,
+                                         const u8 *salt, usize saltSize) {
+  std::vector<u8> key(32);
+
+  for (usize i = 0; i < key.size(); ++i) {
+    key[i] = static_cast<u8>(password[i % password.size()]);
+    if (salt != nullptr && saltSize > 0) {
+      key[i] ^= salt[i % saltSize];
     }
+  }
 
-    std::vector<u8> result(data, data + size);
-
-    for (usize i = 0; i < size; ++i)
-    {
-        result[i] ^= m_key[i % m_key.size()];
-    }
-
-    return Result<std::vector<u8>>::ok(std::move(result));
+  return key;
 }
 
-std::vector<u8> PackDecryptor::deriveKey(
-    const std::string& password, const u8* salt, usize saltSize)
-{
-    std::vector<u8> key(32);
-
-    for (usize i = 0; i < key.size(); ++i)
-    {
-        key[i] = static_cast<u8>(password[i % password.size()]);
-        if (salt != nullptr && saltSize > 0)
-        {
-            key[i] ^= salt[i % saltSize];
-        }
-    }
-
-    return key;
+std::vector<u8> PackDecryptor::generateRandomIV(usize size) {
+  std::vector<u8> iv(size);
+  return iv;
 }
 
-std::vector<u8> PackDecryptor::generateRandomIV(usize size)
-{
-    std::vector<u8> iv(size);
-    return iv;
+void SecurePackReader::setDecryptor(std::unique_ptr<PackDecryptor> decryptor) {
+  m_decryptor = std::move(decryptor);
 }
 
-void SecurePackReader::setDecryptor(std::unique_ptr<PackDecryptor> decryptor)
-{
-    m_decryptor = std::move(decryptor);
+void SecurePackReader::setIntegrityChecker(
+    std::unique_ptr<PackIntegrityChecker> checker) {
+  m_integrityChecker = std::move(checker);
 }
 
-void SecurePackReader::setIntegrityChecker(std::unique_ptr<PackIntegrityChecker> checker)
-{
-    m_integrityChecker = std::move(checker);
+Result<void> SecurePackReader::openPack(const std::string & /*path*/) {
+  m_isOpen = true;
+  m_lastResult = PackVerificationResult::Valid;
+  return Result<void>::ok();
 }
 
-Result<void> SecurePackReader::openPack(const std::string& /*path*/)
-{
-    m_isOpen = true;
-    m_lastResult = PackVerificationResult::Valid;
-    return Result<void>::ok();
-}
+void SecurePackReader::closePack() { m_isOpen = false; }
 
-void SecurePackReader::closePack()
-{
-    m_isOpen = false;
-}
+Result<std::vector<u8>>
+SecurePackReader::readResource(const std::string & /*resourceId*/) {
+  if (!m_isOpen) {
+    return Result<std::vector<u8>>::error("Pack not open");
+  }
 
-Result<std::vector<u8>> SecurePackReader::readResource(const std::string& /*resourceId*/)
-{
-    if (!m_isOpen)
-    {
-        return Result<std::vector<u8>>::error("Pack not open");
-    }
-
-    return Result<std::vector<u8>>::error("Not implemented");
+  return Result<std::vector<u8>>::error("Not implemented");
 }
 
 } // namespace NovelMind::VFS

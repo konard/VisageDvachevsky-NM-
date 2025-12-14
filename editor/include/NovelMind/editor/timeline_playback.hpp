@@ -132,7 +132,8 @@ public:
   virtual void onTimeChanged(f64 /*currentTime*/, f64 /*duration*/) {}
   virtual void onTrackStateChanged(const std::string & /*trackId*/) {}
   virtual void onLoopCompleted(u32 /*loopCount*/) {}
-  virtual void onMarkerReached(const std::string & /*markerId*/, f64 /*time*/) {}
+  virtual void onMarkerReached(const std::string & /*markerId*/, f64 /*time*/) {
+  }
 };
 
 /**

@@ -8,29 +8,25 @@
  * stream into an Abstract Syntax Tree (AST).
  */
 
-#include "NovelMind/core/types.hpp"
 #include "NovelMind/core/result.hpp"
-#include "NovelMind/scripting/token.hpp"
+#include "NovelMind/core/types.hpp"
 #include "NovelMind/scripting/ast.hpp"
-#include <vector>
+#include "NovelMind/scripting/token.hpp"
 #include <string>
+#include <vector>
 
-namespace NovelMind::scripting
-{
+namespace NovelMind::scripting {
 
 /**
  * @brief Parser error information
  */
-struct ParseError
-{
-    std::string message;
-    SourceLocation location;
+struct ParseError {
+  std::string message;
+  SourceLocation location;
 
-    ParseError() = default;
-    ParseError(std::string msg, SourceLocation loc)
-        : message(std::move(msg))
-        , location(loc)
-    {}
+  ParseError() = default;
+  ParseError(std::string msg, SourceLocation loc)
+      : message(std::move(msg)), location(loc) {}
 };
 
 /**
@@ -49,80 +45,79 @@ struct ParseError
  * }
  * @endcode
  */
-class Parser
-{
+class Parser {
 public:
-    Parser();
-    ~Parser();
+  Parser();
+  ~Parser();
 
-    /**
-     * @brief Parse tokens into an AST
-     * @param tokens Vector of tokens from the lexer
-     * @return Result containing the program AST or an error
-     */
-    [[nodiscard]] Result<Program> parse(const std::vector<Token>& tokens);
+  /**
+   * @brief Parse tokens into an AST
+   * @param tokens Vector of tokens from the lexer
+   * @return Result containing the program AST or an error
+   */
+  [[nodiscard]] Result<Program> parse(const std::vector<Token> &tokens);
 
-    /**
-     * @brief Get all errors encountered during parsing
-     */
-    [[nodiscard]] const std::vector<ParseError>& getErrors() const;
+  /**
+   * @brief Get all errors encountered during parsing
+   */
+  [[nodiscard]] const std::vector<ParseError> &getErrors() const;
 
 private:
-    // Token navigation
-    [[nodiscard]] bool isAtEnd() const;
-    [[nodiscard]] const Token& peek() const;
-    [[nodiscard]] const Token& previous() const;
-    const Token& advance();
-    bool check(TokenType type) const;
-    bool match(TokenType type);
-    bool match(std::initializer_list<TokenType> types);
-    const Token& consume(TokenType type, const std::string& message);
+  // Token navigation
+  [[nodiscard]] bool isAtEnd() const;
+  [[nodiscard]] const Token &peek() const;
+  [[nodiscard]] const Token &previous() const;
+  const Token &advance();
+  bool check(TokenType type) const;
+  bool match(TokenType type);
+  bool match(std::initializer_list<TokenType> types);
+  const Token &consume(TokenType type, const std::string &message);
 
-    // Error handling
-    void error(const std::string& message);
-    void synchronize();
+  // Error handling
+  void error(const std::string &message);
+  void synchronize();
 
-    // Grammar rules - declarations
-    void parseDeclaration();
-    CharacterDecl parseCharacterDecl();
-    SceneDecl parseSceneDecl();
+  // Grammar rules - declarations
+  void parseDeclaration();
+  CharacterDecl parseCharacterDecl();
+  SceneDecl parseSceneDecl();
 
-    // Grammar rules - statements
-    StmtPtr parseStatement();
-    StmtPtr parseShowStmt();
-    StmtPtr parseHideStmt();
-    StmtPtr parseSayStmt();
-    StmtPtr parseChoiceStmt();
-    StmtPtr parseIfStmt();
-    StmtPtr parseGotoStmt();
-    StmtPtr parseWaitStmt();
-    StmtPtr parsePlayStmt();
-    StmtPtr parseStopStmt();
-    StmtPtr parseSetStmt();
-    StmtPtr parseTransitionStmt();
-    StmtPtr parseBlock();
+  // Grammar rules - statements
+  StmtPtr parseStatement();
+  StmtPtr parseShowStmt();
+  StmtPtr parseHideStmt();
+  StmtPtr parseSayStmt();
+  StmtPtr parseChoiceStmt();
+  StmtPtr parseIfStmt();
+  StmtPtr parseGotoStmt();
+  StmtPtr parseWaitStmt();
+  StmtPtr parsePlayStmt();
+  StmtPtr parseStopStmt();
+  StmtPtr parseSetStmt();
+  StmtPtr parseTransitionStmt();
+  StmtPtr parseBlock();
 
-    // Grammar rules - expressions
-    ExprPtr parseExpression();
-    ExprPtr parseOr();
-    ExprPtr parseAnd();
-    ExprPtr parseEquality();
-    ExprPtr parseComparison();
-    ExprPtr parseTerm();
-    ExprPtr parseFactor();
-    ExprPtr parseUnary();
-    ExprPtr parseCall();
-    ExprPtr parsePrimary();
+  // Grammar rules - expressions
+  ExprPtr parseExpression();
+  ExprPtr parseOr();
+  ExprPtr parseAnd();
+  ExprPtr parseEquality();
+  ExprPtr parseComparison();
+  ExprPtr parseTerm();
+  ExprPtr parseFactor();
+  ExprPtr parseUnary();
+  ExprPtr parseCall();
+  ExprPtr parsePrimary();
 
-    // Helper parsers
-    Position parsePosition();
-    std::string parseString();
-    std::vector<StmtPtr> parseStatementList();
+  // Helper parsers
+  Position parsePosition();
+  std::string parseString();
+  std::vector<StmtPtr> parseStatementList();
 
-    const std::vector<Token>* m_tokens;
-    size_t m_current;
-    std::vector<ParseError> m_errors;
-    Program m_program;
+  const std::vector<Token> *m_tokens;
+  size_t m_current;
+  std::vector<ParseError> m_errors;
+  Program m_program;
 };
 
 } // namespace NovelMind::scripting

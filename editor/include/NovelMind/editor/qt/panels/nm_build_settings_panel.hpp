@@ -17,25 +17,23 @@ class QPushButton;
 
 namespace NovelMind::editor::qt {
 
-class NMBuildSettingsPanel : public NMDockPanel
-{
-    Q_OBJECT
+class NMBuildSettingsPanel : public NMDockPanel {
+  Q_OBJECT
 
 public:
-    explicit NMBuildSettingsPanel(QWidget* parent = nullptr);
-    ~NMBuildSettingsPanel() override;
+  explicit NMBuildSettingsPanel(QWidget *parent = nullptr);
+  ~NMBuildSettingsPanel() override;
 
-    [[nodiscard]] QString panelName() const override { return "Build Settings"; }
-    bool initialize() override;
-    void shutdown() override;
-    void onUpdate(double deltaTime) override;
+  void onInitialize() override;
+  void onShutdown() override;
+  void onUpdate(double deltaTime) override;
 
 private:
-    void setupUI();
+  void setupUI();
 
-    QComboBox* m_platformSelector = nullptr;
-    QLineEdit* m_outputPathEdit = nullptr;
-    QPushButton* m_buildButton = nullptr;
+  QComboBox *m_platformSelector = nullptr;
+  QLineEdit *m_outputPathEdit = nullptr;
+  QPushButton *m_buildButton = nullptr;
 };
 
 } // namespace NovelMind::editor::qt
