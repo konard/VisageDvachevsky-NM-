@@ -559,8 +559,6 @@ private:
     std::string m_curveEditorPropertyName;
 
     // Panel state (would come from EditorPanel base class)
-    i32 m_width = 800;
-    i32 m_height = 600;
     bool m_visible = true;
 
     bool isVisible() const { return m_visible; }

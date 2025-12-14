@@ -110,7 +110,7 @@ QString QtSelectionManager::primarySelection() const
 
 int QtSelectionManager::selectionCount() const
 {
-    return m_selectedIds.size();
+    return static_cast<int>(m_selectedIds.size());
 }
 
 bool QtSelectionManager::isSelected(const QString& id) const

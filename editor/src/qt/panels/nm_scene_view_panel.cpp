@@ -99,12 +99,12 @@ void NMSceneObject::paint(QPainter* painter, const QStyleOptionGraphicsItem* opt
 
         // Draw corner handles
         QRectF bounds = boundingRect();
-        qreal handleSize = 8;
+        int handleSize = 8;
         painter->setBrush(palette.accentPrimary);
-        painter->drawRect(bounds.left(), bounds.top(), handleSize, handleSize);
-        painter->drawRect(bounds.right() - handleSize, bounds.top(), handleSize, handleSize);
-        painter->drawRect(bounds.left(), bounds.bottom() - handleSize, handleSize, handleSize);
-        painter->drawRect(bounds.right() - handleSize, bounds.bottom() - handleSize, handleSize, handleSize);
+        painter->drawRect(static_cast<int>(bounds.left()), static_cast<int>(bounds.top()), handleSize, handleSize);
+        painter->drawRect(static_cast<int>(bounds.right() - handleSize), static_cast<int>(bounds.top()), handleSize, handleSize);
+        painter->drawRect(static_cast<int>(bounds.left()), static_cast<int>(bounds.bottom() - handleSize), handleSize, handleSize);
+        painter->drawRect(static_cast<int>(bounds.right() - handleSize), static_cast<int>(bounds.bottom() - handleSize), handleSize, handleSize);
     }
 }
 

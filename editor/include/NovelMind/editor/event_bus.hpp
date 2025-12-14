@@ -514,7 +514,7 @@ public:
   /**
    * @brief Convenience method to publish typed event
    */
-  template <typename T, typename... Args> void emit(Args &&...args) {
+  template <typename T, typename... Args> void emit([[maybe_unused]] Args &&...args) {
     auto event = std::make_unique<T>();
     // Initialize event with args if needed (via aggregate init or setters)
     publish(std::move(event));

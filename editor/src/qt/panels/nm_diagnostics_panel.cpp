@@ -57,7 +57,7 @@ void NMDiagnosticsPanel::setupUI()
     layout->addWidget(m_diagnosticsTree, 1);
 }
 
-void NMDiagnosticsPanel::onUpdate(double deltaTime)
+void NMDiagnosticsPanel::onUpdate([[maybe_unused]] double deltaTime)
 {
 }
 

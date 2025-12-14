@@ -240,7 +240,7 @@ void NMDebugOverlayPanel::updateVariablesTab(const QVariantMap& variables) {
         QString typeStr = value.typeName();
 
         // Add quotes for strings
-        if (value.type() == QVariant::String) {
+        if (value.metaType().id() == QMetaType::QString) {
             valueStr = QString("\"%1\"").arg(valueStr);
         }
 
@@ -248,9 +248,9 @@ void NMDebugOverlayPanel::updateVariablesTab(const QVariantMap& variables) {
 
         // Color-code by type
         QColor valueColor;
-        if (value.type() == QVariant::String) {
+        if (value.metaType().id() == QMetaType::QString) {
             valueColor = QColor("#ce9178");  // String color
-        } else if (value.type() == QVariant::Int || value.type() == QVariant::Double) {
+        } else if (value.metaType().id() == QMetaType::Int || value.metaType().id() == QMetaType::Double) {
             valueColor = QColor("#b5cea8");  // Number color
         } else {
             valueColor = QColor("#e0e0e0");  // Default
@@ -273,7 +273,7 @@ void NMDebugOverlayPanel::updateCallStackTab(const QStringList& stack) {
 
     m_callStackList->clear();
 
-    for (int i = stack.size() - 1; i >= 0; --i) {  // Reverse order (top of stack first)
+    for (int i = static_cast<int>(stack.size()) - 1; i >= 0; --i) {  // Reverse order (top of stack first)
         const QString& frame = stack[i];
         auto* item = new QListWidgetItem(QString("%1. %2").arg(stack.size() - i).arg(frame));
 
@@ -295,11 +295,11 @@ void NMDebugOverlayPanel::onCallStackChanged(const QStringList& stack) {
     updateCallStackTab(stack);
 }
 
-void NMDebugOverlayPanel::onPlayModeChanged(int mode) {
+void NMDebugOverlayPanel::onPlayModeChanged([[maybe_unused]] int mode) {
     // Update UI based on play mode
 }
 
-void NMDebugOverlayPanel::onVariableItemDoubleClicked(QTreeWidgetItem* item, int column) {
+void NMDebugOverlayPanel::onVariableItemDoubleClicked(QTreeWidgetItem* item, [[maybe_unused]] int column) {
     if (!item->parent()) {
         // Clicked on a group, not a variable
         return;
@@ -326,7 +326,7 @@ void NMDebugOverlayPanel::editVariable(const QString& name, const QVariant& curr
     bool ok = false;
     QVariant newValue;
 
-    if (currentValue.type() == QVariant::String) {
+    if (currentValue.metaType().id() == QMetaType::QString) {
         newValue = QInputDialog::getText(
             this,
             "Edit Variable",
@@ -335,7 +335,7 @@ void NMDebugOverlayPanel::editVariable(const QString& name, const QVariant& curr
             currentValue.toString(),
             &ok
         );
-    } else if (currentValue.type() == QVariant::Int) {
+    } else if (currentValue.metaType().id() == QMetaType::Int) {
         newValue = QInputDialog::getInt(
             this,
             "Edit Variable",
@@ -346,7 +346,7 @@ void NMDebugOverlayPanel::editVariable(const QString& name, const QVariant& curr
             1,
             &ok
         );
-    } else if (currentValue.type() == QVariant::Double) {
+    } else if (currentValue.metaType().id() == QMetaType::Double) {
         newValue = QInputDialog::getDouble(
             this,
             "Edit Variable",
@@ -379,7 +379,7 @@ void NMDebugOverlayPanel::setupToolBar() {
     m_toolBar->setObjectName("DebugOverlayToolBar");
     m_toolBar->setIconSize(QSize(16, 16));
 
-    auto& iconMgr = NMIconManager::instance();
+    [[maybe_unused]] auto& iconMgr = NMIconManager::instance();
 
     // Display mode toggle
     auto* minimalBtn = new QToolButton;

@@ -57,7 +57,7 @@ void NMLocalizationPanel::setupUI()
     layout->addWidget(m_stringsTable, 1);
 }
 
-void NMLocalizationPanel::onUpdate(double deltaTime)
+void NMLocalizationPanel::onUpdate([[maybe_unused]] double deltaTime)
 {
 }
 

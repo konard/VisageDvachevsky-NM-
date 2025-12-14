@@ -39,7 +39,7 @@ void NMVoiceManagerPanel::setupUI()
     layout->addWidget(m_voiceList, 1);
 }
 
-void NMVoiceManagerPanel::onUpdate(double deltaTime)
+void NMVoiceManagerPanel::onUpdate([[maybe_unused]] double deltaTime)
 {
 }
 

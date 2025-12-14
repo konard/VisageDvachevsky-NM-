@@ -64,7 +64,7 @@ void NMCurveEditorPanel::setupUI()
     m_curveScene->addPath(curvePath, QPen(QColor("#0078d4"), 2));
 }
 
-void NMCurveEditorPanel::onUpdate(double deltaTime)
+void NMCurveEditorPanel::onUpdate([[maybe_unused]] double deltaTime)
 {
     // Update curve visualization if needed
 }

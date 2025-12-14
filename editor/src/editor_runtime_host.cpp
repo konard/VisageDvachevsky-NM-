@@ -282,7 +282,7 @@ void EditorRuntimeHost::stepFrame()
         }
         if (m_animationManager)
         {
-            m_animationManager->update(static_cast<f32>(frameTime));
+            m_animationManager->update(frameTime);
         }
     }
 }
@@ -378,7 +378,7 @@ void EditorRuntimeHost::update(f64 deltaTime)
     // Update animations
     if (m_animationManager)
     {
-        m_animationManager->update(static_cast<f32>(deltaTime));
+        m_animationManager->update(deltaTime);
     }
 }
 

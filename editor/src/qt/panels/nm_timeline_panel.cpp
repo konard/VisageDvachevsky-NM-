@@ -369,7 +369,7 @@ void NMTimelinePanel::zoomToFit()
 void NMTimelinePanel::updatePlayhead()
 {
     int x = frameToX(m_currentFrame);
-    m_playheadItem->setLine(x, 0, x, m_tracks.size() * TRACK_HEIGHT + TIMELINE_MARGIN * 2);
+    m_playheadItem->setLine(x, 0, x, static_cast<qreal>(m_tracks.size() * TRACK_HEIGHT + TIMELINE_MARGIN * 2));
 }
 
 void NMTimelinePanel::updateFrameDisplay()
@@ -421,14 +421,14 @@ void NMTimelinePanel::renderTracks()
         TimelineTrack* track = it.value();
 
         // Track background
-        QGraphicsRectItem* trackBg = m_timelineScene->addRect(
+        m_timelineScene->addRect(
             TRACK_HEADER_WIDTH, y,
             frameToX(m_totalFrames) - TRACK_HEADER_WIDTH, TRACK_HEIGHT,
             QPen(Qt::NoPen),
             QBrush(QColor("#2d2d2d")));
 
         // Track header
-        QGraphicsRectItem* header = m_timelineScene->addRect(
+        m_timelineScene->addRect(
             0, y, TRACK_HEADER_WIDTH, TRACK_HEIGHT,
             QPen(Qt::NoPen),
             QBrush(track->color.darker(150)));

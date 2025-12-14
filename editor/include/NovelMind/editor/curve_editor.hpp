@@ -300,21 +300,6 @@ private:
     // Selection
     std::vector<size_t> m_selectedPoints;
 
-    // Drag state
-    enum class DragMode : u8
-    {
-        None,
-        Pan,
-        Point,
-        InHandle,
-        OutHandle,
-        BoxSelect
-    };
-    DragMode m_dragMode = DragMode::None;
-    i32 m_dragPointIndex = -1;
-    f32 m_dragStartX = 0.0f;
-    f32 m_dragStartY = 0.0f;
-
     // UI state
     bool m_showPresetsPanel = false;
     std::string m_hoveredPreset;
@@ -324,8 +309,6 @@ private:
     bool m_previewPlaying = false;
 
     // Panel state (would come from EditorPanel base class)
-    i32 m_width = 800;
-    i32 m_height = 600;
     bool m_visible = true;
 
     bool isVisible() const { return m_visible; }

@@ -69,7 +69,7 @@ void NMBuildSettingsPanel::setupUI()
     layout->addWidget(m_buildButton);
 }
 
-void NMBuildSettingsPanel::onUpdate(double deltaTime)
+void NMBuildSettingsPanel::onUpdate([[maybe_unused]] double deltaTime)
 {
 }
 
