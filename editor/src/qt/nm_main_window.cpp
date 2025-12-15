@@ -505,9 +505,26 @@ void NMMainWindow::createDefaultLayout() {
   m_assetBrowserPanel->show();
   m_hierarchyPanel->show();
 
+  // Phase 5 panels
+  if (m_playToolbarPanel) {
+    m_playToolbarPanel->show();
+  }
+  if (m_debugOverlayPanel) {
+    m_debugOverlayPanel->show();
+  }
+
+  // Make Scene View the active tab in the central area
+  m_sceneViewPanel->raise();
+
+  // Make Console the active tab in bottom area
+  m_consolePanel->raise();
+
+  // Make Inspector the active tab in right area
+  m_inspectorPanel->raise();
+
   // Resize to reasonable proportions
   resizeDocks({m_hierarchyPanel}, {250}, Qt::Horizontal);
-  resizeDocks({m_inspectorPanel}, {300}, Qt::Horizontal);
+  resizeDocks({m_inspectorPanel, m_debugOverlayPanel}, {300, 300}, Qt::Horizontal);
   resizeDocks({m_consolePanel, m_assetBrowserPanel}, {200, 200}, Qt::Vertical);
 }
 
@@ -568,14 +585,41 @@ void NMMainWindow::updateWindowTitle(const QString &projectName) {
 
 void NMMainWindow::saveLayout() {
   QSettings settings("NovelMind", "Editor");
+  constexpr int currentVersion = 2;
+  settings.setValue("mainwindow/version", currentVersion);
   settings.setValue("mainwindow/geometry", saveGeometry());
   settings.setValue("mainwindow/state", saveState());
 }
 
 void NMMainWindow::restoreLayout() {
   QSettings settings("NovelMind", "Editor");
-  restoreGeometry(settings.value("mainwindow/geometry").toByteArray());
-  restoreState(settings.value("mainwindow/state").toByteArray());
+
+  // Check if we have a saved layout version
+  int savedVersion = settings.value("mainwindow/version", 0).toInt();
+  constexpr int currentVersion = 2; // Increment when layout structure changes
+
+  if (savedVersion != currentVersion) {
+    // Layout version mismatch - use default layout
+    settings.remove("mainwindow/geometry");
+    settings.remove("mainwindow/state");
+    settings.setValue("mainwindow/version", currentVersion);
+    createDefaultLayout();
+    return;
+  }
+
+  // Restore geometry and state
+  QByteArray geometry = settings.value("mainwindow/geometry").toByteArray();
+  QByteArray state = settings.value("mainwindow/state").toByteArray();
+
+  if (!geometry.isEmpty()) {
+    restoreGeometry(geometry);
+  }
+  if (!state.isEmpty()) {
+    restoreState(state);
+  }
+
+  // Ensure all essential panels are at least created (they might be hidden)
+  // If a panel was closed before, clicking View menu should still work
 }
 
 void NMMainWindow::resetToDefaultLayout() {

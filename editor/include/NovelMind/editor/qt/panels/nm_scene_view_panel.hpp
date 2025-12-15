@@ -35,6 +35,10 @@ enum class NMSceneObjectType { Background, Character, UI, Effect };
  */
 class NMSceneObject : public QGraphicsPixmapItem {
 public:
+  /// Custom type for qgraphicsitem_cast support
+  enum { Type = QGraphicsItem::UserType + 10 };
+  int type() const override { return Type; }
+
   explicit NMSceneObject(const QString &id, NMSceneObjectType type,
                          QGraphicsItem *parent = nullptr);
 

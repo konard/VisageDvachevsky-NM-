@@ -27,6 +27,8 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 # Qt6 Editor Library
+# Note: Headers with Q_OBJECT must be listed explicitly for AUTOMOC to process them
+# when they are in a different directory than the source files
 add_library(novelmind_editor STATIC
     # Core editor systems (backend - retained from previous implementation)
     src/editor_runtime_host.cpp
@@ -45,7 +47,7 @@ add_library(novelmind_editor STATIC
     src/error_reporter.cpp
     src/hotkeys_manager.cpp
 
-    # Qt6 GUI implementation
+    # Qt6 GUI implementation - sources
     src/qt/qt_event_bus.cpp
     src/qt/qt_selection_manager.cpp
     src/qt/nm_style_manager.cpp
@@ -55,7 +57,18 @@ add_library(novelmind_editor STATIC
     src/qt/nm_undo_manager.cpp
     src/qt/nm_icon_manager.cpp
 
-    # Phase 0 & 1 panels
+    # Qt6 GUI implementation - headers with Q_OBJECT (required for AUTOMOC)
+    include/NovelMind/editor/qt/qt_event_bus.hpp
+    include/NovelMind/editor/qt/qt_selection_manager.hpp
+    include/NovelMind/editor/qt/nm_style_manager.hpp
+    include/NovelMind/editor/qt/nm_main_window.hpp
+    include/NovelMind/editor/qt/nm_dock_panel.hpp
+    include/NovelMind/editor/qt/nm_welcome_dialog.hpp
+    include/NovelMind/editor/qt/nm_undo_manager.hpp
+    include/NovelMind/editor/qt/nm_play_mode_controller.hpp
+    include/NovelMind/editor/qt/nm_icon_manager.hpp
+
+    # Phase 0 & 1 panels - sources
     src/qt/panels/nm_scene_view_panel.cpp
     src/qt/panels/nm_story_graph_panel.cpp
     src/qt/panels/nm_inspector_panel.cpp
@@ -63,7 +76,15 @@ add_library(novelmind_editor STATIC
     src/qt/panels/nm_asset_browser_panel.cpp
     src/qt/panels/nm_hierarchy_panel.cpp
 
-    # Phase 3 & 4 panels
+    # Phase 0 & 1 panels - headers with Q_OBJECT (required for AUTOMOC)
+    include/NovelMind/editor/qt/panels/nm_scene_view_panel.hpp
+    include/NovelMind/editor/qt/panels/nm_story_graph_panel.hpp
+    include/NovelMind/editor/qt/panels/nm_inspector_panel.hpp
+    include/NovelMind/editor/qt/panels/nm_console_panel.hpp
+    include/NovelMind/editor/qt/panels/nm_asset_browser_panel.hpp
+    include/NovelMind/editor/qt/panels/nm_hierarchy_panel.hpp
+
+    # Phase 3 & 4 panels - sources
     src/qt/panels/nm_timeline_panel.cpp
     src/qt/panels/nm_curve_editor_panel.cpp
     src/qt/panels/nm_voice_manager_panel.cpp
@@ -71,10 +92,22 @@ add_library(novelmind_editor STATIC
     src/qt/panels/nm_diagnostics_panel.cpp
     src/qt/panels/nm_build_settings_panel.cpp
 
-    # Phase 5 - Play-In-Editor
+    # Phase 3 & 4 panels - headers with Q_OBJECT (required for AUTOMOC)
+    include/NovelMind/editor/qt/panels/nm_timeline_panel.hpp
+    include/NovelMind/editor/qt/panels/nm_curve_editor_panel.hpp
+    include/NovelMind/editor/qt/panels/nm_voice_manager_panel.hpp
+    include/NovelMind/editor/qt/panels/nm_localization_panel.hpp
+    include/NovelMind/editor/qt/panels/nm_diagnostics_panel.hpp
+    include/NovelMind/editor/qt/panels/nm_build_settings_panel.hpp
+
+    # Phase 5 - Play-In-Editor - sources
     src/qt/nm_play_mode_controller.cpp
     src/qt/panels/nm_play_toolbar_panel.cpp
     src/qt/panels/nm_debug_overlay_panel.cpp
+
+    # Phase 5 - Play-In-Editor - headers with Q_OBJECT (required for AUTOMOC)
+    include/NovelMind/editor/qt/panels/nm_play_toolbar_panel.hpp
+    include/NovelMind/editor/qt/panels/nm_debug_overlay_panel.hpp
 )
 
 # Alias for backward compatibility

@@ -24,6 +24,10 @@ namespace NovelMind::editor::qt {
  */
 class NMGraphNodeItem : public QGraphicsItem {
 public:
+  /// Custom type for qgraphicsitem_cast support
+  enum { Type = QGraphicsItem::UserType + 1 };
+  int type() const override { return Type; }
+
   explicit NMGraphNodeItem(const QString &title, const QString &nodeType);
 
   void setTitle(const QString &title);
@@ -75,6 +79,10 @@ private:
  */
 class NMGraphConnectionItem : public QGraphicsItem {
 public:
+  /// Custom type for qgraphicsitem_cast support
+  enum { Type = QGraphicsItem::UserType + 2 };
+  int type() const override { return Type; }
+
   NMGraphConnectionItem(NMGraphNodeItem *startNode, NMGraphNodeItem *endNode);
 
   void updatePath();
