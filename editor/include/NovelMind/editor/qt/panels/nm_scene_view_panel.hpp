@@ -41,6 +41,7 @@ public:
 
   explicit NMSceneObject(const QString &id, NMSceneObjectType type,
                          QGraphicsItem *parent = nullptr);
+  ~NMSceneObject() override = default;
 
   [[nodiscard]] QString id() const { return m_id; }
   [[nodiscard]] NMSceneObjectType objectType() const { return m_objectType; }
@@ -77,6 +78,7 @@ public:
   enum class GizmoMode { Move, Rotate, Scale };
 
   explicit NMTransformGizmo(QGraphicsItem *parent = nullptr);
+  ~NMTransformGizmo() override = default;
 
   void setMode(GizmoMode mode);
   [[nodiscard]] GizmoMode mode() const { return m_mode; }

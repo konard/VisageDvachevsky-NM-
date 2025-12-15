@@ -29,6 +29,7 @@ public:
   int type() const override { return Type; }
 
   explicit NMGraphNodeItem(const QString &title, const QString &nodeType);
+  ~NMGraphNodeItem() override = default;
 
   void setTitle(const QString &title);
   [[nodiscard]] QString title() const { return m_title; }
@@ -84,6 +85,7 @@ public:
   int type() const override { return Type; }
 
   NMGraphConnectionItem(NMGraphNodeItem *startNode, NMGraphNodeItem *endNode);
+  ~NMGraphConnectionItem() override = default;
 
   void updatePath();
 
