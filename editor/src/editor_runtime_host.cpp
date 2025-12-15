@@ -162,6 +162,11 @@ Result<void> EditorRuntimeHost::playFromScene(const std::string &sceneId) {
     }
   }
 
+  // Update scene graph with current scene ID
+  if (m_sceneGraph) {
+    m_sceneGraph->setSceneId(sceneId);
+  }
+
   m_state = EditorRuntimeState::Running;
   fireStateChanged(m_state);
 
