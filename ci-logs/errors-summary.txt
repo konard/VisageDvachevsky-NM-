@@ -1,0 +1,100 @@
+build-macos (Debug)	Build	2025-12-15T01:07:32.9792720Z [86/167] Building CXX object _deps/catch2-build/src/CMakeFiles/Catch2.dir/catch2/internal/catch_test_failure_exception.cpp.o
+build-macos (Debug)	Run tests	2025-12-15T01:08:09.4450060Z [36;1mctest --output-on-failure[0m
+build-macos (Debug)	Run tests	2025-12-15T01:08:09.5872470Z         Start   2: Result<T> error value
+build-macos (Debug)	Run tests	2025-12-15T01:08:09.6114170Z   2/118 Test   #2: Result<T> error value .............................................   Passed    0.02 sec
+build-macos (Debug)	Run tests	2025-12-15T01:08:09.6295330Z         Start   4: Result<T> valueOr returns default when error
+build-macos (Debug)	Run tests	2025-12-15T01:08:09.6542000Z   4/118 Test   #4: Result<T> valueOr returns default when error ......................   Passed    0.02 sec
+build-macos (Debug)	Run tests	2025-12-15T01:08:09.6635670Z         Start   6: Result<void> error
+build-macos (Debug)	Run tests	2025-12-15T01:08:09.6823010Z   6/118 Test   #6: Result<void> error ................................................   Passed    0.02 sec
+build-macos (Debug)	Run tests	2025-12-15T01:08:09.9791100Z         Start  17: MemoryFS readFile returns error for non-existing resource
+build-macos (Debug)	Run tests	2025-12-15T01:08:09.9951540Z  17/118 Test  #17: MemoryFS readFile returns error for non-existing resource .........   Passed    0.02 sec
+build-macos (Debug)	Run tests	2025-12-15T01:08:10.1121250Z         Start  25: VM load empty program fails
+build-macos (Debug)	Run tests	2025-12-15T01:08:10.1277370Z  25/118 Test  #25: VM load empty program fails .......................................   Passed    0.02 sec
+build-macos (Debug)	Run tests	2025-12-15T01:08:10.4619650Z         Start  46: Lexer reports errors
+build-macos (Debug)	Run tests	2025-12-15T01:08:10.4824520Z  46/118 Test  #46: Lexer reports errors ..............................................   Passed    0.02 sec
+build-macos (Debug)	Run tests	2025-12-15T01:08:10.6718470Z         Start  57: Validator - Duplicate character definition reports error
+build-macos (Debug)	Run tests	2025-12-15T01:08:10.6882280Z  57/118 Test  #57: Validator - Duplicate character definition reports error ..........   Passed    0.02 sec
+build-macos (Debug)	Run tests	2025-12-15T01:08:10.6883860Z         Start  58: Validator - Duplicate scene definition reports error
+build-macos (Debug)	Run tests	2025-12-15T01:08:10.7037940Z  58/118 Test  #58: Validator - Duplicate scene definition reports error ..............   Passed    0.02 sec
+build-macos (Debug)	Run tests	2025-12-15T01:08:10.7228780Z         Start  60: Validator - Undefined character in show statement reports error
+build-macos (Debug)	Run tests	2025-12-15T01:08:10.7390340Z  60/118 Test  #60: Validator - Undefined character in show statement reports error ...   Passed    0.02 sec
+build-macos (Debug)	Run tests	2025-12-15T01:08:10.7391900Z         Start  61: Validator - Undefined scene in goto reports error
+build-macos (Debug)	Run tests	2025-12-15T01:08:10.7582580Z  61/118 Test  #61: Validator - Undefined scene in goto reports error .................   Passed    0.02 sec
+build-macos (Debug)	Run tests	2025-12-15T01:08:10.8143180Z         Start  65: Validator - Empty choice block reports error
+build-macos (Debug)	Run tests	2025-12-15T01:08:10.8289010Z  65/118 Test  #65: Validator - Empty choice block reports error ......................   Passed    0.01 sec
+build-macos (Debug)	Run tests	2025-12-15T01:08:10.8294160Z         Start  66: Validator - Undefined speaker in say reports error
+build-macos (Debug)	Run tests	2025-12-15T01:08:10.8438120Z  66/118 Test  #66: Validator - Undefined speaker in say reports error ................   Passed    0.01 sec
+build-macos (Debug)	Run tests	2025-12-15T01:08:10.8645470Z         Start  68: ScriptError - Format includes severity and location
+build-macos (Debug)	Run tests	2025-12-15T01:08:10.8812280Z  68/118 Test  #68: ScriptError - Format includes severity and location ...............   Passed    0.02 sec
+build-macos (Debug)	Run tests	2025-12-15T01:08:10.8813590Z         Start  69: ErrorList - Counts errors and warnings correctly
+build-macos (Debug)	Run tests	2025-12-15T01:08:10.8961360Z  69/118 Test  #69: ErrorList - Counts errors and warnings correctly ..................   Passed    0.01 sec
+build-macos (Debug)	Run tests	2025-12-15T01:08:11.7961780Z 100% tests passed, 0 tests failed out of 118
+format-check	Check formatting	2025-12-15T01:06:58.1959006Z [36;1m  xargs clang-format-14 --dry-run --Werror || \[0m
+build-windows (Release)	Build	2025-12-15T01:09:14.1736855Z   catch_test_failure_exception.cpp
+build-windows (Release)	Run tests	2025-12-15T01:12:02.1620473Z [36;1mctest -C Release --output-on-failure[0m
+build-windows (Release)	Run tests	2025-12-15T01:12:03.7794777Z         Start   2: Result<T> error value
+build-windows (Release)	Run tests	2025-12-15T01:12:03.7884199Z   2/118 Test   #2: Result<T> error value .............................................   Passed    0.01 sec
+build-windows (Release)	Run tests	2025-12-15T01:12:03.7975349Z         Start   4: Result<T> valueOr returns default when error
+build-windows (Release)	Run tests	2025-12-15T01:12:03.8062183Z   4/118 Test   #4: Result<T> valueOr returns default when error ......................   Passed    0.01 sec
+build-windows (Release)	Run tests	2025-12-15T01:12:03.8154067Z         Start   6: Result<void> error
+build-windows (Release)	Run tests	2025-12-15T01:12:03.8239798Z   6/118 Test   #6: Result<void> error ................................................   Passed    0.01 sec
+build-windows (Release)	Run tests	2025-12-15T01:12:03.9496463Z         Start  17: MemoryFS readFile returns error for non-existing resource
+build-windows (Release)	Run tests	2025-12-15T01:12:03.9582806Z  17/118 Test  #17: MemoryFS readFile returns error for non-existing resource .........   Passed    0.01 sec
+build-windows (Release)	Run tests	2025-12-15T01:12:04.0237944Z         Start  25: VM load empty program fails
+build-windows (Release)	Run tests	2025-12-15T01:12:04.0321729Z  25/118 Test  #25: VM load empty program fails .......................................   Passed    0.01 sec
+build-windows (Release)	Run tests	2025-12-15T01:12:04.2269623Z         Start  46: Lexer reports errors
+build-windows (Release)	Run tests	2025-12-15T01:12:04.2362405Z  46/118 Test  #46: Lexer reports errors ..............................................   Passed    0.01 sec
+build-windows (Release)	Run tests	2025-12-15T01:12:04.3384262Z         Start  57: Validator - Duplicate character definition reports error
+build-windows (Release)	Run tests	2025-12-15T01:12:04.3476690Z  57/118 Test  #57: Validator - Duplicate character definition reports error ..........   Passed    0.01 sec
+build-windows (Release)	Run tests	2025-12-15T01:12:04.3480872Z         Start  58: Validator - Duplicate scene definition reports error
+build-windows (Release)	Run tests	2025-12-15T01:12:04.3573555Z  58/118 Test  #58: Validator - Duplicate scene definition reports error ..............   Passed    0.01 sec
+build-windows (Release)	Run tests	2025-12-15T01:12:04.3675977Z         Start  60: Validator - Undefined character in show statement reports error
+build-windows (Release)	Run tests	2025-12-15T01:12:04.3767506Z  60/118 Test  #60: Validator - Undefined character in show statement reports error ...   Passed    0.01 sec
+build-windows (Release)	Run tests	2025-12-15T01:12:04.3772307Z         Start  61: Validator - Undefined scene in goto reports error
+build-windows (Release)	Run tests	2025-12-15T01:12:04.3893426Z  61/118 Test  #61: Validator - Undefined scene in goto reports error .................   Passed    0.01 sec
+build-windows (Release)	Run tests	2025-12-15T01:12:04.4213047Z         Start  65: Validator - Empty choice block reports error
+build-windows (Release)	Run tests	2025-12-15T01:12:04.4305059Z  65/118 Test  #65: Validator - Empty choice block reports error ......................   Passed    0.01 sec
+build-windows (Release)	Run tests	2025-12-15T01:12:04.4309879Z         Start  66: Validator - Undefined speaker in say reports error
+build-windows (Release)	Run tests	2025-12-15T01:12:04.4423443Z  66/118 Test  #66: Validator - Undefined speaker in say reports error ................   Passed    0.01 sec
+build-windows (Release)	Run tests	2025-12-15T01:12:04.4530713Z         Start  68: ScriptError - Format includes severity and location
+build-windows (Release)	Run tests	2025-12-15T01:12:04.4632659Z  68/118 Test  #68: ScriptError - Format includes severity and location ...............   Passed    0.01 sec
+build-windows (Release)	Run tests	2025-12-15T01:12:04.4637363Z         Start  69: ErrorList - Counts errors and warnings correctly
+build-windows (Release)	Run tests	2025-12-15T01:12:04.4739849Z  69/118 Test  #69: ErrorList - Counts errors and warnings correctly ..................   Passed    0.01 sec
+build-windows (Release)	Run tests	2025-12-15T01:12:04.9769987Z 100% tests passed, 0 tests failed out of 118
+build-windows (Debug)	Build	2025-12-15T01:09:36.9662379Z   catch_test_failure_exception.cpp
+build-windows (Debug)	Run tests	2025-12-15T01:11:33.6678709Z [36;1mctest -C Debug --output-on-failure[0m
+build-windows (Debug)	Run tests	2025-12-15T01:11:36.3971231Z         Start   2: Result<T> error value
+build-windows (Debug)	Run tests	2025-12-15T01:11:36.4136855Z   2/118 Test   #2: Result<T> error value .............................................   Passed    0.02 sec
+build-windows (Debug)	Run tests	2025-12-15T01:11:36.4305315Z         Start   4: Result<T> valueOr returns default when error
+build-windows (Debug)	Run tests	2025-12-15T01:11:36.4475133Z   4/118 Test   #4: Result<T> valueOr returns default when error ......................   Passed    0.02 sec
+build-windows (Debug)	Run tests	2025-12-15T01:11:36.4641334Z         Start   6: Result<void> error
+build-windows (Debug)	Run tests	2025-12-15T01:11:36.4804860Z   6/118 Test   #6: Result<void> error ................................................   Passed    0.02 sec
+build-windows (Debug)	Run tests	2025-12-15T01:11:36.6995077Z         Start  17: MemoryFS readFile returns error for non-existing resource
+build-windows (Debug)	Run tests	2025-12-15T01:11:36.7162370Z  17/118 Test  #17: MemoryFS readFile returns error for non-existing resource .........   Passed    0.02 sec
+build-windows (Debug)	Run tests	2025-12-15T01:11:36.8326237Z         Start  25: VM load empty program fails
+build-windows (Debug)	Run tests	2025-12-15T01:11:36.8480581Z  25/118 Test  #25: VM load empty program fails .......................................   Passed    0.02 sec
+build-windows (Debug)	Run tests	2025-12-15T01:11:37.2166396Z         Start  46: Lexer reports errors
+build-windows (Debug)	Run tests	2025-12-15T01:11:37.2324133Z  46/118 Test  #46: Lexer reports errors ..............................................   Passed    0.02 sec
+build-windows (Debug)	Run tests	2025-12-15T01:11:37.4020289Z         Start  57: Validator - Duplicate character definition reports error
+build-windows (Debug)	Run tests	2025-12-15T01:11:37.4179413Z  57/118 Test  #57: Validator - Duplicate character definition reports error ..........   Passed    0.02 sec
+build-windows (Debug)	Run tests	2025-12-15T01:11:37.4183577Z         Start  58: Validator - Duplicate scene definition reports error
+build-windows (Debug)	Run tests	2025-12-15T01:11:37.4340686Z  58/118 Test  #58: Validator - Duplicate scene definition reports error ..............   Passed    0.02 sec
+build-windows (Debug)	Run tests	2025-12-15T01:11:37.4505272Z         Start  60: Validator - Undefined character in show statement reports error
+build-windows (Debug)	Run tests	2025-12-15T01:11:37.4670462Z  60/118 Test  #60: Validator - Undefined character in show statement reports error ...   Passed    0.02 sec
+build-windows (Debug)	Run tests	2025-12-15T01:11:37.4675110Z         Start  61: Validator - Undefined scene in goto reports error
+build-windows (Debug)	Run tests	2025-12-15T01:11:37.4855330Z  61/118 Test  #61: Validator - Undefined scene in goto reports error .................   Passed    0.02 sec
+build-windows (Debug)	Run tests	2025-12-15T01:11:37.5355481Z         Start  65: Validator - Empty choice block reports error
+build-windows (Debug)	Run tests	2025-12-15T01:11:37.5511954Z  65/118 Test  #65: Validator - Empty choice block reports error ......................   Passed    0.02 sec
+build-windows (Debug)	Run tests	2025-12-15T01:11:37.5515424Z         Start  66: Validator - Undefined speaker in say reports error
+build-windows (Debug)	Run tests	2025-12-15T01:11:37.5671056Z  66/118 Test  #66: Validator - Undefined speaker in say reports error ................   Passed    0.02 sec
+build-windows (Debug)	Run tests	2025-12-15T01:11:37.5840288Z         Start  68: ScriptError - Format includes severity and location
+build-windows (Debug)	Run tests	2025-12-15T01:11:37.5998740Z  68/118 Test  #68: ScriptError - Format includes severity and location ...............   Passed    0.02 sec
+build-windows (Debug)	Run tests	2025-12-15T01:11:37.6002617Z         Start  69: ErrorList - Counts errors and warnings correctly
+build-windows (Debug)	Run tests	2025-12-15T01:11:37.6159942Z  69/118 Test  #69: ErrorList - Counts errors and warnings correctly ..................   Passed    0.02 sec
+build-windows (Debug)	Run tests	2025-12-15T01:11:38.4826045Z 100% tests passed, 0 tests failed out of 118
+build-linux (clang, Debug)	Build	2025-12-15T01:07:55.5216672Z [86/167] Building CXX object _deps/catch2-build/src/CMakeFiles/Catch2.dir/catch2/internal/catch_test_failure_exception.cpp.o
+build-linux (clang, Debug)	Run tests	2025-12-15T01:08:44.7821823Z [36;1mctest --output-on-failure[0m
+build-linux (clang, Debug)	Run tests	2025-12-15T01:08:45.2125628Z         Start   2: Result<T> error value
+build-linux (clang, Debug)	Run tests	2025-12-15T01:08:45.2204839Z   2/118 Test   #2: Result<T> error value .............................................   Passed    0.01 sec
+build-linux (clang, Debug)	Run tests	2025-12-15T01:08:45.2289641Z         Start   4: Result<T> valueOr returns default when error
+build-linux (clang, Debug)	Run tests	2025-12-15T01:08:45.2368396Z   4/118 Test   #4: Result<T> valueOr returns default when error ......................   Passed    0.01 sec

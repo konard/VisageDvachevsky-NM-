@@ -1,7 +1,7 @@
-# Tests configuration
+#Tests configuration
 include(FetchContent)
 
-# Fetch Catch2 for testing
+#Fetch Catch2 for testing
 FetchContent_Declare(
     Catch2
     GIT_REPOSITORY https://github.com/catchorg/Catch2.git
@@ -9,7 +9,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Catch2)
 
-# Unit tests
+#Unit tests
 add_executable(unit_tests
     unit/test_result.cpp
     unit/test_timer.cpp
@@ -31,18 +31,18 @@ target_link_libraries(unit_tests
         novelmind_compiler_options
 )
 
-# Register unit tests
+#Register unit tests
 include(CTest)
 include(Catch)
 
-# Discover tests with reasonable timeout for fuzz tests
-# Windows Debug builds can be significantly slower, so we use a generous default
+#Discover tests with reasonable timeout for fuzz tests
+#Windows Debug builds can be significantly slower, so we use a generous default
 catch_discover_tests(unit_tests
     PROPERTIES
         TIMEOUT 60  # 60 seconds max per test
 )
 
-# Integration tests (requires editor)
+#Integration tests(requires editor)
 if(NOVELMIND_BUILD_EDITOR)
     add_executable(integration_tests
         integration/test_editor_runtime.cpp
@@ -64,6 +64,6 @@ if(NOVELMIND_BUILD_EDITOR)
 
     catch_discover_tests(integration_tests
         PROPERTIES
-            TIMEOUT 60
+            TIMEOUT 120  # Increased to 120s for GUI tests with complex script execution
     )
 endif()

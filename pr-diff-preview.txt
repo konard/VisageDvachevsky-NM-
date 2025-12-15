@@ -1,0 +1,200 @@
+diff --git a/editor/CMakeLists.txt b/editor/CMakeLists.txt
+index 18fc792..fb6c360 100644
+--- a/editor/CMakeLists.txt
++++ b/editor/CMakeLists.txt
+@@ -27,6 +27,8 @@ set(CMAKE_AUTOUIC ON)
+ set(CMAKE_AUTORCC ON)
+ 
+ # Qt6 Editor Library
++# Note: Headers with Q_OBJECT must be listed explicitly for AUTOMOC to process them
++# when they are in a different directory than the source files
+ add_library(novelmind_editor STATIC
+     # Core editor systems (backend - retained from previous implementation)
+     src/editor_runtime_host.cpp
+@@ -45,7 +47,7 @@ add_library(novelmind_editor STATIC
+     src/error_reporter.cpp
+     src/hotkeys_manager.cpp
+ 
+-    # Qt6 GUI implementation
++    # Qt6 GUI implementation - sources
+     src/qt/qt_event_bus.cpp
+     src/qt/qt_selection_manager.cpp
+     src/qt/nm_style_manager.cpp
+@@ -55,7 +57,18 @@ add_library(novelmind_editor STATIC
+     src/qt/nm_undo_manager.cpp
+     src/qt/nm_icon_manager.cpp
+ 
+-    # Phase 0 & 1 panels
++    # Qt6 GUI implementation - headers with Q_OBJECT (required for AUTOMOC)
++    include/NovelMind/editor/qt/qt_event_bus.hpp
++    include/NovelMind/editor/qt/qt_selection_manager.hpp
++    include/NovelMind/editor/qt/nm_style_manager.hpp
++    include/NovelMind/editor/qt/nm_main_window.hpp
++    include/NovelMind/editor/qt/nm_dock_panel.hpp
++    include/NovelMind/editor/qt/nm_welcome_dialog.hpp
++    include/NovelMind/editor/qt/nm_undo_manager.hpp
++    include/NovelMind/editor/qt/nm_play_mode_controller.hpp
++    include/NovelMind/editor/qt/nm_icon_manager.hpp
++
++    # Phase 0 & 1 panels - sources
+     src/qt/panels/nm_scene_view_panel.cpp
+     src/qt/panels/nm_story_graph_panel.cpp
+     src/qt/panels/nm_inspector_panel.cpp
+@@ -63,7 +76,15 @@ add_library(novelmind_editor STATIC
+     src/qt/panels/nm_asset_browser_panel.cpp
+     src/qt/panels/nm_hierarchy_panel.cpp
+ 
+-    # Phase 3 & 4 panels
++    # Phase 0 & 1 panels - headers with Q_OBJECT (required for AUTOMOC)
++    include/NovelMind/editor/qt/panels/nm_scene_view_panel.hpp
++    include/NovelMind/editor/qt/panels/nm_story_graph_panel.hpp
++    include/NovelMind/editor/qt/panels/nm_inspector_panel.hpp
++    include/NovelMind/editor/qt/panels/nm_console_panel.hpp
++    include/NovelMind/editor/qt/panels/nm_asset_browser_panel.hpp
++    include/NovelMind/editor/qt/panels/nm_hierarchy_panel.hpp
++
++    # Phase 3 & 4 panels - sources
+     src/qt/panels/nm_timeline_panel.cpp
+     src/qt/panels/nm_curve_editor_panel.cpp
+     src/qt/panels/nm_voice_manager_panel.cpp
+@@ -71,10 +92,22 @@ add_library(novelmind_editor STATIC
+     src/qt/panels/nm_diagnostics_panel.cpp
+     src/qt/panels/nm_build_settings_panel.cpp
+ 
+-    # Phase 5 - Play-In-Editor
++    # Phase 3 & 4 panels - headers with Q_OBJECT (required for AUTOMOC)
++    include/NovelMind/editor/qt/panels/nm_timeline_panel.hpp
++    include/NovelMind/editor/qt/panels/nm_curve_editor_panel.hpp
++    include/NovelMind/editor/qt/panels/nm_voice_manager_panel.hpp
++    include/NovelMind/editor/qt/panels/nm_localization_panel.hpp
++    include/NovelMind/editor/qt/panels/nm_diagnostics_panel.hpp
++    include/NovelMind/editor/qt/panels/nm_build_settings_panel.hpp
++
++    # Phase 5 - Play-In-Editor - sources
+     src/qt/nm_play_mode_controller.cpp
+     src/qt/panels/nm_play_toolbar_panel.cpp
+     src/qt/panels/nm_debug_overlay_panel.cpp
++
++    # Phase 5 - Play-In-Editor - headers with Q_OBJECT (required for AUTOMOC)
++    include/NovelMind/editor/qt/panels/nm_play_toolbar_panel.hpp
++    include/NovelMind/editor/qt/panels/nm_debug_overlay_panel.hpp
+ )
+ 
+ # Alias for backward compatibility
+diff --git a/editor/include/NovelMind/editor/qt/panels/nm_scene_view_panel.hpp b/editor/include/NovelMind/editor/qt/panels/nm_scene_view_panel.hpp
+index 83fe7cb..3edf2d0 100644
+--- a/editor/include/NovelMind/editor/qt/panels/nm_scene_view_panel.hpp
++++ b/editor/include/NovelMind/editor/qt/panels/nm_scene_view_panel.hpp
+@@ -35,8 +35,13 @@ enum class NMSceneObjectType { Background, Character, UI, Effect };
+  */
+ class NMSceneObject : public QGraphicsPixmapItem {
+ public:
++  /// Custom type for qgraphicsitem_cast support
++  enum { Type = QGraphicsItem::UserType + 10 };
++  int type() const override { return Type; }
++
+   explicit NMSceneObject(const QString &id, NMSceneObjectType type,
+                          QGraphicsItem *parent = nullptr);
++  ~NMSceneObject() override = default;
+ 
+   [[nodiscard]] QString id() const { return m_id; }
+   [[nodiscard]] NMSceneObjectType objectType() const { return m_objectType; }
+@@ -61,13 +66,19 @@ class NMSceneObject : public QGraphicsPixmapItem {
+ };
+ 
+ /**
+- * @brief Transform gizmo for moving objects
++ * @brief Transform gizmo handle types for interaction
++ */
++enum class GizmoHandle { None, AxisX, AxisY, Center, RotateHandle, ScaleCorner };
++
++/**
++ * @brief Transform gizmo for moving, rotating, and scaling objects
+  */
+ class NMTransformGizmo : public QGraphicsItemGroup {
+ public:
+   enum class GizmoMode { Move, Rotate, Scale };
+ 
+   explicit NMTransformGizmo(QGraphicsItem *parent = nullptr);
++  ~NMTransformGizmo() override = default;
+ 
+   void setMode(GizmoMode mode);
+   [[nodiscard]] GizmoMode mode() const { return m_mode; }
+@@ -77,6 +88,13 @@ class NMTransformGizmo : public QGraphicsItemGroup {
+ 
+   void updatePosition();
+ 
++  // Interaction methods
++  [[nodiscard]] bool isDragging() const { return m_isDragging; }
++  void startDrag(const QPointF &scenePos, GizmoHandle handle);
++  void updateDrag(const QPointF &scenePos);
++  void endDrag();
++  [[nodiscard]] GizmoHandle hitTest(const QPointF &localPos) const;
++
+ private:
+   void createMoveGizmo();
+   void createRotateGizmo();
+@@ -85,6 +103,15 @@ class NMTransformGizmo : public QGraphicsItemGroup {
+ 
+   GizmoMode m_mode = GizmoMode::Move;
+   NMSceneObject *m_targetObject = nullptr;
++
++  // Dragging state
++  bool m_isDragging = false;
++  GizmoHandle m_activeHandle = GizmoHandle::None;
++  QPointF m_dragStartPos;
++  QPointF m_targetStartPos;
++  qreal m_targetStartRotation = 0.0;
++  qreal m_targetStartScaleX = 1.0;
++  qreal m_targetStartScaleY = 1.0;
+ };
+ 
+ /**
+@@ -121,10 +148,13 @@ class NMSceneGraphicsScene : public QGraphicsScene {
+ signals:
+   void objectSelected(const QString &objectId);
+   void objectPositionChanged(const QString &objectId, const QPointF &position);
++  void objectTransformChanged(const QString &objectId);
+ 
+ protected:
+   void drawBackground(QPainter *painter, const QRectF &rect) override;
+   void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
++  void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
++  void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+ 
+ private:
+   void updateGizmo();
+diff --git a/editor/include/NovelMind/editor/qt/panels/nm_story_graph_panel.hpp b/editor/include/NovelMind/editor/qt/panels/nm_story_graph_panel.hpp
+index 14bb277..41c213e 100644
+--- a/editor/include/NovelMind/editor/qt/panels/nm_story_graph_panel.hpp
++++ b/editor/include/NovelMind/editor/qt/panels/nm_story_graph_panel.hpp
+@@ -24,7 +24,12 @@ namespace NovelMind::editor::qt {
+  */
+ class NMGraphNodeItem : public QGraphicsItem {
+ public:
++  /// Custom type for qgraphicsitem_cast support
++  enum { Type = QGraphicsItem::UserType + 1 };
++  int type() const override { return Type; }
++
+   explicit NMGraphNodeItem(const QString &title, const QString &nodeType);
++  ~NMGraphNodeItem() override = default;
+ 
+   void setTitle(const QString &title);
+   [[nodiscard]] QString title() const { return m_title; }
+@@ -75,7 +80,12 @@ class NMGraphNodeItem : public QGraphicsItem {
+  */
+ class NMGraphConnectionItem : public QGraphicsItem {
+ public:
++  /// Custom type for qgraphicsitem_cast support
++  enum { Type = QGraphicsItem::UserType + 2 };
++  int type() const override { return Type; }
++
+   NMGraphConnectionItem(NMGraphNodeItem *startNode, NMGraphNodeItem *endNode);
++  ~NMGraphConnectionItem() override = default;
+ 
+   void updatePath();
+ 
+diff --git a/editor/src/editor_runtime_host.cpp b/editor/src/editor_runtime_host.cpp
+index de78f98..73f1f38 100644
+--- a/editor/src/editor_runtime_host.cpp
++++ b/editor/src/editor_runtime_host.cpp

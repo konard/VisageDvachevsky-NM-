@@ -193,7 +193,11 @@ void NMGraphNodeItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
 
   if (selectedAction == breakpointAction) {
     // Toggle breakpoint via Play Mode Controller
-    NMPlayModeController::instance().toggleBreakpoint(m_nodeIdString);
+    if (!m_nodeIdString.isEmpty()) {
+      NMPlayModeController::instance().toggleBreakpoint(m_nodeIdString);
+    } else {
+      qWarning() << "[StoryGraph] Cannot toggle breakpoint: node ID not set";
+    }
   } else if (selectedAction == deleteAction) {
     // TODO: Implement node deletion via undo system
     // For now, just mark for deletion
@@ -831,8 +835,10 @@ void NMStoryGraphPanel::updateNodeBreakpoints() {
   const auto items = m_scene->items();
   for (auto *item : items) {
     if (auto *node = qgraphicsitem_cast<NMGraphNodeItem *>(item)) {
-      bool hasBreakpoint = breakpoints.contains(node->nodeIdString());
-      node->setBreakpoint(hasBreakpoint);
+      if (!node->nodeIdString().isEmpty()) {
+        bool hasBreakpoint = breakpoints.contains(node->nodeIdString());
+        node->setBreakpoint(hasBreakpoint);
+      }
     }
   }
 }

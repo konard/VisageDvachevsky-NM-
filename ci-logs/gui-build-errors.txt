@@ -1,0 +1,50 @@
+build-linux-gui (gcc, Debug)	Build	2025-12-15T01:08:27.6385698Z [94/215] Building CXX object editor/CMakeFiles/novelmind_editor.dir/src/error_reporter.cpp.o
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.5203479Z         Start   2: Result<T> error value
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.5240330Z   2/149 Test   #2: Result<T> error value .............................................   Passed    0.00 sec
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.5277441Z         Start   4: Result<T> valueOr returns default when error
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.5313777Z   4/149 Test   #4: Result<T> valueOr returns default when error ......................   Passed    0.00 sec
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.5350816Z         Start   6: Result<void> error
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.5385363Z   6/149 Test   #6: Result<void> error ................................................   Passed    0.00 sec
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.6051130Z         Start  17: MemoryFS readFile returns error for non-existing resource
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.6086782Z  17/149 Test  #17: MemoryFS readFile returns error for non-existing resource .........   Passed    0.00 sec
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.7111066Z         Start  46: Lexer reports errors
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.7146420Z  46/149 Test  #46: Lexer reports errors ..............................................   Passed    0.00 sec
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.7524526Z         Start  57: Validator - Duplicate character definition reports error
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.7560478Z  57/149 Test  #57: Validator - Duplicate character definition reports error ..........   Passed    0.00 sec
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.7561621Z         Start  58: Validator - Duplicate scene definition reports error
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.7597319Z  58/149 Test  #58: Validator - Duplicate scene definition reports error ..............   Passed    0.00 sec
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.7635795Z         Start  60: Validator - Undefined character in show statement reports error
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.7672528Z  60/149 Test  #60: Validator - Undefined character in show statement reports error ...   Passed    0.00 sec
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.7673684Z         Start  61: Validator - Undefined scene in goto reports error
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.7709939Z  61/149 Test  #61: Validator - Undefined scene in goto reports error .................   Passed    0.00 sec
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.7823776Z         Start  65: Validator - Empty choice block reports error
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.7860019Z  65/149 Test  #65: Validator - Empty choice block reports error ......................   Passed    0.00 sec
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.7861193Z         Start  66: Validator - Undefined speaker in say reports error
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.7897018Z  66/149 Test  #66: Validator - Undefined speaker in say reports error ................   Passed    0.00 sec
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.7972031Z         Start  69: ErrorList - Counts errors and warnings correctly
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.8008588Z  69/149 Test  #69: ErrorList - Counts errors and warnings correctly ..................   Passed    0.00 sec
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.9678417Z         Start 112: Fuzz - Validator handles undefined references
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:09:18.9714898Z 112/149 Test #112: Fuzz - Validator handles undefined references .....................   Passed    0.00 sec
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:10:19.2127061Z 129/149 Test #129: EditorRuntimeHost - Variables and flags inspection ................***Timeout  60.17 sec
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:10:19.2203147Z         Start 132: Integration - Invalid script produces validation errors
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:10:19.2235490Z 132/149 Test #132: Integration - Invalid script produces validation errors ...........   Passed    0.00 sec
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:11:19.4054447Z 134/149 Test #134: Integration - Script with variables and flags validates ...........***Timeout  60.18 sec
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:11:19.4555286Z The following tests FAILED:
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:11:19.4555819Z 	129 - EditorRuntimeHost - Variables and flags inspection (Timeout)
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:11:19.4558459Z 	134 - Integration - Script with variables and flags validates (Timeout)
+build-linux-gui (gcc, Debug)	Run tests	2025-12-15T01:11:19.5381243Z ##[error]Process completed with exit code 8.
+build-linux-gui (clang, Debug)	Build	2025-12-15T01:08:34.4158417Z [88/215] Building CXX object editor/CMakeFiles/novelmind_editor.dir/src/error_reporter.cpp.o
+build-linux-gui (clang, Debug)	Run tests	2025-12-15T01:09:55.5612995Z         Start   2: Result<T> error value
+build-linux-gui (clang, Debug)	Run tests	2025-12-15T01:09:55.5682615Z   2/149 Test   #2: Result<T> error value .............................................   Passed    0.01 sec
+build-linux-gui (clang, Debug)	Run tests	2025-12-15T01:09:55.5751345Z         Start   4: Result<T> valueOr returns default when error
+build-linux-gui (clang, Debug)	Run tests	2025-12-15T01:09:55.5818909Z   4/149 Test   #4: Result<T> valueOr returns default when error ......................   Passed    0.01 sec
+build-linux-gui (clang, Debug)	Run tests	2025-12-15T01:09:55.5887262Z         Start   6: Result<void> error
+build-linux-gui (clang, Debug)	Run tests	2025-12-15T01:09:55.5954771Z   6/149 Test   #6: Result<void> error ................................................   Passed    0.01 sec
+build-linux-gui (clang, Debug)	Run tests	2025-12-15T01:09:55.6930711Z         Start  17: MemoryFS readFile returns error for non-existing resource
+build-linux-gui (clang, Debug)	Run tests	2025-12-15T01:09:55.6997301Z  17/149 Test  #17: MemoryFS readFile returns error for non-existing resource .........   Passed    0.01 sec
+build-linux-gui (clang, Debug)	Run tests	2025-12-15T01:09:55.8885612Z         Start  46: Lexer reports errors
+build-linux-gui (clang, Debug)	Run tests	2025-12-15T01:09:55.8953473Z  46/149 Test  #46: Lexer reports errors ..............................................   Passed    0.01 sec
+build-linux-gui (clang, Debug)	Run tests	2025-12-15T01:09:55.9637832Z         Start  57: Validator - Duplicate character definition reports error
+build-linux-gui (clang, Debug)	Run tests	2025-12-15T01:09:55.9704796Z  57/149 Test  #57: Validator - Duplicate character definition reports error ..........   Passed    0.01 sec
+build-linux-gui (clang, Debug)	Run tests	2025-12-15T01:09:55.9706170Z         Start  58: Validator - Duplicate scene definition reports error
+build-linux-gui (clang, Debug)	Run tests	2025-12-15T01:09:55.9773079Z  58/149 Test  #58: Validator - Duplicate scene definition reports error ..............   Passed    0.01 sec

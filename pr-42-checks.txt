@@ -1,0 +1,13 @@
+build-linux-gui (gcc, Debug)	fail	4m36s	https://github.com/VisageDvachevsky/NM-/actions/runs/20217211774/job/58032259431	
+build-linux (clang, Debug)	pass	2m1s	https://github.com/VisageDvachevsky/NM-/actions/runs/20217211774/job/58032259430	
+build-linux (clang, Release)	pass	2m13s	https://github.com/VisageDvachevsky/NM-/actions/runs/20217211774/job/58032259447	
+build-linux (gcc, Debug)	pass	1m29s	https://github.com/VisageDvachevsky/NM-/actions/runs/20217211774/job/58032259432	
+build-linux (gcc, Release)	pass	1m41s	https://github.com/VisageDvachevsky/NM-/actions/runs/20217211774/job/58032259433	
+build-macos (Debug)	pass	1m31s	https://github.com/VisageDvachevsky/NM-/actions/runs/20217211774/job/58032259423	
+build-macos (Release)	pass	2m24s	https://github.com/VisageDvachevsky/NM-/actions/runs/20217211774/job/58032259446	
+build-windows (Debug)	pass	4m56s	https://github.com/VisageDvachevsky/NM-/actions/runs/20217211774/job/58032259429	
+build-linux-gui (clang, Release)	fail	4m51s	https://github.com/VisageDvachevsky/NM-/actions/runs/20217211774/job/58032259443	
+build-windows (Release)	pass	5m23s	https://github.com/VisageDvachevsky/NM-/actions/runs/20217211774/job/58032259428	
+build-linux-gui (clang, Debug)	fail	4m51s	https://github.com/VisageDvachevsky/NM-/actions/runs/20217211774/job/58032259436	
+build-linux-gui (gcc, Release)	fail	4m51s	https://github.com/VisageDvachevsky/NM-/actions/runs/20217211774/job/58032259442	
+format-check	pass	15s	https://github.com/VisageDvachevsky/NM-/actions/runs/20217211774/job/58032259424	
