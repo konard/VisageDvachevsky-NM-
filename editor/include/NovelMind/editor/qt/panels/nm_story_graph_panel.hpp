@@ -270,6 +270,7 @@ private slots:
   void onFitToGraph();
   void onCurrentNodeChanged(const QString &nodeId);
   void onBreakpointsChanged();
+  void onSelectionChanged();
   void onNodeTypeSelected(const QString &nodeType);
   void onRequestConnection(NMGraphNodeItem *from, NMGraphNodeItem *to);
   void onDeleteSelected();

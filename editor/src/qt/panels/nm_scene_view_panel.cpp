@@ -132,6 +132,8 @@ void NMSceneObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 NMTransformGizmo::NMTransformGizmo(QGraphicsItem *parent)
     : QGraphicsItemGroup(parent) {
   setFlag(ItemIgnoresTransformations, true);
+  setAcceptHoverEvents(true);
+  setZValue(1000); // Ensure gizmo is always on top
   createMoveGizmo();
 }
 

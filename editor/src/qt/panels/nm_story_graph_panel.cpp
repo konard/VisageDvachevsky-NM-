@@ -307,7 +307,11 @@ void NMStoryGraphScene::removeNode(NMGraphNodeItem *node) {
   // Remove from list and scene
   m_nodes.removeAll(node);
   removeItem(node);
+
+  // Emit signal BEFORE deleting to avoid use-after-free
   emit nodeDeleted(node);
+
+  // Now safe to delete
   delete node;
 }
 
@@ -317,7 +321,11 @@ void NMStoryGraphScene::removeConnection(NMGraphConnectionItem *connection) {
 
   m_connections.removeAll(connection);
   removeItem(connection);
+
+  // Emit signal BEFORE deleting to avoid use-after-free
   emit connectionDeleted(connection);
+
+  // Now safe to delete
   delete connection;
 }
 
@@ -746,6 +754,10 @@ void NMStoryGraphPanel::setupContent() {
   // Connect view signals
   connect(m_view, &NMStoryGraphView::requestConnection, this,
           &NMStoryGraphPanel::onRequestConnection);
+
+  // Connect scene selection changes
+  connect(m_scene, &QGraphicsScene::selectionChanged, this,
+          &NMStoryGraphPanel::onSelectionChanged);
 }
 
 void NMStoryGraphPanel::setupNodePalette() {
@@ -886,6 +898,9 @@ void NMStoryGraphPanel::createNode(const QString &nodeType) {
   // Select the new node
   m_scene->clearSelection();
   node->setSelected(true);
+
+  // Emit selection signal for inspector
+  emit nodeSelected(m_nextNodeId);
 }
 
 void NMStoryGraphPanel::onNodeTypeSelected(const QString &nodeType) {
@@ -906,6 +921,25 @@ void NMStoryGraphPanel::onRequestConnection(NMGraphNodeItem *from,
 
   // Create the connection
   m_scene->addConnection(from, to);
+}
+
+void NMStoryGraphPanel::onSelectionChanged() {
+  if (!m_scene)
+    return;
+
+  auto selected = m_scene->selectedItems();
+
+  // Find first selected node
+  for (auto *item : selected) {
+    if (auto *node = qgraphicsitem_cast<NMGraphNodeItem *>(item)) {
+      // Emit selection signal for inspector
+      emit nodeSelected(node->nodeId());
+      return;
+    }
+  }
+
+  // No node selected
+  emit nodeSelected(0);
 }
 
 void NMStoryGraphPanel::onDeleteSelected() {

@@ -222,7 +222,8 @@ void NMDebugOverlayPanel::setupUI() {
 
   // Create a container widget and use setContentWidget instead of setLayout
   // to avoid "QWidget::setLayout: Attempting to set QLayout" warning
-  auto *container = new QWidget(this);
+  // Use nullptr parent - setContentWidget will handle parenting
+  auto *container = new QWidget(nullptr);
   container->setLayout(layout);
   setContentWidget(container);
 }
