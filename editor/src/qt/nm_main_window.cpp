@@ -222,7 +222,8 @@ void NMMainWindow::setupMenuBar() {
 
   m_actionResetLayout =
       viewMenu->addAction(iconMgr.getIcon("refresh", 16), tr("&Reset Layout"));
-  m_actionResetLayout->setToolTip(tr("Reset all panels to default layout"));
+  m_actionResetLayout->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_R));
+  m_actionResetLayout->setToolTip(tr("Reset all panels to default layout (Ctrl+Shift+R)"));
 
   // =========================================================================
   // Play Menu
@@ -291,6 +292,11 @@ void NMMainWindow::setupToolBar() {
   m_mainToolBar->addAction(m_actionPlay);
   m_mainToolBar->addAction(m_actionPause);
   m_mainToolBar->addAction(m_actionStop);
+
+  m_mainToolBar->addSeparator();
+
+  // View operations - add reset layout to toolbar for discoverability
+  m_mainToolBar->addAction(m_actionResetLayout);
 }
 
 void NMMainWindow::setupStatusBar() {
@@ -307,10 +313,16 @@ void NMMainWindow::setupPanels() {
   m_sceneViewPanel = new NMSceneViewPanel(this);
   m_sceneViewPanel->setObjectName("SceneViewPanel");
   m_sceneViewPanel->setWindowIcon(iconMgr.getIcon("panel-scene", 16));
+  // Prevent accidental closure of critical panels
+  m_sceneViewPanel->setFeatures(QDockWidget::DockWidgetMovable |
+                                 QDockWidget::DockWidgetFloatable);
 
   m_storyGraphPanel = new NMStoryGraphPanel(this);
   m_storyGraphPanel->setObjectName("StoryGraphPanel");
   m_storyGraphPanel->setWindowIcon(iconMgr.getIcon("panel-graph", 16));
+  // Prevent accidental closure of critical panels
+  m_storyGraphPanel->setFeatures(QDockWidget::DockWidgetMovable |
+                                  QDockWidget::DockWidgetFloatable);
 
   m_inspectorPanel = new NMInspectorPanel(this);
   m_inspectorPanel->setObjectName("InspectorPanel");

@@ -2,6 +2,8 @@
 #include "NovelMind/editor/editor_runtime_host.hpp"
 #include "NovelMind/scripting/parser.hpp"
 #include "NovelMind/scripting/lexer.hpp"
+#include <atomic>
+#include <chrono>
 #include <filesystem>
 #include <fstream>
 
@@ -15,7 +17,12 @@ namespace
 
 std::filesystem::path createTempDir()
 {
-    auto tempDir = std::filesystem::temp_directory_path() / "nm_test_project";
+    // Create unique temp directory for each test to avoid race conditions
+    // when tests run in parallel
+    static std::atomic<int> counter{0};
+    auto uniqueId = std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()) +
+                    "_" + std::to_string(counter++);
+    auto tempDir = std::filesystem::temp_directory_path() / ("nm_test_project_" + uniqueId);
     std::filesystem::create_directories(tempDir);
     std::filesystem::create_directories(tempDir / "scripts");
     std::filesystem::create_directories(tempDir / "assets");
